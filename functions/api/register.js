@@ -71,8 +71,9 @@ export async function onRequestPost(context) {
     // رکورد نیمه‌کاره را پاک می‌کنیم تا حساب "شبح" باقی نماند و کاربر
     // دوباره بتواند با همین ایمیل ثبت‌نام کند.
     if (!existing && err && err.testMode) {
-      await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(userId).run();
+      // اول کد تأیید (که به users ارجاع دارد) و بعد خود کاربر
       await env.DB.prepare("DELETE FROM email_verifications WHERE email = ?").bind(email).run();
+      await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(userId).run();
       return jsonError(
         "ثبت‌نام انجام نشد: " + err.message,
         502,
