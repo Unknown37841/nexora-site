@@ -173,6 +173,11 @@
     display: grid; place-items: center;
   }
   .cart-badge.hidden { display: none; }
+  .icon-btn.logged-in::after {
+    content: ''; position: absolute; bottom: 6px; right: 6px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--success); border: 2px solid var(--bg);
+  }
   .theme-toggle svg { transition: transform 0.5s; }
   [data-theme="dark"] .theme-toggle svg { transform: rotate(180deg); }
 
@@ -1181,6 +1186,186 @@
   }
   .admin-empty { text-align: center; color: var(--text-mute); padding: 30px 0; }
 
+  /* ---------- UI v3: OTP code boxes ---------- */
+  .otp-row { display: flex; gap: 10px; justify-content: center; direction: ltr; margin: 6px 0 2px; }
+  .otp-box {
+    width: 46px; height: 56px;
+    border-radius: 12px;
+    border: 1.5px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit; font-size: 1.35rem; font-weight: 800;
+    text-align: center; outline: none; transition: all 0.2s;
+  }
+  .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.18); transform: translateY(-2px); }
+  .otp-box.filled { border-color: var(--primary); }
+  .form-group.error .otp-box { border-color: #ef4444; }
+
+  /* ---------- UI v3: Global toast ---------- */
+  .g-toast {
+    position: fixed; top: 24px; left: 50%;
+    transform: translate(-50%, -80px);
+    z-index: 500; min-width: 260px; max-width: 92vw;
+    padding: 13px 22px; border-radius: 999px;
+    font-size: 0.88rem; font-weight: 600; text-align: center;
+    box-shadow: var(--shadow-lg); backdrop-filter: blur(14px);
+    transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.45s;
+    opacity: 0; pointer-events: none;
+  }
+  .g-toast.show { transform: translate(-50%, 0); opacity: 1; }
+  .g-toast.success { background: rgba(16,185,129,0.96); color: #fff; }
+  .g-toast.error { background: rgba(239,68,68,0.96); color: #fff; }
+  .g-toast.info { background: rgba(99,102,241,0.96); color: #fff; }
+
+  /* ---------- UI v3: FAQ accordion ---------- */
+  .faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: var(--radius-sm); overflow: hidden;
+    backdrop-filter: blur(10px); transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .faq-item[open] { border-color: var(--primary); box-shadow: var(--shadow); }
+  .faq-item summary {
+    list-style: none; cursor: pointer; padding: 18px 22px;
+    font-weight: 700; font-size: 0.98rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary .faq-chev { transition: transform 0.3s; color: var(--primary); flex-shrink: 0; }
+  .faq-item[open] summary .faq-chev { transform: rotate(180deg); }
+  .faq-item .faq-body { padding: 0 22px 18px; color: var(--text-soft); font-size: 0.9rem; line-height: 1.9; }
+
+  /* ---------- UI v3: Skeleton loading ---------- */
+  .sk-card { border-radius: var(--radius); border: 1px solid var(--surface-border); background: var(--surface); padding: 28px; min-height: 260px; }
+  .sk-shine {
+    background: linear-gradient(90deg, var(--surface-border) 25%, rgba(99,102,241,0.14) 50%, var(--surface-border) 75%);
+    background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 7px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+  .sk-icon { width: 56px; height: 56px; border-radius: 16px; margin-bottom: 20px; }
+  .sk-line { height: 14px; margin-bottom: 12px; }
+  .sk-line.w60 { width: 60%; } .sk-line.w40 { width: 40%; } .sk-line.w90 { width: 90%; }
+
+  /* ---------- UI v3: Mobile menu ---------- */
+  .mobile-menu { position: fixed; inset: 0; z-index: 250; display: none; }
+  .mobile-menu.active { display: block; }
+  .mm-back { position: absolute; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); }
+  .mm-panel {
+    position: absolute; top: 0; right: 0; left: 0;
+    background: var(--bg-soft); border-bottom: 1px solid var(--surface-border);
+    border-radius: 0 0 24px 24px; padding: 22px;
+    display: flex; flex-direction: column; gap: 6px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+  }
+  .mobile-menu.active .mm-panel { transform: translateY(0); }
+  .mm-panel a, .mm-panel button.mm-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; border-radius: 12px; border: none;
+    background: transparent; color: var(--text);
+    font-family: inherit; font-size: 0.98rem; font-weight: 600;
+    text-decoration: none; cursor: pointer; text-align: right; width: 100%;
+  }
+  .mm-panel a:hover, .mm-item:hover { background: var(--surface); }
+  .mm-item svg { color: var(--primary); flex-shrink: 0; }
+
+  /* ---------- UI v3: Back to top ---------- */
+  .to-top {
+    position: fixed; bottom: 26px; right: 26px; z-index: 90;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 1px solid var(--surface-border);
+    background: var(--bg-soft); color: var(--text);
+    box-shadow: var(--shadow); cursor: pointer;
+    display: grid; place-items: center;
+    opacity: 0; transform: translateY(16px); pointer-events: none;
+    transition: all 0.35s;
+  }
+  .to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .to-top:hover { background: var(--primary); color: #fff; border-color: transparent; }
+
+  /* ---------- UI v3: Account panel ---------- */
+  .acc-head { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .acc-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid; place-items: center;
+    color: #fff; font-size: 1.5rem; font-weight: 800;
+    box-shadow: 0 10px 25px -8px rgba(99,102,241,0.6);
+  }
+  .acc-name { font-weight: 800; font-size: 1.05rem; }
+  .acc-email { font-size: 0.8rem; color: var(--text-mute); direction: ltr; background: var(--surface); border: 1px solid var(--surface-border); padding: 3px 12px; border-radius: 999px; }
+  .acc-menu { display: flex; flex-direction: column; gap: 8px; }
+  .acc-item {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 13px 16px; border-radius: 14px;
+    border: 1px solid var(--surface-border); background: var(--surface);
+    color: var(--text); font-family: inherit; font-size: 0.92rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-align: right;
+  }
+  .acc-item:hover { border-color: var(--primary); transform: translateX(-3px); }
+  .acc-item svg { color: var(--primary); flex-shrink: 0; }
+  .acc-item .ai-chev { margin-right: auto; color: var(--text-mute); }
+  .acc-item.danger { color: #ef4444; }
+  .acc-item.danger svg { color: #ef4444; }
+
+  /* ---------- UI v3: Success / confirm modals ---------- */
+  .pop-modal { position: fixed; inset: 0; z-index: 400; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,0.6); backdrop-filter: blur(8px); }
+  .pop-modal.active { display: flex; }
+  .pop-card {
+    background: var(--bg-soft); border: 1px solid var(--surface-border);
+    border-radius: 24px; padding: 36px 32px; max-width: 400px; width: 100%;
+    text-align: center; box-shadow: var(--shadow-lg);
+    animation: popIn 0.45s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes popIn { from { transform: scale(0.85) translateY(14px); opacity: 0; } }
+  .success-check {
+    width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 18px;
+    background: rgba(16,185,129,0.14); display: grid; place-items: center;
+    color: var(--success); position: relative;
+  }
+  .success-check::after {
+    content: ''; position: absolute; inset: -8px; border-radius: 50%;
+    border: 2px solid rgba(16,185,129,0.35); animation: ripple 1.6s infinite;
+  }
+  @keyframes ripple { to { transform: scale(1.35); opacity: 0; } }
+  .pop-card h3 { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; }
+  .pop-card .sc-sub { color: var(--text-mute); font-size: 0.85rem; margin-bottom: 16px; }
+  .pop-card .sc-id { direction: ltr; font-size: 0.8rem; background: var(--surface); border: 1px dashed var(--surface-border); border-radius: 10px; padding: 8px; margin-bottom: 8px; color: var(--text-soft); }
+  .pop-card .sc-total { font-size: 1.15rem; font-weight: 800; margin-bottom: 20px; }
+  .sc-actions { display: flex; flex-direction: column; gap: 10px; }
+  .sc-actions .btn { justify-content: center; padding: 12px; font-size: 0.92rem; }
+  .confirm-card { max-width: 360px; }
+  .confirm-card p { color: var(--text-soft); font-size: 0.92rem; margin-bottom: 20px; line-height: 1.8; }
+  .confirm-btns { display: flex; gap: 10px; }
+  .confirm-btns .btn { flex: 1; justify-content: center; padding: 11px; font-size: 0.9rem; }
+  .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+
+  /* ---------- UI v3: Admin stats + search ---------- */
+  .adm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .adm-stat { background: var(--bg-soft); border: 1px solid var(--surface-border); border-radius: var(--radius-sm); padding: 16px 18px; box-shadow: var(--shadow); }
+  .adm-stat .as-num { font-size: 1.45rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .adm-stat .as-label { font-size: 0.78rem; color: var(--text-mute); }
+  .adm-search { width: 100%; padding: 11px 16px; border-radius: 999px; border: 1px solid var(--surface-border); background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.9rem; outline: none; margin-bottom: 14px; }
+  .adm-search:focus { border-color: var(--primary); }
+
+  /* ---------- UI v3: Cart polish ---------- */
+  .ci-sub { font-size: 0.75rem; color: var(--primary); font-weight: 700; }
+  .continue-btn {
+    width: 100%; padding: 12px; border-radius: 999px;
+    border: 1px solid var(--surface-border); background: transparent;
+    color: var(--text-soft); font-family: inherit; font-weight: 600;
+    font-size: 0.9rem; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+  }
+  .continue-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .add-btn.added { background: var(--success); color: #fff; }
+
+  /* ---------- UI v3: Scrollbar ---------- */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 99px; border: 2px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+  ::selection { background: rgba(99,102,241,0.25); }
+
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1341,9 +1526,17 @@
 
       <form id="verifyForm" novalidate>
         <div class="form-group">
-          <label for="verifyCode">کد تأیید</label>
-          <input type="text" id="verifyCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="------" autocomplete="one-time-code" dir="ltr">
-          <div class="field-error">کد باید ۶ رقم باشد.</div>
+          <label style="text-align:center;">کد تأیید</label>
+          <div class="otp-row" id="otpRow">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+          </div>
+          <input type="hidden" id="verifyCode">
+          <div class="field-error" style="text-align:center;">کد باید ۶ رقم باشد.</div>
         </div>
         <button type="submit" class="auth-submit" id="verifySubmit">تأیید و ادامه</button>
         <button type="button" class="auth-submit" id="resendCodeBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:10px;">
@@ -1358,17 +1551,35 @@
 
     <!-- Account panel (shown when logged in) -->
     <div class="auth-panel" id="panel-account" style="display:none;">
-      <h3>حساب کاربری</h3>
-      <p class="auth-sub" id="accountWelcome">خوش آمدید</p>
-      <button type="button" class="auth-submit" id="showOrdersBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;">
-        سفارش‌های من
-      </button>
+      <div class="acc-head">
+        <div class="acc-avatar" id="accAvatar">؟</div>
+        <div class="acc-name" id="accName">—</div>
+        <div class="acc-email" id="accEmail">—</div>
+      </div>
+      <div class="acc-menu">
+        <button type="button" class="acc-item" id="showOrdersBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          سفارش‌های من
+          <svg class="ai-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button type="button" class="acc-item" id="accAdminBtn" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          پنل مدیریت
+        </button>
+        <button type="button" class="acc-item danger" id="logoutBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          خروج از حساب
+        </button>
+      </div>
       <div id="ordersBox" style="display:none;">
         <div class="orders-list" id="ordersList"></div>
       </div>
-      <button type="button" class="auth-submit" id="logoutBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:14px;">
-        خروج از حساب
-      </button>
       <div class="auth-toast" id="accountToast"></div>
     </div>
   </div>
@@ -1393,8 +1604,64 @@
       <span class="t-amount" id="cartTotal">0 تومان</span>
     </div>
     <button class="checkout-btn" id="checkoutBtn">ثبت سفارش</button>
+    <button class="continue-btn" id="continueBtn">→ ادامه‌ی خرید</button>
     <div class="cart-note">پرداخت آنلاین به‌زودی متصل می‌شود؛ سفارش شما ثبت و توسط پشتیبانی نهایی می‌شود.</div>
     <div class="cart-toast" id="cartToast"></div>
+  </div>
+</div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mm-back" id="mmBack"></div>
+  <div class="mm-panel">
+    <a href="#services" class="mm-link">🛒 سرویس‌ها</a>
+    <a href="#features" class="mm-link">✨ ویژگی‌ها</a>
+    <a href="#reviews" class="mm-link">💬 نظرات</a>
+    <a href="#faq" class="mm-link">❓ سوالات متداول</a>
+    <button type="button" class="mm-item" id="mmCart">🧺 سبد خرید</button>
+    <button type="button" class="mm-item" id="mmProfile">👤 حساب کاربری</button>
+    <button type="button" class="mm-item" id="mmAdmin" style="display:none;">⚙️ پنل مدیریت</button>
+  </div>
+</div>
+
+<!-- Back to top -->
+<button class="to-top" id="toTop" aria-label="بازگشت به بالا">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+  </svg>
+</button>
+
+<!-- Global toast -->
+<div class="g-toast" id="gToast"></div>
+
+<!-- Order success modal -->
+<div class="pop-modal" id="successModal">
+  <div class="pop-card">
+    <div class="success-check">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+    </div>
+    <h3>سفارش ثبت شد! 🎉</h3>
+    <p class="sc-sub">ممنون که Nexora رو انتخاب کردی</p>
+    <div class="sc-id" id="scOrderId">—</div>
+    <div class="sc-total" id="scTotal">—</div>
+    <div class="sc-actions">
+      <button type="button" class="btn btn-primary" id="scOrdersBtn">مشاهده سفارش‌های من</button>
+      <button type="button" class="btn btn-ghost" id="scCloseBtn">ادامه‌ی خرید</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="pop-modal" id="confirmModal">
+  <div class="pop-card confirm-card">
+    <h3 id="cfTitle">مطمئنی؟</h3>
+    <p id="cfText">این عملیات قابل بازگشت نیست.</p>
+    <div class="confirm-btns">
+      <button type="button" class="btn btn-danger" id="cfYes">بله، انجام بده</button>
+      <button type="button" class="btn btn-ghost" id="cfNo">انصراف</button>
+    </div>
   </div>
 </div>
 
@@ -1588,23 +1855,37 @@
       <span class="section-tag">سوالات متداول</span>
       <h2>هر سوالی داری جوابش اینجاست</h2>
     </div>
-    <div class="features-grid">
-      <div class="feature reveal">
-        <h4>چطور اشتراک بخرم؟</h4>
-        <p>سرویس موردنظر را به سبد خرید اضافه کنید، وارد حساب شوید و سفارش را ثبت کنید. پس از اتصال درگاه پرداخت، به‌صورت آنلاین پرداخت می‌کنید.</p>
-      </div>
-      <div class="feature reveal">
-        <h4>اشتراک‌ها اورجینال هستند؟</h4>
-        <p>بله؛ تمام اشتراک‌ها رسمی و اورجینال هستند و تا پایان دوره فعال می‌مانند.</p>
-      </div>
-      <div class="feature reveal">
-        <h4>کد ورود (لاگین) چطور کار می‌کند؟</h4>
-        <p>برای امنیت بیشتر، هر بار که وارد شوید یک کد ۶ رقمی به ایمیلتان فرستاده می‌شود؛ با وارد کردن آن وارد حساب می‌شوید.</p>
-      </div>
-      <div class="feature reveal">
-        <h4>پشتیبانی چطور جواب می‌دهد؟</h4>
-        <p>تیم پشتیبانی ۲۴ ساعته است؛ کافی است از بخش تماس پیام بدهید.</p>
-      </div>
+    <div class="faq-list">
+      <details class="faq-item reveal">
+        <summary>چطور اشتراک بخرم؟
+          <svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="faq-body">سرویس موردنظر را به سبد خرید اضافه کنید، وارد حساب شوید و سفارش را ثبت کنید. پس از اتصال درگاه پرداخت، به‌صورت آنلاین پرداخت می‌کنید.</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary>اشتراک‌ها اورجینال هستند؟
+          <svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="faq-body">بله؛ تمام اشتراک‌ها رسمی و اورجینال هستند و تا پایان دوره فعال می‌مانند. در صورت هرگونه مشکل، ضمانت بازگشت وجه تا ۷ روز وجود دارد.</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary>کد ورود (لاگین) چطور کار می‌کند؟
+          <svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="faq-body">برای امنیت بیشتر، هر بار که وارد شوید یک کد ۶ رقمی به ایمیلتان فرستاده می‌شود؛ با وارد کردن آن وارد حساب می‌شوید. اگر ایمیل را در اینباکس ندیدید، پوشه‌ی هرزنامه (Spam) را هم بررسی کنید.</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary>کد تأیید نیامد یا منقضی شد، چیکار کنم؟
+          <svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="faq-body">دکمه‌ی «ارسال مجدد کد» را بزنید (حداکثر هر ۶۰ ثانیه یک‌بار). کدها ۱۰ دقیقه اعتبار دارند. اگر ایمیل نیامد، پوشه‌ی Spam و تب Promotions جیمیل را بگردید.</div>
+      </details>
+      <details class="faq-item reveal">
+        <summary>پشتیبانی چطور جواب می‌دهد؟
+          <svg class="faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+        <div class="faq-body">تیم پشتیبانی ۲۴ ساعته و ۷ روز هفته در کنار شماست؛ کافی است از بخش تماس یا شبکه‌های اجتماعی پیام بدهید — بدون ربات!</div>
+      </details>
     </div>
   </div>
 </section>
@@ -1697,6 +1978,13 @@
       <button type="button" class="admin-tab-btn" data-asec="orders">سفارش‌ها</button>
     </div>
 
+    <div class="adm-stats" id="admStats">
+      <div class="adm-stat"><div class="as-num" id="stProducts">—</div><div class="as-label">محصول فعال</div></div>
+      <div class="adm-stat"><div class="as-num" id="stOrders">—</div><div class="as-label">کل سفارش‌ها</div></div>
+      <div class="adm-stat"><div class="as-num" id="stPending">—</div><div class="as-label">در انتظار پرداخت</div></div>
+      <div class="adm-stat"><div class="as-num" id="stRevenue">—</div><div class="as-label">گردش (تومان)</div></div>
+    </div>
+
     <!-- Products management -->
     <div class="admin-section active" id="asec-products">
       <div class="admin-card" id="prodFormCard">
@@ -1773,6 +2061,7 @@
 
       <div class="admin-card">
         <h4>محصولات فعلی</h4>
+        <input type="text" class="adm-search" id="admProdSearch" placeholder="🔍 جستجو در محصولات…">
         <div class="admin-prod-list" id="adminProdList"></div>
       </div>
     </div>
@@ -1812,6 +2101,14 @@
     clearTimeout(el._t);
     el._t = setTimeout(() => el.classList.remove('show'), 6000);
   }
+  // توست شناور بالای صفحه
+  function gToast(msg, type) {
+    const el = $('gToast');
+    el.textContent = msg;
+    el.className = 'g-toast show ' + (type || 'info');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 4200);
+  }
   function setError(inputEl, hasError) {
     inputEl.closest('.form-group').classList.toggle('error', hasError);
   }
@@ -1826,9 +2123,34 @@
     localStorage.setItem('theme', next);
   });
   const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('visible');
+        en.target.querySelectorAll('.stat-num').forEach(animateNum);
+        revealObserver.unobserve(en.target);
+      }
+    });
   }, { threshold: 0.1 });
   document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // شمارنده‌ی انیمیشنی آمار
+  function animateNum(el) {
+    if (el._done) return; el._done = true;
+    const raw = el.textContent;
+    const m = raw.match(/^([\d.,]+)(.*)$/);
+    if (!m) return;
+    const target = parseFloat(m[1].replace(/,/g, ''));
+    if (isNaN(target)) return;
+    const suffix = m[2] || '';
+    const t0 = performance.now(), dur = 1400;
+    (function tick(t) {
+      const k = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - k, 3);
+      const v = Math.round(target * eased);
+      el.textContent = v.toLocaleString('fa-IR') + suffix;
+      if (k < 1) requestAnimationFrame(tick);
+    })(t0);
+  }
 
   // ================= State =================
   let currentUser = null;
@@ -1858,6 +2180,37 @@
   };
   let pendingEmail = null;
   let pendingMode = 'register'; // register | login
+  const otpBoxes = Array.from(document.querySelectorAll('#otpRow .otp-box'));
+
+  // رفتار جعبه‌های کد: حرکت خودکار، چسباندن، Backspace
+  otpBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/\D/g, '').slice(0, 1);
+      box.classList.toggle('filled', !!box.value);
+      if (box.value && i < otpBoxes.length - 1) otpBoxes[i + 1].focus();
+      $('verifyCode').value = otpBoxes.map(b => b.value).join('');
+    });
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        otpBoxes[i - 1].focus();
+        otpBoxes[i - 1].value = '';
+        otpBoxes[i - 1].classList.remove('filled');
+        e.preventDefault();
+      }
+      if (e.key === 'ArrowLeft' && i > 0) otpBoxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < otpBoxes.length - 1) otpBoxes[i + 1].focus();
+    });
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const digits = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+      if (!digits) return;
+      digits.split('').forEach((d, j) => {
+        if (otpBoxes[j]) { otpBoxes[j].value = d; otpBoxes[j].classList.add('filled'); }
+      });
+      $('verifyCode').value = otpBoxes.map(b => b.value).join('');
+      otpBoxes[Math.min(digits.length, 5)].focus();
+    });
+  });
 
   function openModal(tab) {
     overlay.classList.add('active');
@@ -1884,7 +2237,11 @@
   }
   function showAccountPanel() {
     showOnly(panels.account);
-    $('accountWelcome').textContent = 'خوش آمدید ' + currentUser.name + ' (' + currentUser.email + ')';
+    const nm = (currentUser.name || '؟').trim();
+    $('accAvatar').textContent = nm.charAt(0).toUpperCase();
+    $('accName').textContent = nm;
+    $('accEmail').textContent = currentUser.email;
+    $('accAdminBtn').style.display = currentUser.is_admin ? 'flex' : 'none';
     $('ordersBox').style.display = 'none';
     $('ordersList').innerHTML = '';
   }
@@ -1894,13 +2251,16 @@
     showOnly(panels.verify);
     $('verifyTitle').textContent = pendingMode === 'login' ? 'ورود به حساب' : 'تأیید ایمیل';
     $('verifySub').textContent = message || ('کد ۶ رقمی به ' + email + ' ارسال شد. لطفاً آن را وارد کنید.');
-    const ci = $('verifyCode');
-    ci.value = '';
-    setTimeout(() => ci.focus(), 50);
+    otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+    $('verifyCode').value = '';
+    setTimeout(() => otpBoxes[0].focus(), 50);
   }
   function updateAuthUI() {
     const show = !!(currentUser && currentUser.is_admin);
     document.getElementById('adminBtn').classList.toggle('show', show);
+    $('mmAdmin').style.display = show ? 'flex' : 'none';
+    profileBtn.classList.toggle('logged-in', !!currentUser);
+    profileBtn.setAttribute('aria-label', currentUser ? ('حساب: ' + currentUser.name) : 'پروفایل');
   }
 
   $('profileBtn').addEventListener('click', () => openModal('login'));
@@ -2006,9 +2366,9 @@
     currentUser = data.user;
     pendingEmail = null;
     updateAuthUI();
-    showToast($('verifyToast'), (pendingMode === 'login' ? 'ورود موفق! ' : 'حساب شما فعال شد! ') + 'خوش آمدی ' + currentUser.name, 'success');
+    gToast((pendingMode === 'login' ? 'ورود موفق 🎉' : 'حساب فعال شد 🎉') + ' خوش آمدی ' + currentUser.name, 'success');
     this.reset();
-    setTimeout(() => { closeModal(); if (adminPage.classList.contains('active')) loadAdminData(); }, 1200);
+    setTimeout(() => { closeModal(); if (adminPage.classList.contains('active')) loadAdminData(); }, 900);
   });
 
   let resendTimer = null;
@@ -2066,13 +2426,16 @@
     box.style.display = 'block';
   });
 
+  // ---- Logout ----
   $('logoutBtn').addEventListener('click', doLogout);
+  $('accAdminBtn').addEventListener('click', () => { closeModal(); openAdmin(); });
   async function doLogout() {
     await api('/api/logout', 'POST');
     currentUser = null;
     updateAuthUI();
     closeAdmin();
     closeModal();
+    gToast('از حساب خارج شدید.', 'info');
   }
 
   // ================= Products (public site) =================
@@ -2111,9 +2474,17 @@
       </div>`).join('');
   }
   async function loadProducts() {
+    const grid = $('servicesGrid');
+    grid.innerHTML = Array.from({ length: 6 }).map(() => `
+      <div class="sk-card">
+        <div class="sk-shine sk-icon"></div>
+        <div class="sk-shine sk-line w60"></div>
+        <div class="sk-shine sk-line w90"></div>
+        <div class="sk-shine sk-line w40"></div>
+      </div>`).join('');
     const { ok, data } = await api('/api/products', 'GET');
     if (ok && data.ok) { products = data.products; renderProducts(); renderFooterProducts(); }
-    else $('servicesGrid').innerHTML = '<div class="prod-loading">خطا در بارگذاری سرویس‌ها. صفحه را رفرش کنید.</div>';
+    else grid.innerHTML = '<div class="prod-loading">خطا در بارگذاری سرویس‌ها. صفحه را رفرش کنید.</div>';
   }
   function renderFooterProducts() {
     $('footerProducts').innerHTML =
@@ -2128,11 +2499,14 @@
       const id = addBtn.dataset.add;
       cart[id] = (Number(cart[id]) || 0) + 1;
       cartSave(); updateCartBadge();
-      addBtn.style.transform = 'scale(0.85)';
-      setTimeout(() => addBtn.style.transform = '', 150);
-      const badge = $('cartBadge');
-      badge.style.transform = 'scale(1.3)';
-      setTimeout(() => badge.style.transform = '', 200);
+      addBtn.classList.add('added');
+      addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(() => {
+        addBtn.classList.remove('added');
+        addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+      }, 900);
+      const p = products.find(x => x.id === id);
+      gToast((p ? p.name : 'محصول') + ' به سبد اضافه شد 🛒', 'success');
     }
   });
 
@@ -2168,6 +2542,7 @@
           <div class="cart-item-info">
             <div class="ci-name">${esc(p.name)}</div>
             <div class="ci-price">${Number(p.price).toLocaleString('en-US')} ت × ${q}</div>
+            <div class="ci-sub">${fmt(p.price * q)}</div>
           </div>
           <div class="ci-controls">
             <button class="qty-btn" data-dec="${esc(id)}">−</button>
@@ -2217,8 +2592,52 @@
       return;
     }
     cart = {}; cartSave(); updateCartBadge(); renderCart();
-    showToast($('cartToast'), 'سفارش ' + data.orderId + ' ثبت شد! مبلغ: ' + fmt(data.total) + ' — پرداخت به‌زودی فعال می‌شود.', 'success');
+    this.disabled = false;
+    $('scOrderId').textContent = 'شماره سفارش: ' + data.orderId;
+    $('scTotal').textContent = fmt(data.total);
+    $('successModal').classList.add('active');
   });
+  $('continueBtn').addEventListener('click', closeCart);
+  $('scCloseBtn').addEventListener('click', () => $('successModal').classList.remove('active'));
+  $('scOrdersBtn').addEventListener('click', () => {
+    $('successModal').classList.remove('active');
+    openModal('account');
+    showAccountPanel();
+    $('showOrdersBtn').click();
+  });
+
+  // ================= Mobile menu / back-to-top / confirm =================
+  const mobileMenu = $('mobileMenu');
+  function openMobileMenu() { mobileMenu.classList.add('active'); }
+  function closeMobileMenu() { mobileMenu.classList.remove('active'); }
+  document.querySelector('.menu-toggle').addEventListener('click', openMobileMenu);
+  $('mmBack').addEventListener('click', closeMobileMenu);
+  document.querySelectorAll('.mm-link').forEach(a => a.addEventListener('click', closeMobileMenu));
+  $('mmCart').addEventListener('click', () => { closeMobileMenu(); openCart(); });
+  $('mmProfile').addEventListener('click', () => { closeMobileMenu(); openModal('login'); });
+  $('mmAdmin').addEventListener('click', () => { closeMobileMenu(); openAdmin(); });
+
+  const toTop = $('toTop');
+  window.addEventListener('scroll', () => {
+    toTop.classList.toggle('show', window.scrollY > 600);
+  }, { passive: true });
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // مودال تأیید به‌جای confirm() بومی
+  let cfResolve = null;
+  function askConfirm(title, text) {
+    $('cfTitle').textContent = title;
+    $('cfText').textContent = text;
+    $('confirmModal').classList.add('active');
+    return new Promise(res => { cfResolve = res; });
+  }
+  function closeConfirm(val) {
+    $('confirmModal').classList.remove('active');
+    if (cfResolve) { cfResolve(val); cfResolve = null; }
+  }
+  $('cfYes').addEventListener('click', () => closeConfirm(true));
+  $('cfNo').addEventListener('click', () => closeConfirm(false));
+  $('confirmModal').addEventListener('click', (e) => { if (e.target === $('confirmModal')) closeConfirm(false); });
 
   // ================= Admin =================
   const adminPage = $('adminPage');
@@ -2252,13 +2671,29 @@
 
   function adminToast(el, msg, type) { showToast(el, msg, type); }
 
+  let allAdminProducts = [];
+  let allAdminOrders = [];
+
   async function loadAdminData() {
     const { ok, data } = await api('/api/admin-products', 'GET');
     if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'خطا در دریافت محصولات.', 'error'); return; }
-    renderAdminProducts(data.products);
+    allAdminProducts = data.products || [];
+    renderAdminProducts(allAdminProducts);
     const res2 = await api('/api/admin-orders', 'GET');
-    if (res2.ok && res2.data.ok) renderAdminOrders(res2.data.orders);
+    if (res2.ok && res2.data.ok) { allAdminOrders = res2.data.orders || []; renderAdminOrders(allAdminOrders); }
+    updateAdmStats();
   }
+  function updateAdmStats() {
+    $('stProducts').textContent = allAdminProducts.filter(p => p.active).length;
+    $('stOrders').textContent = allAdminOrders.length;
+    $('stPending').textContent = allAdminOrders.filter(o => o.status === 'pending').length;
+    const rev = allAdminOrders.filter(o => o.status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
+    $('stRevenue').textContent = rev.toLocaleString('en-US');
+  }
+  $('admProdSearch').addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    renderAdminProducts(q ? allAdminProducts.filter(p => (p.name + ' ' + (p.description || '')).toLowerCase().includes(q)) : allAdminProducts);
+  });
 
   function renderAdminProducts(list) {
     $('adminProdList').innerHTML = list.length ? list.map(p => `
@@ -2304,7 +2739,7 @@
     const sel = e.target.closest('[data-ord]');
     if (!sel) return;
     const { ok, data } = await api('/api/admin-orders?id=' + encodeURIComponent(sel.dataset.ord), 'PUT', { status: sel.value });
-    if (ok && data.ok) adminToast($('ordersToast'), 'وضعیت سفارش به‌روزرسانی شد.', 'success');
+    if (ok && data.ok) gToast('وضعیت سفارش به‌روزرسانی شد ✓', 'success');
     else adminToast($('ordersToast'), data.error || 'به‌روزرسانی ناموفق بود.', 'error');
   });
 
@@ -2352,7 +2787,7 @@
       : await api('/api/admin-products', 'POST', payload);
     btn.disabled = false;
     if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'ذخیره ناموفق بود.', 'error'); return; }
-    adminToast($('prodToast'), editingId ? 'محصول ویرایش شد.' : 'محصول جدید اضافه شد.', 'success');
+    gToast(editingId ? 'محصول ویرایش شد ✓' : 'محصول جدید اضافه شد ✓', 'success');
     resetProdForm();
     loadAdminData();
     loadProducts();
@@ -2402,15 +2837,17 @@
       adminPage.scrollIntoView({ behavior: 'smooth' });
       $('prodFormCard').scrollIntoView({ behavior: 'smooth' });
     }
-    if (delBtn && confirm('این محصول کاملاً حذف شود؟')) {
-      api('/api/admin-products?id=' + encodeURIComponent(delBtn.dataset.del), 'DELETE')
-        .then(({ ok, data }) => {
-          if (ok && data.ok) { adminToast($('prodToast'), 'محصول حذف شد.', 'success'); loadAdminData(); loadProducts(); }
-          else adminToast($('prodToast'), data.error || 'حذف ناموفق بود.', 'error');
-        });
+    if (delBtn) {
+      askConfirm('حذف محصول', 'محصول «' + (allAdminProducts.find(x => x.id === delBtn.dataset.del) || {}).name + '» کاملاً حذف شود؟ این عملیات قابل بازگشت نیست.').then((yes) => {
+        if (!yes) return;
+        api('/api/admin-products?id=' + encodeURIComponent(delBtn.dataset.del), 'DELETE')
+          .then(({ ok, data }) => {
+            if (ok && data.ok) { gToast('محصول حذف شد.', 'success'); loadAdminData(); loadProducts(); }
+            else adminToast($('prodToast'), data.error || 'حذف ناموفق بود.', 'error');
+          });
+      });
     }
   });
-  let allAdminProducts = [];
 
   // ================= Init =================
   (async function init() {
