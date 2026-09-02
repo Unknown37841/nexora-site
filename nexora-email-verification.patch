@@ -1,0 +1,645 @@
+diff --git a/README.md b/README.md
+index ed676ae..32eb94c 100644
+--- a/README.md
++++ b/README.md
+@@ -64,7 +64,30 @@ git push -u origin main
+ 
+ ---
+ 
+-## مرحله ۵: تست
++## مرحله ۵: تنظیم Resend برای ارسال کد تأیید ایمیل
++
++از این نسخه به بعد، ثبت‌نام دیگه بلافاصله کاربر رو Login نمی‌کنه؛ یک کد ۶ رقمی به ایمیلش می‌فرسته و فقط بعد از وارد کردن درست کد، حساب فعال و Session ساخته می‌شه (فایل‌های `functions/api/register.js`، `functions/api/verify-email.js` و `functions/api/resend-code.js`). برای اینکه ایمیل واقعاً ارسال بشه باید [Resend](https://resend.com) رو وصل کنید:
++
++۱. توی [resend.com](https://resend.com/onboarding) ثبت‌نام کنید (پلن رایگان روزانه ۱۰۰ ایمیل و ماهانه ۳۰۰۰ ایمیل می‌ده).
++۲. از داشبورد Resend یک **API Key** بسازید (بخش **API Keys → Create API Key**).
++۳. برگردید به پروژه Pages‌تون در Cloudflare → **Settings → Environment variables** (نه Functions bindings؛ این بخش جداست).
++۴. یک متغیر جدید اضافه کنید:
++   - **Variable name**: `RESEND_API_KEY`
++   - **Value**: کلیدی که از Resend گرفتید
++   - نوعش رو روی **Secret** بذارید (نه Text) تا رمزنگاری‌شده ذخیره بشه.
++۵. اختیاری: اگه دامنه‌ی خودتون رو توی Resend Verify کردید، یک متغیر دیگه هم اضافه کنید:
++   - **Variable name**: `RESEND_FROM`
++   - **Value**: مثلاً `Nexora <noreply@yourdomain.com>`
++   - اگه این رو نذارید، ایمیل‌ها از آدرس تستی `onboarding@resend.dev` ارسال می‌شن که **فقط به ایمیل خود شما (همونی که با Resend ثبت‌نام کردید)** قابل تحویله؛ برای تست شخصی کافیه ولی برای کاربرای واقعی سایت باید یک دامنه رو توی Resend وریفای کنید.
++۶. بعد از اضافه‌کردن متغیر، یک دیپلوی جدید بزنید (تب **Deployments → Retry deployment**، یا یک کامیت خالی پوش کنید) تا متغیر اعمال بشه.
++
++### اگه دیتابیس رو از قبل ساخته بودید
++
++اگه قبلاً `schema.sql` قدیمی (بدون `email_verified`) رو روی `nexora-db` اجرا کرده بودید، کافیه فایل جدید `migration_add_email_verification.sql` رو یک بار توی **Console** دیتابیس اجرا کنید. اگه از صفر دیتابیس می‌سازید، همون `schema.sql` جدید (که جدول `email_verifications` و ستون `email_verified` رو داره) کافیه.
++
++---
++
++## مرحله ۶: تست
+ 
+ آدرس `https://nexora-site.pages.dev` (یا هر آدرسی که Cloudflare بهتون داد) رو باز کنید، روی آیکون پروفایل بزنید و با یک ایمیل تست ثبت‌نام کنید. اگه پیام «ثبت‌نام با موفقیت انجام شد» رو دیدید، یعنی همه‌چیز درست وصل شده و اطلاعات واقعاً توی D1 ذخیره می‌شه (نه فقط توی مرورگر شما).
+ 
+@@ -77,6 +100,8 @@ git push -u origin main
+ - **دامنه اختصاصی**: اگه دامنه دارید، از تب **Custom domains** توی پروژه Pages می‌تونید وصلش کنید — کاملاً رایگانه.
+ - **رمزهای عبور**: هش می‌شن (با PBKDF2 و salt تصادفی) و هیچ‌جا به‌صورت متن ساده ذخیره نمی‌شن.
+ - **نشست (Session)**: با یک کوکی امن (`HttpOnly`) به مدت ۳۰ روز مدیریت می‌شه.
++- **تأیید ایمیل**: کد ۶ رقمی ۱۰ دقیقه اعتبار داره، حداکثر ۵ بار تلاش اشتباه مجازه، و بین دو درخواست «ارسال مجدد» باید حداقل ۶۰ ثانیه فاصله باشه (برای جلوگیری از اسپم/سوءاستفاده). این مقادیر بالای `functions/_utils.js` قابل تغییرن.
++- **بدون RESEND_API_KEY**: اگه این Secret رو تنظیم نکنید، درخواست ثبت‌نام با خطای ۵۰۲ برمی‌گرده (کاربر توی دیتابیس ساخته می‌شه ولی کد تأییدش نمی‌رسه) — پس قبل از تست، حتماً مرحله ۵ رو انجام بدید.
+ - **حد رایگان Cloudflare**: روزانه ۱۰۰٬۰۰۰ درخواست Functions و ۵ گیگابایت فضای D1 — برای شروع کار کاملاً کافیه.
+ - **ثبت‌نام با شماره موبایل ایران**: فعلاً غیرفعاله (دکمه «به‌زودی»). وقتی آماده بودید یک سرویس پیامکی (کاوه‌نگار / ippanel و مشابه) انتخاب کنید، من یک endpoint جدید (`/api/send-otp` و `/api/verify-otp`) بهتون اضافه می‌کنم — کد فعلی طوری نوشته شده که این کار راحت اضافه بشه.
+ 
+diff --git a/functions/_utils.js b/functions/_utils.js
+index 48c457c..59928d0 100644
+--- a/functions/_utils.js
++++ b/functions/_utils.js
+@@ -8,8 +8,8 @@ export function jsonResponse(data, status = 200, extraHeaders = {}) {
+   });
+ }
+ 
+-export function jsonError(message, status = 400) {
+-  return jsonResponse({ ok: false, error: message }, status);
++export function jsonError(message, status = 400, extra = {}) {
++  return jsonResponse({ ok: false, error: message, ...extra }, status);
+ }
+ 
+ export function isValidEmail(v) {
+@@ -74,6 +74,88 @@ export function getCookie(request, name) {
+   return match ? decodeURIComponent(match[1]) : null;
+ }
+ 
++// ---- Email verification codes (6-digit, stored hashed in D1) ----
++const VERIFICATION_CODE_TTL_MS = 10 * 60 * 1000; // ۱۰ دقیقه اعتبار کد
++const VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000; // فاصله مجاز بین دو ارسال
++export const VERIFICATION_MAX_ATTEMPTS = 5; // حداکثر تلاش اشتباه قبل از نیاز به کد جدید
++
++export function generateVerificationCode() {
++  const arr = new Uint8Array(4);
++  crypto.getRandomValues(arr);
++  const num = ((arr[0] << 24) | (arr[1] << 16) | (arr[2] << 8) | arr[3]) >>> 0;
++  return String(num % 1000000).padStart(6, "0");
++}
++
++export async function sha256Hex(text) {
++  const enc = new TextEncoder();
++  const digest = await crypto.subtle.digest("SHA-256", enc.encode(text));
++  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
++}
++
++// یک کد جدید می‌سازد، هشش را در D1 ذخیره می‌کند و خود کد (متن ساده) را برمی‌گرداند
++// تا فقط همان لحظه برای ارسال ایمیل استفاده شود. کد خام هرگز در دیتابیس ذخیره نمی‌شود.
++export async function createVerificationCode(env, email) {
++  const code = generateVerificationCode();
++  const codeHash = await sha256Hex(code);
++  const now = Date.now();
++  const expiresAt = now + VERIFICATION_CODE_TTL_MS;
++
++  await env.DB.prepare(
++    `INSERT INTO email_verifications (email, code_hash, expires_at, attempts, last_sent_at)
++     VALUES (?, ?, ?, 0, ?)
++     ON CONFLICT(email) DO UPDATE SET
++       code_hash = excluded.code_hash,
++       expires_at = excluded.expires_at,
++       attempts = 0,
++       last_sent_at = excluded.last_sent_at`
++  )
++    .bind(email, codeHash, expiresAt, now)
++    .run();
++
++  return code;
++}
++
++export function verificationCooldownRemainingMs(lastSentAt) {
++  return VERIFICATION_RESEND_COOLDOWN_MS - (Date.now() - lastSentAt);
++}
++
++// ---- ارسال ایمیل کد تأیید از طریق Resend ----
++// نیاز به Secret به اسم RESEND_API_KEY در Cloudflare Pages داره (Settings → Environment variables).
++// اختیاری: RESEND_FROM برای تعیین آدرس فرستنده (پیش‌فرض روی دامنه تست Resend هست).
++export async function sendVerificationEmail(env, { to, name, code }) {
++  if (!env.RESEND_API_KEY) {
++    throw new Error("RESEND_API_KEY تنظیم نشده است.");
++  }
++
++  const fromAddress = env.RESEND_FROM || "Nexora <onboarding@resend.dev>";
++
++  const res = await fetch("https://api.resend.com/emails", {
++    method: "POST",
++    headers: {
++      Authorization: `Bearer ${env.RESEND_API_KEY}`,
++      "Content-Type": "application/json",
++    },
++    body: JSON.stringify({
++      from: fromAddress,
++      to: [to],
++      subject: "کد تأیید ایمیل شما در Nexora",
++      html: `
++        <div dir="rtl" style="font-family: Tahoma, Arial, sans-serif; text-align:right; line-height:1.8;">
++          <p>سلام ${name || ""} 👋</p>
++          <p>کد تأیید ایمیل شما در Nexora:</p>
++          <p style="font-size:28px; font-weight:bold; letter-spacing:6px; direction:ltr; text-align:center;">${code}</p>
++          <p>این کد تا ۱۰ دقیقه دیگر معتبره. اگه شما این درخواست رو نداده‌اید، همین ایمیل رو نادیده بگیرید.</p>
++        </div>
++      `,
++    }),
++  });
++
++  if (!res.ok) {
++    const errText = await res.text().catch(() => "");
++    throw new Error("ارسال ایمیل تأیید ناموفق بود: " + errText);
++  }
++}
++
+ export async function getSessionUser(request, env) {
+   const token = getCookie(request, "session");
+   if (!token) return null;
+diff --git a/functions/api/login.js b/functions/api/login.js
+index d15caf3..1b3b7a6 100644
+--- a/functions/api/login.js
++++ b/functions/api/login.js
+@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
+   if (!password) return jsonError("لطفاً رمز عبور را وارد کنید.", 400);
+ 
+   const user = await env.DB.prepare(
+-    "SELECT id, name, email, password_hash, salt FROM users WHERE email = ?"
++    "SELECT id, name, email, password_hash, salt, email_verified FROM users WHERE email = ?"
+   )
+     .bind(email)
+     .first();
+@@ -36,6 +36,14 @@ export async function onRequestPost(context) {
+     return jsonError("ایمیل یا رمز عبور اشتباه است.", 401);
+   }
+ 
++  if (!user.email_verified) {
++    return jsonError(
++      "ایمیل شما هنوز تأیید نشده است. کد تأیید را وارد کنید.",
++      403,
++      { code: "EMAIL_NOT_VERIFIED", email: user.email }
++    );
++  }
++
+   const token = await createSession(env, user.id);
+ 
+   return jsonResponse(
+diff --git a/functions/api/register.js b/functions/api/register.js
+index 7ff10f5..7a49cc5 100644
+--- a/functions/api/register.js
++++ b/functions/api/register.js
+@@ -4,8 +4,8 @@ import {
+   isValidEmail,
+   hashPassword,
+   randomHex,
+-  createSession,
+-  sessionCookieHeader,
++  createVerificationCode,
++  sendVerificationEmail,
+ } from "../_utils.js";
+ 
+ export async function onRequestPost(context) {
+@@ -26,27 +26,49 @@ export async function onRequestPost(context) {
+   if (!isValidEmail(email)) return jsonError("لطفاً یک ایمیل معتبر وارد کنید.", 400);
+   if (password.length < 6) return jsonError("رمز عبور باید حداقل ۶ کاراکتر باشد.", 400);
+ 
+-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
++  const existing = await env.DB.prepare(
++    "SELECT id, email_verified FROM users WHERE email = ?"
++  )
+     .bind(email)
+     .first();
+-  if (existing) return jsonError("این ایمیل قبلاً ثبت‌نام کرده است.", 409);
++
++  // اگه قبلاً با همین ایمیل ثبت‌نام شده و تأیید هم شده، دیگه اجازه نده.
++  if (existing && existing.email_verified) {
++    return jsonError("این ایمیل قبلاً ثبت‌نام کرده است.", 409);
++  }
+ 
+   const salt = randomHex(16);
+   const passwordHash = await hashPassword(password, salt);
+-  const id = randomHex(16);
+   const now = Date.now();
+ 
+-  await env.DB.prepare(
+-    "INSERT INTO users (id, name, email, password_hash, salt, created_at) VALUES (?, ?, ?, ?, ?, ?)"
+-  )
+-    .bind(id, name, email, passwordHash, salt, now)
+-    .run();
++  if (existing) {
++    // ثبت‌نام قبلی ناتمام مونده (تأیید ایمیل انجام نشده) -> اطلاعات رو آپدیت کن و کد جدید بفرست
++    await env.DB.prepare(
++      "UPDATE users SET name = ?, password_hash = ?, salt = ? WHERE id = ?"
++    )
++      .bind(name, passwordHash, salt, existing.id)
++      .run();
++  } else {
++    const id = randomHex(16);
++    await env.DB.prepare(
++      "INSERT INTO users (id, name, email, password_hash, salt, created_at, email_verified) VALUES (?, ?, ?, ?, ?, ?, 0)"
++    )
++      .bind(id, name, email, passwordHash, salt, now)
++      .run();
++  }
++
++  const code = await createVerificationCode(env, email);
+ 
+-  const token = await createSession(env, id);
++  try {
++    await sendVerificationEmail(env, { to: email, name, code });
++  } catch (err) {
++    return jsonError(
++      "ثبت‌نام ذخیره شد اما ارسال ایمیل کد تأیید با خطا مواجه شد. کمی بعد دوباره «ارسال مجدد کد» را بزنید.",
++      502
++    );
++  }
+ 
+-  return jsonResponse(
+-    { ok: true, user: { id, name, email } },
+-    201,
+-    { "Set-Cookie": sessionCookieHeader(token) }
+-  );
++  // توجه: اینجا دیگه هیچ Session ساخته نمی‌شه. کاربر فقط وقتی وارد حساب می‌شه
++  // که کد ۶ رقمی رو در /api/verify-email درست وارد کنه.
++  return jsonResponse({ ok: true, pendingVerification: true, email }, 201);
+ }
+diff --git a/functions/api/resend-code.js b/functions/api/resend-code.js
+new file mode 100644
+index 0000000..e5c39f5
+--- /dev/null
++++ b/functions/api/resend-code.js
+@@ -0,0 +1,58 @@
++import {
++  jsonResponse,
++  jsonError,
++  isValidEmail,
++  createVerificationCode,
++  sendVerificationEmail,
++  verificationCooldownRemainingMs,
++} from "../_utils.js";
++
++export async function onRequestPost(context) {
++  const { request, env } = context;
++
++  let body;
++  try {
++    body = await request.json();
++  } catch {
++    return jsonError("درخواست نامعتبر است.", 400);
++  }
++
++  const email = (body.email || "").toString().trim().toLowerCase();
++  if (!isValidEmail(email)) return jsonError("ایمیل نامعتبر است.", 400);
++
++  const user = await env.DB.prepare(
++    "SELECT id, name, email_verified FROM users WHERE email = ?"
++  )
++    .bind(email)
++    .first();
++
++  if (!user) return jsonError("کاربری با این ایمیل پیدا نشد.", 404);
++  if (user.email_verified) return jsonError("این ایمیل قبلاً تأیید شده است.", 409);
++
++  const existing = await env.DB.prepare(
++    "SELECT last_sent_at FROM email_verifications WHERE email = ?"
++  )
++    .bind(email)
++    .first();
++
++  if (existing) {
++    const remainingMs = verificationCooldownRemainingMs(existing.last_sent_at);
++    if (remainingMs > 0) {
++      const waitSec = Math.ceil(remainingMs / 1000);
++      return jsonError(`لطفاً ${waitSec} ثانیه دیگر دوباره تلاش کنید.`, 429, {
++        code: "COOLDOWN",
++        retryAfterSeconds: waitSec,
++      });
++    }
++  }
++
++  const code = await createVerificationCode(env, email);
++
++  try {
++    await sendVerificationEmail(env, { to: email, name: user.name, code });
++  } catch (err) {
++    return jsonError("ارسال ایمیل با خطا مواجه شد. کمی بعد دوباره تلاش کنید.", 502);
++  }
++
++  return jsonResponse({ ok: true });
++}
+diff --git a/functions/api/verify-email.js b/functions/api/verify-email.js
+new file mode 100644
+index 0000000..c2bcbc4
+--- /dev/null
++++ b/functions/api/verify-email.js
+@@ -0,0 +1,87 @@
++import {
++  jsonResponse,
++  jsonError,
++  isValidEmail,
++  sha256Hex,
++  createSession,
++  sessionCookieHeader,
++  VERIFICATION_MAX_ATTEMPTS,
++} from "../_utils.js";
++
++export async function onRequestPost(context) {
++  const { request, env } = context;
++
++  let body;
++  try {
++    body = await request.json();
++  } catch {
++    return jsonError("درخواست نامعتبر است.", 400);
++  }
++
++  const email = (body.email || "").toString().trim().toLowerCase();
++  const code = (body.code || "").toString().trim();
++
++  if (!isValidEmail(email)) return jsonError("ایمیل نامعتبر است.", 400);
++  if (!/^\d{6}$/.test(code)) return jsonError("کد باید ۶ رقم باشد.", 400);
++
++  const record = await env.DB.prepare(
++    "SELECT * FROM email_verifications WHERE email = ?"
++  )
++    .bind(email)
++    .first();
++
++  if (!record) {
++    return jsonError(
++      "کدی برای این ایمیل پیدا نشد. لطفاً دوباره ثبت‌نام کنید یا کد جدید بگیرید.",
++      404
++    );
++  }
++
++  if (record.expires_at < Date.now()) {
++    return jsonError("کد منقضی شده است. لطفاً کد جدید درخواست کنید.", 410, {
++      code: "CODE_EXPIRED",
++    });
++  }
++
++  if (record.attempts >= VERIFICATION_MAX_ATTEMPTS) {
++    return jsonError(
++      "تعداد تلاش‌های مجاز تمام شده. لطفاً کد جدید درخواست کنید.",
++      429,
++      { code: "TOO_MANY_ATTEMPTS" }
++    );
++  }
++
++  const codeHash = await sha256Hex(code);
++  if (codeHash !== record.code_hash) {
++    await env.DB.prepare(
++      "UPDATE email_verifications SET attempts = attempts + 1 WHERE email = ?"
++    )
++      .bind(email)
++      .run();
++    return jsonError("کد وارد شده اشتباه است.", 400);
++  }
++
++  const user = await env.DB.prepare(
++    "SELECT id, name, email FROM users WHERE email = ?"
++  )
++    .bind(email)
++    .first();
++
++  if (!user) return jsonError("کاربری با این ایمیل پیدا نشد.", 404);
++
++  await env.DB.prepare("UPDATE users SET email_verified = 1 WHERE id = ?")
++    .bind(user.id)
++    .run();
++
++  await env.DB.prepare("DELETE FROM email_verifications WHERE email = ?")
++    .bind(email)
++    .run();
++
++  const token = await createSession(env, user.id);
++
++  return jsonResponse(
++    { ok: true, user },
++    200,
++    { "Set-Cookie": sessionCookieHeader(token) }
++  );
++}
+diff --git a/migration_add_email_verification.sql b/migration_add_email_verification.sql
+new file mode 100644
+index 0000000..0c75e03
+--- /dev/null
++++ b/migration_add_email_verification.sql
+@@ -0,0 +1,19 @@
++-- این فایل رو فقط یک بار، توی Cloudflare D1 Console (تب Console دیتابیس nexora-db) اجرا کن.
++-- برای دیتابیسی نوشته شده که از قبل schema.sql قدیمی (بدون email_verified) روش اجرا شده.
++-- اگر داری از صفر دیتابیس می‌سازی، لازم نیست این فایل رو اجرا کنی؛ همون schema.sql جدید کافیه.
++
++ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0;
++
++CREATE TABLE IF NOT EXISTS email_verifications (
++  email TEXT PRIMARY KEY,
++  code_hash TEXT NOT NULL,
++  expires_at INTEGER NOT NULL,
++  attempts INTEGER NOT NULL DEFAULT 0,
++  last_sent_at INTEGER NOT NULL,
++  FOREIGN KEY (email) REFERENCES users(email)
++);
++
++-- نکته: کاربرهایی که قبلاً (با کد قدیمی) ثبت‌نام کرده‌اند، email_verified = 0 می‌شوند
++-- و تا وقتی کد تأیید رو نزنن نمی‌تونن Login کنن. اگه می‌خوای کاربرهای قدیمی رو معاف کنی،
++-- این خط رو هم اجرا کن (اختیاری):
++-- UPDATE users SET email_verified = 1;
+diff --git a/public/index.html b/public/index.html
+index 0a31317..c51ec40 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -962,6 +962,25 @@
+       </form>
+     </div>
+ 
++    <!-- Verify email panel -->
++    <div class="auth-panel" id="panel-verify" style="display:none;">
++      <h3>تأیید ایمیل</h3>
++      <p class="auth-sub" id="verifySub">کد ۶ رقمی ارسال‌شده به ایمیلتان را وارد کنید</p>
++
++      <form id="verifyForm" novalidate>
++        <div class="form-group">
++          <label for="verifyCode">کد تأیید</label>
++          <input type="text" id="verifyCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="------" autocomplete="one-time-code" dir="ltr">
++          <div class="field-error">کد باید ۶ رقم باشد.</div>
++        </div>
++        <button type="submit" class="auth-submit">تأیید کد</button>
++        <button type="button" class="auth-submit" id="resendCodeBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:10px;">
++          ارسال مجدد کد
++        </button>
++        <div class="auth-toast" id="verifyToast"></div>
++      </form>
++    </div>
++
+     <!-- Account panel (shown when logged in) -->
+     <div class="auth-panel" id="panel-account" style="display:none;">
+       <h3>حساب کاربری</h3>
+@@ -1387,9 +1406,11 @@
+     const authTabsWrap = document.querySelector('.auth-tabs');
+     const panelRegister = document.getElementById('panel-register');
+     const panelLogin = document.getElementById('panel-login');
++    const panelVerify = document.getElementById('panel-verify');
+     const panelAccount = document.getElementById('panel-account');
+ 
+     let currentUser = null;
++    let pendingEmail = null; // ایمیلی که منتظر وارد کردن کد تأیید براشه
+ 
+     function openModal(tab) {
+       overlay.classList.add('active');
+@@ -1409,16 +1430,31 @@
+       tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+       panelRegister.style.display = tab === 'register' ? 'block' : 'none';
+       panelLogin.style.display = tab === 'login' ? 'block' : 'none';
++      panelVerify.style.display = 'none';
+       panelAccount.style.display = 'none';
+     }
+     function showAccountPanel() {
+       authTabsWrap.style.display = 'none';
+       panelRegister.style.display = 'none';
+       panelLogin.style.display = 'none';
++      panelVerify.style.display = 'none';
+       panelAccount.style.display = 'block';
+       document.getElementById('accountWelcome').textContent =
+         'خوش آمدید ' + currentUser.name + ' (' + currentUser.email + ')';
+     }
++    function showVerifyPanel(email, message) {
++      pendingEmail = email;
++      authTabsWrap.style.display = 'none';
++      panelRegister.style.display = 'none';
++      panelLogin.style.display = 'none';
++      panelAccount.style.display = 'none';
++      panelVerify.style.display = 'block';
++      document.getElementById('verifySub').textContent =
++        message || ('کد ۶ رقمی ارسال‌شده به ' + email + ' را وارد کنید');
++      const codeInput = document.getElementById('verifyCode');
++      codeInput.value = '';
++      setTimeout(() => codeInput.focus(), 50);
++    }
+ 
+     profileBtn.addEventListener('click', () => openModal('register'));
+     closeBtn.addEventListener('click', closeModal);
+@@ -1501,10 +1537,9 @@
+         return;
+       }
+ 
+-      currentUser = data.user;
+-      showToast(regToast, 'ثبت‌نام با موفقیت انجام شد! خوش آمدید ' + currentUser.name + ' 🎉', 'success');
+       registerForm.reset();
+-      setTimeout(() => { closeModal(); }, 1500);
++      startResendCooldown(60);
++      showVerifyPanel(data.email, 'کد ۶ رقمی به ' + data.email + ' ارسال شد. لطفاً آن را وارد کنید.');
+     });
+ 
+     // ---- Login ----
+@@ -1536,6 +1571,13 @@
+       submitBtn.disabled = false;
+ 
+       if (!ok || !data.ok) {
++        if (data.code === 'EMAIL_NOT_VERIFIED') {
++          loginForm.reset();
++          startResendCooldown(60);
++          showVerifyPanel(data.email, 'ایمیل شما هنوز تأیید نشده. کد جدیدی براتون فرستادیم؛ وارد کنید.');
++          api('/api/resend-code', 'POST', { email: data.email });
++          return;
++        }
+         showToast(loginToast, data.error || 'ایمیل یا رمز عبور اشتباه است.', 'error');
+         return;
+       }
+@@ -1546,6 +1588,76 @@
+       setTimeout(() => { closeModal(); }, 1200);
+     });
+ 
++    // ---- Verify email code ----
++    const verifyForm = document.getElementById('verifyForm');
++    const verifyToast = document.getElementById('verifyToast');
++    const resendCodeBtn = document.getElementById('resendCodeBtn');
++    let resendTimer = null;
++
++    function startResendCooldown(seconds) {
++      clearInterval(resendTimer);
++      let remaining = seconds;
++      resendCodeBtn.disabled = true;
++      resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
++      resendTimer = setInterval(() => {
++        remaining -= 1;
++        if (remaining <= 0) {
++          clearInterval(resendTimer);
++          resendCodeBtn.disabled = false;
++          resendCodeBtn.textContent = 'ارسال مجدد کد';
++        } else {
++          resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
++        }
++      }, 1000);
++    }
++
++    verifyForm.addEventListener('submit', async function (e) {
++      e.preventDefault();
++      const codeInput = document.getElementById('verifyCode');
++      const code = codeInput.value.trim();
++
++      const codeOk = /^\d{6}$/.test(code);
++      setError(codeInput, !codeOk);
++      if (!codeOk) {
++        showToast(verifyToast, 'کد باید ۶ رقم باشد.', 'error');
++        return;
++      }
++
++      const submitBtn = verifyForm.querySelector('button[type="submit"]');
++      submitBtn.disabled = true;
++      const { ok, data } = await api('/api/verify-email', 'POST', {
++        email: pendingEmail,
++        code,
++      });
++      submitBtn.disabled = false;
++
++      if (!ok || !data.ok) {
++        showToast(verifyToast, data.error || 'کد اشتباه است. دوباره تلاش کنید.', 'error');
++        return;
++      }
++
++      currentUser = data.user;
++      pendingEmail = null;
++      showToast(verifyToast, 'ایمیل تأیید شد! خوش آمدید ' + currentUser.name + ' 🎉', 'success');
++      verifyForm.reset();
++      setTimeout(() => { closeModal(); }, 1200);
++    });
++
++    resendCodeBtn.addEventListener('click', async function () {
++      if (!pendingEmail || resendCodeBtn.disabled) return;
++      resendCodeBtn.disabled = true;
++      const { ok, data } = await api('/api/resend-code', 'POST', { email: pendingEmail });
++
++      if (!ok || !data.ok) {
++        showToast(verifyToast, data.error || 'ارسال مجدد کد ناموفق بود.', 'error');
++        resendCodeBtn.disabled = false;
++        return;
++      }
++
++      showToast(verifyToast, 'کد جدید ارسال شد. صندوق ایمیلتون رو چک کنید.', 'success');
++      startResendCooldown(60);
++    });
++
+     // ---- Logout ----
+     const logoutBtn = document.getElementById('logoutBtn');
+     logoutBtn.addEventListener('click', async function () {
+diff --git a/schema.sql b/schema.sql
+index 23fd52a..b9e9d46 100644
+--- a/schema.sql
++++ b/schema.sql
+@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
+   email TEXT UNIQUE NOT NULL,
+   password_hash TEXT NOT NULL,
+   salt TEXT NOT NULL,
+-  created_at INTEGER NOT NULL
++  created_at INTEGER NOT NULL,
++  email_verified INTEGER NOT NULL DEFAULT 0
+ );
+ 
+ CREATE TABLE IF NOT EXISTS sessions (
+@@ -16,3 +17,14 @@ CREATE TABLE IF NOT EXISTS sessions (
+ );
+ 
+ CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
++
++-- کدهای تأیید ایمیل (۶ رقمی). به‌ازای هر ایمیل فقط یک ردیف فعال وجود دارد؛
++-- درخواست کد جدید، ردیف قبلی را جایگزین می‌کند (ON CONFLICT).
++CREATE TABLE IF NOT EXISTS email_verifications (
++  email TEXT PRIMARY KEY,
++  code_hash TEXT NOT NULL,
++  expires_at INTEGER NOT NULL,
++  attempts INTEGER NOT NULL DEFAULT 0,
++  last_sent_at INTEGER NOT NULL,
++  FOREIGN KEY (email) REFERENCES users(email)
++);

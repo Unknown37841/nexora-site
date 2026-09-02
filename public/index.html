@@ -962,6 +962,25 @@
       </form>
     </div>
 
+    <!-- Verify email panel -->
+    <div class="auth-panel" id="panel-verify" style="display:none;">
+      <h3>تأیید ایمیل</h3>
+      <p class="auth-sub" id="verifySub">کد ۶ رقمی ارسال‌شده به ایمیلتان را وارد کنید</p>
+
+      <form id="verifyForm" novalidate>
+        <div class="form-group">
+          <label for="verifyCode">کد تأیید</label>
+          <input type="text" id="verifyCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="------" autocomplete="one-time-code" dir="ltr">
+          <div class="field-error">کد باید ۶ رقم باشد.</div>
+        </div>
+        <button type="submit" class="auth-submit">تأیید کد</button>
+        <button type="button" class="auth-submit" id="resendCodeBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:10px;">
+          ارسال مجدد کد
+        </button>
+        <div class="auth-toast" id="verifyToast"></div>
+      </form>
+    </div>
+
     <!-- Account panel (shown when logged in) -->
     <div class="auth-panel" id="panel-account" style="display:none;">
       <h3>حساب کاربری</h3>
@@ -1387,9 +1406,11 @@
     const authTabsWrap = document.querySelector('.auth-tabs');
     const panelRegister = document.getElementById('panel-register');
     const panelLogin = document.getElementById('panel-login');
+    const panelVerify = document.getElementById('panel-verify');
     const panelAccount = document.getElementById('panel-account');
 
     let currentUser = null;
+    let pendingEmail = null; // ایمیلی که منتظر وارد کردن کد تأیید براشه
 
     function openModal(tab) {
       overlay.classList.add('active');
@@ -1409,15 +1430,30 @@
       tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
       panelRegister.style.display = tab === 'register' ? 'block' : 'none';
       panelLogin.style.display = tab === 'login' ? 'block' : 'none';
+      panelVerify.style.display = 'none';
       panelAccount.style.display = 'none';
     }
     function showAccountPanel() {
       authTabsWrap.style.display = 'none';
       panelRegister.style.display = 'none';
       panelLogin.style.display = 'none';
+      panelVerify.style.display = 'none';
       panelAccount.style.display = 'block';
       document.getElementById('accountWelcome').textContent =
         'خوش آمدید ' + currentUser.name + ' (' + currentUser.email + ')';
+    }
+    function showVerifyPanel(email, message) {
+      pendingEmail = email;
+      authTabsWrap.style.display = 'none';
+      panelRegister.style.display = 'none';
+      panelLogin.style.display = 'none';
+      panelAccount.style.display = 'none';
+      panelVerify.style.display = 'block';
+      document.getElementById('verifySub').textContent =
+        message || ('کد ۶ رقمی ارسال‌شده به ' + email + ' را وارد کنید');
+      const codeInput = document.getElementById('verifyCode');
+      codeInput.value = '';
+      setTimeout(() => codeInput.focus(), 50);
     }
 
     profileBtn.addEventListener('click', () => openModal('register'));
@@ -1501,10 +1537,9 @@
         return;
       }
 
-      currentUser = data.user;
-      showToast(regToast, 'ثبت‌نام با موفقیت انجام شد! خوش آمدید ' + currentUser.name + ' 🎉', 'success');
       registerForm.reset();
-      setTimeout(() => { closeModal(); }, 1500);
+      startResendCooldown(60);
+      showVerifyPanel(data.email, 'کد ۶ رقمی به ' + data.email + ' ارسال شد. لطفاً آن را وارد کنید.');
     });
 
     // ---- Login ----
@@ -1536,6 +1571,13 @@
       submitBtn.disabled = false;
 
       if (!ok || !data.ok) {
+        if (data.code === 'EMAIL_NOT_VERIFIED') {
+          loginForm.reset();
+          startResendCooldown(60);
+          showVerifyPanel(data.email, 'ایمیل شما هنوز تأیید نشده. کد جدیدی براتون فرستادیم؛ وارد کنید.');
+          api('/api/resend-code', 'POST', { email: data.email });
+          return;
+        }
         showToast(loginToast, data.error || 'ایمیل یا رمز عبور اشتباه است.', 'error');
         return;
       }
@@ -1544,6 +1586,76 @@
       showToast(loginToast, 'خوش آمدید ' + currentUser.name + '! ورود موفقیت‌آمیز بود.', 'success');
       loginForm.reset();
       setTimeout(() => { closeModal(); }, 1200);
+    });
+
+    // ---- Verify email code ----
+    const verifyForm = document.getElementById('verifyForm');
+    const verifyToast = document.getElementById('verifyToast');
+    const resendCodeBtn = document.getElementById('resendCodeBtn');
+    let resendTimer = null;
+
+    function startResendCooldown(seconds) {
+      clearInterval(resendTimer);
+      let remaining = seconds;
+      resendCodeBtn.disabled = true;
+      resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
+      resendTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(resendTimer);
+          resendCodeBtn.disabled = false;
+          resendCodeBtn.textContent = 'ارسال مجدد کد';
+        } else {
+          resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
+        }
+      }, 1000);
+    }
+
+    verifyForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const codeInput = document.getElementById('verifyCode');
+      const code = codeInput.value.trim();
+
+      const codeOk = /^\d{6}$/.test(code);
+      setError(codeInput, !codeOk);
+      if (!codeOk) {
+        showToast(verifyToast, 'کد باید ۶ رقم باشد.', 'error');
+        return;
+      }
+
+      const submitBtn = verifyForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      const { ok, data } = await api('/api/verify-email', 'POST', {
+        email: pendingEmail,
+        code,
+      });
+      submitBtn.disabled = false;
+
+      if (!ok || !data.ok) {
+        showToast(verifyToast, data.error || 'کد اشتباه است. دوباره تلاش کنید.', 'error');
+        return;
+      }
+
+      currentUser = data.user;
+      pendingEmail = null;
+      showToast(verifyToast, 'ایمیل تأیید شد! خوش آمدید ' + currentUser.name + ' 🎉', 'success');
+      verifyForm.reset();
+      setTimeout(() => { closeModal(); }, 1200);
+    });
+
+    resendCodeBtn.addEventListener('click', async function () {
+      if (!pendingEmail || resendCodeBtn.disabled) return;
+      resendCodeBtn.disabled = true;
+      const { ok, data } = await api('/api/resend-code', 'POST', { email: pendingEmail });
+
+      if (!ok || !data.ok) {
+        showToast(verifyToast, data.error || 'ارسال مجدد کد ناموفق بود.', 'error');
+        resendCodeBtn.disabled = false;
+        return;
+      }
+
+      showToast(verifyToast, 'کد جدید ارسال شد. صندوق ایمیلتون رو چک کنید.', 'success');
+      startResendCooldown(60);
     });
 
     // ---- Logout ----

@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
   if (!password) return jsonError("لطفاً رمز عبور را وارد کنید.", 400);
 
   const user = await env.DB.prepare(
-    "SELECT id, name, email, password_hash, salt FROM users WHERE email = ?"
+    "SELECT id, name, email, password_hash, salt, email_verified FROM users WHERE email = ?"
   )
     .bind(email)
     .first();
@@ -34,6 +34,14 @@ export async function onRequestPost(context) {
   const computedHash = await hashPassword(password, user.salt);
   if (computedHash !== user.password_hash) {
     return jsonError("ایمیل یا رمز عبور اشتباه است.", 401);
+  }
+
+  if (!user.email_verified) {
+    return jsonError(
+      "ایمیل شما هنوز تأیید نشده است. کد تأیید را وارد کنید.",
+      403,
+      { code: "EMAIL_NOT_VERIFIED", email: user.email }
+    );
   }
 
   const token = await createSession(env, user.id);

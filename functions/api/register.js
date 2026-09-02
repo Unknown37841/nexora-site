@@ -4,8 +4,8 @@ import {
   isValidEmail,
   hashPassword,
   randomHex,
-  createSession,
-  sessionCookieHeader,
+  createVerificationCode,
+  sendVerificationEmail,
 } from "../_utils.js";
 
 export async function onRequestPost(context) {
@@ -26,27 +26,49 @@ export async function onRequestPost(context) {
   if (!isValidEmail(email)) return jsonError("لطفاً یک ایمیل معتبر وارد کنید.", 400);
   if (password.length < 6) return jsonError("رمز عبور باید حداقل ۶ کاراکتر باشد.", 400);
 
-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?")
+  const existing = await env.DB.prepare(
+    "SELECT id, email_verified FROM users WHERE email = ?"
+  )
     .bind(email)
     .first();
-  if (existing) return jsonError("این ایمیل قبلاً ثبت‌نام کرده است.", 409);
+
+  // اگه قبلاً با همین ایمیل ثبت‌نام شده و تأیید هم شده، دیگه اجازه نده.
+  if (existing && existing.email_verified) {
+    return jsonError("این ایمیل قبلاً ثبت‌نام کرده است.", 409);
+  }
 
   const salt = randomHex(16);
   const passwordHash = await hashPassword(password, salt);
-  const id = randomHex(16);
   const now = Date.now();
 
-  await env.DB.prepare(
-    "INSERT INTO users (id, name, email, password_hash, salt, created_at) VALUES (?, ?, ?, ?, ?, ?)"
-  )
-    .bind(id, name, email, passwordHash, salt, now)
-    .run();
+  if (existing) {
+    // ثبت‌نام قبلی ناتمام مونده (تأیید ایمیل انجام نشده) -> اطلاعات رو آپدیت کن و کد جدید بفرست
+    await env.DB.prepare(
+      "UPDATE users SET name = ?, password_hash = ?, salt = ? WHERE id = ?"
+    )
+      .bind(name, passwordHash, salt, existing.id)
+      .run();
+  } else {
+    const id = randomHex(16);
+    await env.DB.prepare(
+      "INSERT INTO users (id, name, email, password_hash, salt, created_at, email_verified) VALUES (?, ?, ?, ?, ?, ?, 0)"
+    )
+      .bind(id, name, email, passwordHash, salt, now)
+      .run();
+  }
 
-  const token = await createSession(env, id);
+  const code = await createVerificationCode(env, email);
 
-  return jsonResponse(
-    { ok: true, user: { id, name, email } },
-    201,
-    { "Set-Cookie": sessionCookieHeader(token) }
-  );
+  try {
+    await sendVerificationEmail(env, { to: email, name, code });
+  } catch (err) {
+    return jsonError(
+      "ثبت‌نام ذخیره شد اما ارسال ایمیل کد تأیید با خطا مواجه شد. کمی بعد دوباره «ارسال مجدد کد» را بزنید.",
+      502
+    );
+  }
+
+  // توجه: اینجا دیگه هیچ Session ساخته نمی‌شه. کاربر فقط وقتی وارد حساب می‌شه
+  // که کد ۶ رقمی رو در /api/verify-email درست وارد کنه.
+  return jsonResponse({ ok: true, pendingVerification: true, email }, 201);
 }

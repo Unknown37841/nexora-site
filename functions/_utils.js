@@ -8,8 +8,8 @@ export function jsonResponse(data, status = 200, extraHeaders = {}) {
   });
 }
 
-export function jsonError(message, status = 400) {
-  return jsonResponse({ ok: false, error: message }, status);
+export function jsonError(message, status = 400, extra = {}) {
+  return jsonResponse({ ok: false, error: message, ...extra }, status);
 }
 
 export function isValidEmail(v) {
@@ -72,6 +72,88 @@ export function getCookie(request, name) {
   const cookieHeader = request.headers.get("Cookie") || "";
   const match = cookieHeader.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
+}
+
+// ---- Email verification codes (6-digit, stored hashed in D1) ----
+const VERIFICATION_CODE_TTL_MS = 10 * 60 * 1000; // ۱۰ دقیقه اعتبار کد
+const VERIFICATION_RESEND_COOLDOWN_MS = 60 * 1000; // فاصله مجاز بین دو ارسال
+export const VERIFICATION_MAX_ATTEMPTS = 5; // حداکثر تلاش اشتباه قبل از نیاز به کد جدید
+
+export function generateVerificationCode() {
+  const arr = new Uint8Array(4);
+  crypto.getRandomValues(arr);
+  const num = ((arr[0] << 24) | (arr[1] << 16) | (arr[2] << 8) | arr[3]) >>> 0;
+  return String(num % 1000000).padStart(6, "0");
+}
+
+export async function sha256Hex(text) {
+  const enc = new TextEncoder();
+  const digest = await crypto.subtle.digest("SHA-256", enc.encode(text));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+// یک کد جدید می‌سازد، هشش را در D1 ذخیره می‌کند و خود کد (متن ساده) را برمی‌گرداند
+// تا فقط همان لحظه برای ارسال ایمیل استفاده شود. کد خام هرگز در دیتابیس ذخیره نمی‌شود.
+export async function createVerificationCode(env, email) {
+  const code = generateVerificationCode();
+  const codeHash = await sha256Hex(code);
+  const now = Date.now();
+  const expiresAt = now + VERIFICATION_CODE_TTL_MS;
+
+  await env.DB.prepare(
+    `INSERT INTO email_verifications (email, code_hash, expires_at, attempts, last_sent_at)
+     VALUES (?, ?, ?, 0, ?)
+     ON CONFLICT(email) DO UPDATE SET
+       code_hash = excluded.code_hash,
+       expires_at = excluded.expires_at,
+       attempts = 0,
+       last_sent_at = excluded.last_sent_at`
+  )
+    .bind(email, codeHash, expiresAt, now)
+    .run();
+
+  return code;
+}
+
+export function verificationCooldownRemainingMs(lastSentAt) {
+  return VERIFICATION_RESEND_COOLDOWN_MS - (Date.now() - lastSentAt);
+}
+
+// ---- ارسال ایمیل کد تأیید از طریق Resend ----
+// نیاز به Secret به اسم RESEND_API_KEY در Cloudflare Pages داره (Settings → Environment variables).
+// اختیاری: RESEND_FROM برای تعیین آدرس فرستنده (پیش‌فرض روی دامنه تست Resend هست).
+export async function sendVerificationEmail(env, { to, name, code }) {
+  if (!env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY تنظیم نشده است.");
+  }
+
+  const fromAddress = env.RESEND_FROM || "Nexora <onboarding@resend.dev>";
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: fromAddress,
+      to: [to],
+      subject: "کد تأیید ایمیل شما در Nexora",
+      html: `
+        <div dir="rtl" style="font-family: Tahoma, Arial, sans-serif; text-align:right; line-height:1.8;">
+          <p>سلام ${name || ""} 👋</p>
+          <p>کد تأیید ایمیل شما در Nexora:</p>
+          <p style="font-size:28px; font-weight:bold; letter-spacing:6px; direction:ltr; text-align:center;">${code}</p>
+          <p>این کد تا ۱۰ دقیقه دیگر معتبره. اگه شما این درخواست رو نداده‌اید، همین ایمیل رو نادیده بگیرید.</p>
+        </div>
+      `,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    throw new Error("ارسال ایمیل تأیید ناموفق بود: " + errText);
+  }
 }
 
 export async function getSessionUser(request, env) {
