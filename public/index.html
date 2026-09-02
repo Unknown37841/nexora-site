@@ -1366,6 +1366,202 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
   ::selection { background: rgba(99,102,241,0.25); }
 
+  /* ---------- UI v4: App pages (profile / payment / contact / legal) ---------- */
+  .app-page { display: none; min-height: 100vh; padding: 100px 0 90px; }
+  .app-page.active { display: block; }
+  .app-wrap { max-width: 860px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+  .page-head { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .page-back {
+    width: 42px; height: 42px; border-radius: 50%;
+    border: 1px solid var(--surface-border); background: var(--surface);
+    color: var(--text); cursor: pointer; display: grid; place-items: center;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .page-back:hover { border-color: var(--primary); color: var(--primary); }
+  .page-head h2 { font-size: 1.4rem; font-weight: 800; }
+  .page-head .ph-sub { font-size: 0.82rem; color: var(--text-mute); }
+  .app-card {
+    background: var(--bg-soft); border: 1px solid var(--surface-border);
+    border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
+    box-shadow: var(--shadow);
+  }
+  .app-card h4 { font-size: 0.98rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .app-card h4 svg { color: var(--primary); }
+
+  /* profile header */
+  .prof-hero { display: flex; align-items: center; gap: 16px; }
+  .prof-avatar {
+    width: 72px; height: 72px; border-radius: 22px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid; place-items: center; color: #fff;
+    font-size: 1.9rem; font-weight: 800; flex-shrink: 0;
+    box-shadow: 0 12px 28px -8px rgba(99,102,241,0.6);
+  }
+  .prof-id { font-size: 1.15rem; font-weight: 800; word-break: break-word; }
+  .prof-email { font-size: 0.82rem; color: var(--text-mute); direction: ltr; text-align: right; word-break: break-all; }
+  .prof-role {
+    display: inline-block; margin-top: 6px; font-size: 0.7rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px;
+    background: rgba(99,102,241,0.14); color: var(--primary);
+  }
+  .prof-role.admin { background: rgba(245,158,11,0.16); color: #f59e0b; }
+  .prof-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .ps-item { text-align: center; background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius-sm); padding: 14px 8px; }
+  .ps-num { font-size: 1.25rem; font-weight: 800; color: var(--primary); }
+  .ps-label { font-size: 0.72rem; color: var(--text-mute); }
+  .set-row {
+    display: flex; align-items: center; gap: 12px; width: 100%;
+    padding: 15px 4px; border: none; border-bottom: 1px solid var(--surface-border);
+    background: transparent; color: var(--text); font-family: inherit;
+    font-size: 0.93rem; font-weight: 600; cursor: pointer; text-align: right;
+  }
+  .set-row:last-child { border-bottom: none; }
+  .set-row svg { color: var(--primary); flex-shrink: 0; }
+  .set-row .sr-chev { margin-right: auto; color: var(--text-mute); }
+  .set-row.danger { color: #ef4444; }
+  .set-row.danger svg { color: #ef4444; }
+  .set-inline { display: flex; align-items: center; justify-content: space-between; padding: 15px 4px; border-bottom: 1px solid var(--surface-border); }
+  .set-inline:last-child { border-bottom: none; }
+  .set-inline .si-label { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.93rem; }
+  .set-inline .si-label svg { color: var(--primary); }
+  .switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .sl {
+    position: absolute; inset: 0; border-radius: 999px; cursor: pointer;
+    background: var(--surface-border); transition: 0.25s;
+  }
+  .switch .sl::before {
+    content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+    right: 3px; top: 3px; background: #fff; transition: 0.25s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .switch input:checked + .sl { background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
+  .switch input:checked + .sl::before { transform: translateX(-20px); }
+
+  /* payment page */
+  .pay-steps { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+  .pay-step { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; color: var(--text-mute); }
+  .pay-step.active { color: var(--primary); }
+  .pay-step .ps-dot {
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    border: 1.5px solid currentColor; font-size: 0.78rem;
+  }
+  .pay-step.active .ps-dot { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .pay-step.done .ps-dot { background: var(--success); color: #fff; border-color: var(--success); }
+  .pay-line { flex: 1; height: 1.5px; background: var(--surface-border); }
+  .card-visual {
+    background: linear-gradient(135deg, #1e293b, #4f46e5 60%, #7c3aed);
+    border-radius: 18px; padding: 22px; color: #fff; margin-bottom: 20px;
+    box-shadow: 0 18px 40px -14px rgba(79,70,229,0.55);
+    position: relative; overflow: hidden;
+  }
+  .card-visual::after {
+    content: ''; position: absolute; width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); top: -110px; left: -60px;
+  }
+  .cv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; }
+  .cv-chip { width: 40px; height: 30px; border-radius: 7px; background: linear-gradient(135deg, #fbbf24, #d97706); }
+  .cv-brand { font-size: 0.78rem; font-weight: 700; opacity: 0.85; letter-spacing: 0.08em; }
+  .cv-number { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.14em; direction: ltr; text-align: left; font-family: 'Vazirmatn', monospace; }
+  .cv-bottom { display: flex; justify-content: space-between; margin-top: 18px; font-size: 0.72rem; opacity: 0.85; }
+  .cv-bottom .cvb-v { font-weight: 700; font-size: 0.88rem; direction: ltr; }
+  .pay-amount {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(99,102,241,0.09); border: 1px dashed var(--primary);
+    border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 18px;
+  }
+  .pay-amount .pa-label { font-size: 0.85rem; color: var(--text-soft); }
+  .pay-amount .pa-num { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+  .pay-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pay-fields .pf-full { grid-column: 1 / -1; }
+  .pay-fields label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; }
+  .pay-fields input {
+    width: 100%; padding: 13px 14px; border-radius: 12px;
+    border: 1.5px solid var(--surface-border); background: var(--surface);
+    color: var(--text); font-family: inherit; font-size: 1rem; outline: none;
+    transition: all 0.2s; direction: ltr; text-align: left;
+  }
+  .pay-fields input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+  .pay-fields input.err { border-color: #ef4444; }
+  .pay-fields .pf-hint { font-size: 0.72rem; color: var(--text-mute); margin-top: 4px; direction: rtl; text-align: right; }
+  .pay-submit {
+    width: 100%; margin-top: 18px; padding: 15px; border-radius: 999px; border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff; font-family: inherit; font-weight: 800; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 12px 30px -8px rgba(99,102,241,0.65); transition: all 0.25s;
+  }
+  .pay-submit:hover { transform: translateY(-2px); }
+  .pay-submit:disabled { opacity: 0.65; cursor: wait; transform: none; }
+  .pay-secure { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; font-size: 0.76rem; color: var(--text-mute); }
+  .pay-secure svg { color: var(--success); }
+  .spinner {
+    width: 18px; height: 18px; border-radius: 50%; display: inline-block;
+    border: 2.5px solid rgba(255,255,255,0.35); border-top-color: #fff;
+    animation: spin 0.8s linear infinite; vertical-align: middle; margin-left: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pay-summary-item { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 9px 0; border-bottom: 1px dashed var(--surface-border); }
+  .pay-summary-item:last-child { border-bottom: none; }
+  .pay-summary-item .psi-name { color: var(--text-soft); }
+  .pay-summary-item .psi-val { font-weight: 700; }
+
+  /* contact / legal */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .contact-info-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--surface-border); }
+  .contact-info-row:last-child { border-bottom: none; }
+  .ci-ico { width: 44px; height: 44px; border-radius: 14px; background: rgba(99,102,241,0.12); color: var(--primary); display: grid; place-items: center; flex-shrink: 0; }
+  .ci-txt .ci-t { font-weight: 700; font-size: 0.9rem; }
+  .ci-txt .ci-v { font-size: 0.8rem; color: var(--text-mute); direction: ltr; text-align: right; }
+  .legal-card h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 10px; }
+  .legal-card p, .legal-card li { color: var(--text-soft); font-size: 0.9rem; line-height: 2; }
+  .legal-card ul { padding-right: 18px; }
+  .legal-card h5 { margin: 18px 0 6px; font-size: 0.95rem; }
+
+  /* bottom nav (mobile) */
+  .bottom-nav {
+    position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 150; display: none;
+    background: var(--bg-soft); border: 1px solid var(--surface-border);
+    border-radius: 999px; padding: 8px 10px;
+    box-shadow: var(--shadow-lg); backdrop-filter: blur(20px);
+    gap: 4px; width: min(430px, calc(100vw - 28px));
+    justify-content: space-around;
+  }
+  .bn-item {
+    border: none; background: transparent; color: var(--text-mute);
+    font-family: inherit; font-size: 0.62rem; font-weight: 600;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 7px 10px; border-radius: 999px; cursor: pointer;
+    position: relative; transition: all 0.2s; text-decoration: none;
+  }
+  .bn-item.active { color: var(--primary); background: rgba(99,102,241,0.1); }
+  .bn-item .bn-badge {
+    position: absolute; top: 2px; right: 4px;
+    background: var(--primary); color: #fff;
+    font-size: 0.58rem; font-weight: 700;
+    min-width: 15px; height: 15px; padding: 0 3px;
+    border-radius: 999px; display: grid; place-items: center;
+  }
+  .bn-item .bn-badge.hidden { display: none; }
+
+  @media (max-width: 720px) {
+    .bottom-nav { display: flex; }
+    .app-page { padding: 84px 0 100px; }
+    .pay-fields { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .prof-stats { gap: 8px; }
+    .cv-number { font-size: 1.05rem; }
+    .nav-links { display: none; }
+    /* هدر موبایل: فقط تم + منو (سبد و پروفایل در نوار پایین هستن) */
+    #cartBtn, #profileBtn, #adminBtn { display: none; }
+    .to-top { bottom: 86px; }
+    .cart-drawer { width: 100vw; }
+    .auth-modal { padding: 26px 18px; }
+    .otp-box { width: 42px; height: 52px; font-size: 1.2rem; }
+    .page-head h2 { font-size: 1.2rem; }
+    .hero h1 { font-size: clamp(1.9rem, 7vw, 2.6rem); }
+  }
+
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1647,7 +1843,8 @@
     <div class="sc-id" id="scOrderId">—</div>
     <div class="sc-total" id="scTotal">—</div>
     <div class="sc-actions">
-      <button type="button" class="btn btn-primary" id="scOrdersBtn">مشاهده سفارش‌های من</button>
+      <button type="button" class="btn btn-primary" id="scPayBtn">💳 پرداخت سفارش</button>
+      <button type="button" class="btn btn-ghost" id="scOrdersBtn">مشاهده سفارش‌های من</button>
       <button type="button" class="btn btn-ghost" id="scCloseBtn">ادامه‌ی خرید</button>
     </div>
   </div>
@@ -1940,19 +2137,19 @@
       <div class="footer-col">
         <h5>شرکت</h5>
         <ul>
-          <li><a href="#">درباره ما</a></li>
+          <li><a href="#" data-page="about">درباره ما</a></li>
           <li><a href="#">بلاگ</a></li>
-          <li><a href="#">تماس با ما</a></li>
-          <li><a href="#">همکاری</a></li>
+          <li><a href="#" data-page="contact">تماس با ما</a></li>
+          <li><a href="#" data-page="contact">همکاری</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h5>پشتیبانی</h5>
         <ul>
           <li><a href="#faq">سوالات متداول</a></li>
-          <li><a href="#">قوانین و مقررات</a></li>
-          <li><a href="#">حریم خصوصی</a></li>
-          <li><a href="#">گارانتی بازگشت</a></li>
+          <li><a href="#" data-page="rules">قوانین و مقررات</a></li>
+          <li><a href="#" data-page="privacy">حریم خصوصی</a></li>
+          <li><a href="#" data-page="rules">گارانتی بازگشت</a></li>
         </ul>
       </div>
     </div>
@@ -2077,6 +2274,284 @@
   </div>
 </div>
 
+<!-- Profile Page -->
+<div class="app-page" id="profilePage">
+  <div class="app-wrap">
+    <div class="page-head">
+      <button class="page-back" id="profBackBtn" aria-label="بازگشت">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div>
+        <h2>حساب کاربری</h2>
+        <div class="ph-sub">مدیریت پروفایل، سفارش‌ها و امنیت</div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="prof-hero">
+        <div class="prof-avatar" id="pfAvatar">؟</div>
+        <div style="min-width:0;">
+          <div class="prof-id" id="pfDispName">—</div>
+          <div class="prof-email" id="pfEmail">—</div>
+          <span class="prof-role" id="pfRole">کاربر</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <div class="prof-stats">
+        <div class="ps-item"><div class="ps-num" id="pfStOrders">0</div><div class="ps-label">کل سفارش‌ها</div></div>
+        <div class="ps-item"><div class="ps-num" id="pfStSpent">0</div><div class="ps-label">خرید موفق (تومان)</div></div>
+        <div class="ps-item"><div class="ps-num" id="pfStPending">0</div><div class="ps-label">در انتظار پرداخت</div></div>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <h4>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        سفارش‌ها
+      </h4>
+      <div class="orders-list" id="pfOrdersList"><div class="no-orders">در حال بارگذاری…</div></div>
+    </div>
+
+    <div class="app-card">
+      <h4>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        ویرایش نام کاربری
+      </h4>
+      <form id="pfNameForm" style="display:flex;gap:10px;">
+        <input type="text" id="pfNameInput" maxlength="40" placeholder="نام کاربری جدید" style="flex:1;padding:12px 14px;border-radius:12px;border:1.5px solid var(--surface-border);background:var(--surface);color:var(--text);font-family:inherit;font-size:0.92rem;outline:none;">
+        <button type="submit" class="file-btn" style="padding:12px 22px;font-weight:700;">ذخیره</button>
+      </form>
+    </div>
+
+    <div class="app-card">
+      <h4>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        امنیت
+      </h4>
+      <button type="button" class="set-row" id="pfChangePassBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        تغییر رمز عبور
+        <svg class="sr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="set-inline">
+        <span class="si-label">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          حالت تیره
+        </span>
+        <label class="switch">
+          <input type="checkbox" id="pfThemeSwitch">
+          <span class="sl"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="app-card">
+      <button type="button" class="set-row" id="pfAdminBtn" style="display:none;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        پنل مدیریت
+        <svg class="sr-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button type="button" class="set-row danger" id="pfLogoutBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        خروج از حساب
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Page -->
+<div class="app-page" id="paymentPage">
+  <div class="app-wrap" style="max-width:560px;">
+    <div class="page-head">
+      <button class="page-back" id="payBackBtn" aria-label="بازگشت">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div>
+        <h2>پرداخت سفارش</h2>
+        <div class="ph-sub" id="payOrderId">—</div>
+      </div>
+    </div>
+
+    <div class="pay-steps">
+      <div class="pay-step done"><span class="ps-dot">✓</span> ثبت سفارش</div>
+      <div class="pay-line"></div>
+      <div class="pay-step active"><span class="ps-dot">۲</span> پرداخت</div>
+      <div class="pay-line"></div>
+      <div class="pay-step"><span class="ps-dot">۳</span> فعال‌سازی</div>
+    </div>
+
+    <div class="app-card">
+      <div class="card-visual">
+        <div class="cv-top">
+          <div class="cv-chip"></div>
+          <div class="cv-brand">SHETAB · PAY</div>
+        </div>
+        <div class="cv-number" id="cvNumber">•••• •••• •••• ••••</div>
+        <div class="cv-bottom">
+          <div>انقضا<span class="cvb-v" id="cvExpiry" style="display:block;">••/••</span></div>
+          <div style="text-align:left;">کارت به نام<span class="cvb-v" id="cvHolder" style="display:block;text-align:right;">—</span></div>
+        </div>
+      </div>
+
+      <div class="pay-amount">
+        <span class="pa-label">مبلغ قابل پرداخت</span>
+        <span class="pa-num" id="payAmount">—</span>
+      </div>
+
+      <div id="paySummary"></div>
+
+      <form id="payForm" novalidate>
+        <div class="pay-fields">
+          <div class="pf-full">
+            <label>شماره کارت</label>
+            <input type="text" id="payCard" inputmode="numeric" maxlength="19" placeholder="6037 9911 2233 4455" autocomplete="cc-number">
+            <div class="pf-hint">۱۶ رقم — فقط ارقام مجاز</div>
+          </div>
+          <div>
+            <label>تاریخ انقضا</label>
+            <input type="text" id="payExp" inputmode="numeric" maxlength="7" placeholder="۱۴۰۵/۰۶" autocomplete="cc-exp">
+          </div>
+          <div>
+            <label>CVV2</label>
+            <input type="text" id="payCvv" inputmode="numeric" maxlength="4" placeholder="1234" autocomplete="cc-csc">
+          </div>
+          <div class="pf-full">
+            <label>رمز دوم (پویا)</label>
+            <input type="password" id="payPass" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off">
+            <div class="pf-hint">رمز پویا از پیامک بانک — در مرحله‌ی بعدی سایت، توسط API استعلام می‌شود.</div>
+          </div>
+        </div>
+        <button type="submit" class="pay-submit" id="paySubmitBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:6px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          پرداخت امن
+        </button>
+        <div class="pay-secure">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          اطلاعات کارت شما فقط برای استعلام به درگاه ارسال می‌شود و در سایت ذخیره نمی‌گردد.
+        </div>
+        <div class="admin-toast" id="payToast"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Contact Page -->
+<div class="app-page" id="contactPage">
+  <div class="app-wrap" style="max-width:760px;">
+    <div class="page-head">
+      <button class="page-back" id="ctBackBtn" aria-label="بازگشت">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div>
+        <h2>تماس با ما</h2>
+        <div class="ph-sub">پشتیبانی ۲۴ ساعته، ۷ روز هفته</div>
+      </div>
+    </div>
+    <div class="contact-grid">
+      <div class="app-card">
+        <h4>راه‌های ارتباطی</h4>
+        <div class="contact-info-row">
+          <div class="ci-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="ci-txt"><div class="ci-t">تلگرام پشتیبانی</div><div class="ci-v">@nexora_support</div></div>
+        </div>
+        <div class="contact-info-row">
+          <div class="ci-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="ci-txt"><div class="ci-t">ایمیل</div><div class="ci-v">support@noor.kdns.fr</div></div>
+        </div>
+        <div class="contact-info-row">
+          <div class="ci-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="ci-txt"><div class="ci-t">ساعات پاسخ‌گویی</div><div class="ci-v">۲۴/۷ — بدون تعطیلی</div></div>
+        </div>
+      </div>
+      <div class="app-card">
+        <h4>ارسال پیام</h4>
+        <form id="contactForm">
+          <div class="form-group">
+            <label for="ctSubject">موضوع</label>
+            <select id="ctSubject" style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--surface-border);background:var(--surface);color:var(--text);font-family:inherit;font-size:0.92rem;outline:none;">
+              <option>سوال درباره محصول</option>
+              <option>مشکل در پرداخت</option>
+              <option>پیگیری سفارش</option>
+              <option>پیشنهاد و انتقاد</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ctMsg">متن پیام</label>
+            <textarea id="ctMsg" rows="4" placeholder="پیام شما…" style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--surface-border);background:var(--surface);color:var(--text);font-family:inherit;font-size:0.92rem;outline:none;resize:vertical;"></textarea>
+          </div>
+          <button type="submit" class="auth-submit" style="margin-top:4px;">ارسال پیام</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Legal Page (rules / privacy / about) -->
+<div class="app-page" id="legalPage">
+  <div class="app-wrap" style="max-width:760px;">
+    <div class="page-head">
+      <button class="page-back" id="lgBackBtn" aria-label="بازگشت">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div>
+        <h2 id="lgTitle">قوانین و مقررات</h2>
+        <div class="ph-sub" id="lgSub">آخرین به‌روزرسانی: شهریور ۱۴۰۵</div>
+      </div>
+    </div>
+    <div class="app-card legal-card" id="lgBody"></div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="passOverlay">
+  <div class="auth-modal" style="max-width:400px;">
+    <button class="modal-close" id="passClose" aria-label="بستن">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>تغییر رمز عبور</h3>
+    <p class="auth-sub">رمز فعلی را وارد کن و یک رمز جدید انتخاب کن</p>
+    <form id="passForm" novalidate>
+      <div class="form-group">
+        <label for="pwCurrent">رمز فعلی</label>
+        <input type="password" id="pwCurrent" autocomplete="current-password" dir="ltr">
+      </div>
+      <div class="form-group">
+        <label for="pwNew">رمز جدید</label>
+        <input type="password" id="pwNew" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" dir="ltr">
+      </div>
+      <div class="form-group">
+        <label for="pwNew2">تکرار رمز جدید</label>
+        <input type="password" id="pwNew2" autocomplete="new-password" dir="ltr">
+      </div>
+      <button type="submit" class="auth-submit" id="pwSubmitBtn">تغییر رمز</button>
+      <div class="auth-toast" id="pwToast"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Bottom Nav (mobile) -->
+<nav class="bottom-nav" id="bottomNav">
+  <a href="#home" class="bn-item active" data-bn="home">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    خانه
+  </a>
+  <a href="#services" class="bn-item" data-bn="services">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    سرویس‌ها
+  </a>
+  <button type="button" class="bn-item" data-bn="cart">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span class="bn-badge hidden" id="bnCartBadge">0</span>
+    سبد
+  </button>
+  <button type="button" class="bn-item" data-bn="profile">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    پروفایل
+  </button>
+</nav>
+
 <script>
   // ================= Helpers =================
   const $ = (id) => document.getElementById(id);
@@ -2167,6 +2642,8 @@
     const b = $('cartBadge');
     b.textContent = n;
     b.classList.toggle('hidden', n === 0);
+    const bn = $('bnCartBadge');
+    if (bn) { bn.textContent = n; bn.classList.toggle('hidden', n === 0); }
   }
 
   // ================= Auth =================
@@ -2263,7 +2740,7 @@
     profileBtn.setAttribute('aria-label', currentUser ? ('حساب: ' + currentUser.name) : 'پروفایل');
   }
 
-  $('profileBtn').addEventListener('click', () => openModal('login'));
+  $('profileBtn').addEventListener('click', () => { if (currentUser) openProfile(); else openModal('login'); });
   $('authClose').addEventListener('click', closeModal);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
   document.addEventListener('keydown', (e) => {
@@ -2585,6 +3062,10 @@
     }
     this.disabled = true;
     const items = Object.keys(cart).filter(id => cart[id] > 0).map(id => ({ id, qty: cart[id] }));
+    finalItemsSnapshot = items.map(it => {
+      const p = products.find(x => x.id === it.id) || {};
+      return { name: p.name || it.id, price: p.price || 0, qty: it.qty };
+    });
     const { ok, data } = await api('/api/orders', 'POST', { items });
     this.disabled = false;
     if (!ok || !data.ok) {
@@ -2593,17 +3074,22 @@
     }
     cart = {}; cartSave(); updateCartBadge(); renderCart();
     this.disabled = false;
+    lastOrder = { id: data.orderId, total: data.total, items: finalItemsSnapshot };
     $('scOrderId').textContent = 'شماره سفارش: ' + data.orderId;
     $('scTotal').textContent = fmt(data.total);
     $('successModal').classList.add('active');
   });
+  let lastOrder = null;
+  let finalItemsSnapshot = [];
   $('continueBtn').addEventListener('click', closeCart);
   $('scCloseBtn').addEventListener('click', () => $('successModal').classList.remove('active'));
+  $('scPayBtn').addEventListener('click', () => {
+    $('successModal').classList.remove('active');
+    if (lastOrder) openPayment(lastOrder);
+  });
   $('scOrdersBtn').addEventListener('click', () => {
     $('successModal').classList.remove('active');
-    openModal('account');
-    showAccountPanel();
-    $('showOrdersBtn').click();
+    openProfile();
   });
 
   // ================= Mobile menu / back-to-top / confirm =================
@@ -2614,7 +3100,7 @@
   $('mmBack').addEventListener('click', closeMobileMenu);
   document.querySelectorAll('.mm-link').forEach(a => a.addEventListener('click', closeMobileMenu));
   $('mmCart').addEventListener('click', () => { closeMobileMenu(); openCart(); });
-  $('mmProfile').addEventListener('click', () => { closeMobileMenu(); openModal('login'); });
+  $('mmProfile').addEventListener('click', () => { closeMobileMenu(); if (currentUser) openProfile(); else openModal('login'); });
   $('mmAdmin').addEventListener('click', () => { closeMobileMenu(); openAdmin(); });
 
   const toTop = $('toTop');
@@ -2639,6 +3125,271 @@
   $('cfNo').addEventListener('click', () => closeConfirm(false));
   $('confirmModal').addEventListener('click', (e) => { if (e.target === $('confirmModal')) closeConfirm(false); });
 
+  // ================= Page router (profile / payment / contact / legal) =================
+  const appPages = ['profilePage', 'paymentPage', 'contactPage', 'legalPage', 'adminPage'];
+  let siteHidden = false;
+  function hideSite() {
+    if (siteHidden) return;
+    document.querySelector('header').style.display = 'none';
+    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = 'none');
+    siteHidden = true;
+  }
+  function showSite() {
+    if (!siteHidden) return;
+    document.querySelector('header').style.display = '';
+    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = '');
+    siteHidden = false;
+  }
+  function showAppPage(id) {
+    hideSite();
+    appPages.forEach(p => $(p).classList.toggle('active', p === id));
+    window.scrollTo(0, 0);
+  }
+  function closeAppPages() {
+    appPages.forEach(p => $(p).classList.remove('active'));
+    showSite();
+  }
+  function currentPage() { return appPages.find(p => $(p).classList.contains('active')) || null; }
+
+  // ---- Profile ----
+  async function openProfile() {
+    if (!currentUser) { openModal('login'); return; }
+    showAppPage('profilePage');
+    const nm = (currentUser.name || '؟').trim();
+    $('pfAvatar').textContent = nm.charAt(0).toUpperCase();
+    $('pfDispName').textContent = nm;
+    $('pfEmail').textContent = currentUser.email;
+    $('pfRole').textContent = currentUser.is_admin ? 'مدیر سایت ⭐' : 'کاربر';
+    $('pfRole').classList.toggle('admin', !!currentUser.is_admin);
+    $('pfAdminBtn').style.display = currentUser.is_admin ? 'flex' : 'none';
+    $('pfNameInput').value = nm;
+    $('pfThemeSwitch').checked = rootEl.getAttribute('data-theme') === 'dark';
+    $('pfOrdersList').innerHTML = '<div class="no-orders">در حال بارگذاری…</div>';
+    const { ok, data } = await api('/api/profile', 'GET');
+    if (ok && data.ok) {
+      $('pfStOrders').textContent = data.stats.orders;
+      $('pfStSpent').textContent = (data.stats.spent || 0).toLocaleString('fa-IR');
+      $('pfStPending').textContent = data.stats.pending;
+    }
+    const res2 = await api('/api/orders', 'GET');
+    if (res2.ok && res2.data.ok) {
+      const statusFa = { pending: 'در انتظار پرداخت', paid: 'پرداخت شده', cancelled: 'لغو شده' };
+      $('pfOrdersList').innerHTML = res2.data.orders.length
+        ? res2.data.orders.map(o => `
+            <div class="order-card">
+              <div class="o-head">
+                <span class="o-id">${esc(o.id)}</span>
+                <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
+              </div>
+              <div class="o-items">${o.items.map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
+              <div class="o-total" style="display:flex;justify-content:space-between;align-items:center;">
+                <span>${fmt(o.total)}</span>
+                ${o.status === 'pending' ? `<button class="file-btn" data-pay="${esc(o.id)}" data-total="${o.total}" data-items="${esc(JSON.stringify(o.items))}">پرداخت</button>` : ''}
+              </div>
+            </div>`).join('')
+        : '<div class="no-orders">هنوز سفارشی ثبت نکرده‌اید.</div>';
+    } else {
+      $('pfOrdersList').innerHTML = '<div class="no-orders">خطا در دریافت سفارش‌ها.</div>';
+    }
+  }
+  $('profBackBtn').addEventListener('click', closeAppPages);
+  $('pfLogoutBtn').addEventListener('click', doLogout);
+  $('pfAdminBtn').addEventListener('click', () => { closeAppPages(); openAdmin(); });
+  $('pfThemeSwitch').addEventListener('change', function () {
+    const next = this.checked ? 'dark' : 'light';
+    rootEl.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+  $('pfNameForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const v = $('pfNameInput').value.trim();
+    if (v.length < 2) { gToast('نام کاربری باید حداقل ۲ کاراکتر باشد.', 'error'); return; }
+    const { ok, data } = await api('/api/profile', 'PUT', { name: v });
+    if (ok && data.ok) {
+      currentUser.name = data.name;
+      $('pfDispName').textContent = data.name;
+      $('pfAvatar').textContent = data.name.charAt(0).toUpperCase();
+      gToast('نام کاربری ذخیره شد ✓', 'success');
+    } else gToast(data.error || 'ذخیره ناموفق بود.', 'error');
+  });
+  // پرداخت از لیست سفارش‌ها
+  $('pfOrdersList').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-pay]');
+    if (!btn) return;
+    let items = [];
+    try { items = JSON.parse(btn.dataset.items); } catch (err) {}
+    openPayment({ id: btn.dataset.pay, total: Number(btn.dataset.total), items });
+  });
+
+  // ---- Change password modal ----
+  const passOverlay = $('passOverlay');
+  $('pfChangePassBtn').addEventListener('click', () => { passOverlay.classList.add('active'); document.body.style.overflow = 'hidden'; });
+  $('passClose').addEventListener('click', () => { passOverlay.classList.remove('active'); document.body.style.overflow = ''; });
+  passOverlay.addEventListener('click', (e) => { if (e.target === passOverlay) { passOverlay.classList.remove('active'); document.body.style.overflow = ''; } });
+  $('passForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const cur = $('pwCurrent').value, n1 = $('pwNew').value, n2 = $('pwNew2').value;
+    if (!cur) { showToast($('pwToast'), 'رمز فعلی را وارد کنید.', 'error'); return; }
+    if (n1.length < 6) { showToast($('pwToast'), 'رمز جدید باید حداقل ۶ کاراکتر باشد.', 'error'); return; }
+    if (n1 !== n2) { showToast($('pwToast'), 'تکرار رمز جدید یکسان نیست.', 'error'); return; }
+    const btn = $('pwSubmitBtn');
+    btn.disabled = true;
+    const { ok, data } = await api('/api/change-password', 'PUT', { current: cur, next: n1 });
+    btn.disabled = false;
+    if (ok && data.ok) {
+      this.reset();
+      passOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      gToast('رمز عبور با موفقیت تغییر کرد 🔒', 'success');
+    } else showToast($('pwToast'), data.error || 'تغییر رمز ناموفق بود.', 'error');
+  });
+
+  // ---- Payment ----
+  const payPage = $('paymentPage');
+  let payOrder = null;
+  function openPayment(order) {
+    if (!currentUser) { openModal('login'); showToast($('loginToast'), 'برای پرداخت وارد شوید.', 'error'); return; }
+    payOrder = order;
+    showAppPage('paymentPage');
+    $('payOrderId').textContent = 'شماره سفارش: ' + order.id;
+    $('payAmount').textContent = fmt(order.total);
+    $('paySummary').innerHTML = (order.items || []).map(it =>
+      `<div class="pay-summary-item"><span class="psi-name">${esc(it.name)} × ${it.qty}</span><span class="psi-val">${fmt(it.price * it.qty)}</span></div>`
+    ).join('');
+    $('cvNumber').textContent = '•••• •••• •••• ••••';
+    $('cvExpiry').textContent = '••/••';
+    $('cvHolder').textContent = currentUser.name || '—';
+  }
+  $('payBackBtn').addEventListener('click', () => { closeAppPages(); openProfile(); });
+
+  // فرمت زنده شماره کارت: 6037 9911 2233 4455
+  $('payCard').addEventListener('input', function () {
+    const d = this.value.replace(/\D/g, '').slice(0, 16);
+    this.value = d.replace(/(\d{4})(?=\d)/g, '$1 ');
+    $('cvNumber').textContent = (this.value || '•••• •••• •••• ••••').padEnd(19, '•');
+  });
+  $('payExp').addEventListener('input', function () {
+    let d = this.value.replace(/[^\d۰-۹]/g, '').replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
+    d = d.slice(0, 6);
+    this.value = d.length > 4 ? d.slice(0, 4) + '/' + d.slice(4) : d;
+    $('cvExpiry').textContent = this.value || '••/••';
+  });
+  $('payCvv').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 4); });
+  $('payPass').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 8); });
+
+  // اعتبارسنجی شماره کارت ایرانی (الگوریتم Luhn)
+  function luhnValid(num) {
+    let sum = 0, dbl = false;
+    for (let i = num.length - 1; i >= 0; i--) {
+      let d = Number(num[i]);
+      if (dbl) { d *= 2; if (d > 9) d -= 9; }
+      sum += d; dbl = !dbl;
+    }
+    return num.length === 16 && sum % 10 === 0;
+  }
+
+  $('payForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const card = $('payCard').value.replace(/\s/g, '');
+    const exp = $('payExp').value.trim();
+    const cvv = $('payCvv').value;
+    const pass = $('payPass').value;
+    let bad = false;
+    const mark = (el, cond) => { el.classList.toggle('err', cond); if (cond) bad = true; };
+    mark($('payCard'), !luhnValid(card));
+    mark($('payExp'), !/^1[34]\d{2}\/(0[1-9]|1[0-2])$/.test(exp));
+    mark($('payCvv'), cvv.length < 4);
+    mark($('payPass'), pass.length < 6);
+    if (bad) { showToast($('payToast'), 'لطفاً اطلاعات کارت را دقیق وارد کنید (شماره کارت نامعتبر است؟).', 'error'); return; }
+
+    const btn = $('paySubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> در حال اتصال به درگاه…';
+    // === نقطه‌ی اتصال API پرداخت در آینده ===
+    // فعلاً درگاه واقعی وصل نیست؛ درخواست شبیه‌سازی می‌شود.
+    await new Promise(r => setTimeout(r, 1800));
+    btn.disabled = false;
+    btn.innerHTML = 'پرداخت امن';
+    showToast($('payToast'), 'درگاه پرداخت هنوز فعال نشده است. به‌محض اتصال، همین‌جا پرداخت خواهید کرد. سفارش شما در وضعیت «در انتظار پرداخت» ذخیره شده است.', 'error');
+  });
+
+  // ---- Contact ----
+  $('ctBackBtn').addEventListener('click', closeAppPages);
+  $('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const msg = $('ctMsg').value.trim();
+    if (msg.length < 5) { gToast('متن پیام خیلی کوتاه است.', 'error'); return; }
+    this.reset();
+    gToast('پیام شما ثبت شد — به‌زودی پاسخ می‌دهیم 💬', 'success');
+  });
+
+  // ---- Legal / About ----
+  const LEGAL = {
+    rules: {
+      title: 'قوانین و مقررات',
+      body: `<h5>۱. ثبت‌نام و حساب کاربری</h5>
+        <p>کاربر با ثبت‌نام در نکسورا، اطلاعات صحیح (یوزرنیم و ایمیل معتبر) را متعهد می‌شود وارد کند. مسئولیت حفظ رمز عبور بر عهده‌ی کاربر است.</p>
+        <h5>۲. خرید اشتراک</h5>
+        <p>تمام قیمت‌ها به تومان است. پس از ثبت سفارش، فعال‌سازی معمولاً زیر ۵ دقیقه (در ساعات اداری حداکثر تا ۲۴ ساعت) انجام می‌شود.</p>
+        <h5>۳. ضمانت بازگشت وجه</h5>
+        <p>در صورت عدم تحویل یا مشکل فنی از سمت ما، تا ۷ روز پس از خرید، وجه کامل بازگردانده می‌شود.</p>
+        <h5>۴. تخلفات</h5>
+        <p>سوءاستفاده از اشتراک‌ها (فروش مجدد، اشتراک‌گذاری غیرمجاز با افراد خارج از تعریف سرویس) باعث ابطال بدون بازگشت وجه می‌شود.</p>`
+    },
+    privacy: {
+      title: 'حریم خصوصی',
+      body: `<h5>چه اطلاعاتی ذخیره می‌شود؟</h5>
+        <ul>
+          <li>یوزرنیم، ایمیل و رمز عبور <b>هش‌شده</b> (PBKDF2) — رمز شما هیچ‌جا به‌صورت متن ساده ذخیره نمی‌شود.</li>
+          <li>تاریخچه‌ی سفارش‌ها برای پشتیبانی و تمدید اشتراک.</li>
+        </ul>
+        <h5>اطلاعات کارت بانکی</h5>
+        <p>هیچ‌گاه در سرور نکسورا ذخیره نمی‌شود؛ مستقیماً به درگاه پرداخت امن ارسال می‌گردد.</p>
+        <h5>اشتراک‌گذاری با دیگران</h5>
+        <p>اطلاعات شما فروخته یا در اختیار شخص ثالث قرار نمی‌گیرد.</p>`
+    },
+    about: {
+      title: 'درباره Nexora',
+      body: `<p>نکسورا پلتفرم فروش اشتراک سرویس‌های پریمیوم جهانی است؛ با هدف دور زدن تحریم‌ها، مشکل پرداخت ارزی و نوسان ارز برای کاربران ایرانی.</p>
+        <h5>چرا ما؟</h5>
+        <ul>
+          <li>فعال‌سازی سریع و ضمانت اصالت اشتراک‌ها</li>
+          <li>پشتیبانی انسانی ۲۴/۷</li>
+          <li>قیمت‌های منصفانه و شفاف</li>
+          <li>بیش از ۳ سال سابقه و هزاران کاربر فعال</li>
+        </ul>
+        <p>تیم ما متشکل از متخصصان فناوری است که تجربه‌ی خرید سرویس‌های خارجی را برای شما ساده و مطمئن کرده‌اند.</p>`
+    },
+  };
+  function openLegal(key) {
+    const L = LEGAL[key] || LEGAL.rules;
+    $('lgTitle').textContent = L.title;
+    $('lgBody').innerHTML = L.body;
+    showAppPage('legalPage');
+  }
+  $('lgBackBtn').addEventListener('click', closeAppPages);
+
+  // ---- Bottom nav ----
+  function setBnActive(name) {
+    document.querySelectorAll('.bn-item').forEach(b => b.classList.toggle('active', b.dataset.bn === name));
+  }
+  document.querySelectorAll('.bn-item').forEach(b => b.addEventListener('click', (e) => {
+    const act = b.dataset.bn;
+    if (act === 'cart') { e.preventDefault(); openCart(); return; }
+    if (act === 'profile') { e.preventDefault(); openProfile(); return; }
+    setBnActive(act);
+  }));
+  $('logoHome').addEventListener('click', () => { closeAppPages(); });
+
+  // ---- Footer links ----
+  document.querySelectorAll('[data-page]').forEach(a => a.addEventListener('click', (e) => {
+    e.preventDefault();
+    const p = a.dataset.page;
+    if (p === 'contact') showAppPage('contactPage');
+    else if (p === 'profile') openProfile();
+    else openLegal(p);
+  }));
+
   // ================= Admin =================
   const adminPage = $('adminPage');
   let editingId = null;
@@ -2653,16 +3404,11 @@
       showToast($('loginToast'), 'دسترسی فقط برای مدیر سایت.', 'error');
       return;
     }
-    document.querySelector('header').style.display = 'none';
-    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = 'none');
-    adminPage.classList.add('active');
-    window.scrollTo(0, 0);
+    showAppPage('adminPage');
     loadAdminData();
   }
   function closeAdmin() {
-    adminPage.classList.remove('active');
-    document.querySelector('header').style.display = '';
-    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = '');
+    closeAppPages();
   }
   document.querySelectorAll('.admin-tab-btn').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.admin-tab-btn').forEach(x => x.classList.toggle('active', x === b));
