@@ -139,6 +139,13 @@ export async function sendVerificationEmail(env, { to, name, code }) {
       from: fromAddress,
       to: [to],
       subject: "کد تأیید ایمیل شما در Nexora",
+      // نسخه‌ی متنی ساده — برای تحویل‌پذیری بهتر در جیمیل ضروریه
+      text:
+        `سلام ${name || ""}\n\n` +
+        `کد تأیید ایمیل شما در Nexora: ${code}\n\n` +
+        `این کد تا ۱۰ دقیقه دیگر معتبر است.\n` +
+        `اگر شما این درخواست را نداده‌اید، این ایمیل را نادیده بگیرید.\n\n` +
+        `— تیم Nexora`,
       html: `
         <div dir="rtl" style="font-family: Tahoma, Arial, sans-serif; text-align:right; line-height:1.8;">
           <p>سلام ${name || ""} 👋</p>
