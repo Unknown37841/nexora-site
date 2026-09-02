@@ -5,6 +5,7 @@ import {
   createVerificationCode,
   sendVerificationEmail,
   verificationCooldownRemainingMs,
+  logError,
 } from "../_utils.js";
 
 export async function onRequestPost(context) {

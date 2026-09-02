@@ -6,6 +6,7 @@ import {
   randomHex,
   createVerificationCode,
   sendVerificationEmail,
+  logError,
 } from "../_utils.js";
 
 export async function onRequestPost(context) {
