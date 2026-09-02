@@ -152,7 +152,20 @@ export async function sendVerificationEmail(env, { to, name, code }) {
 
   if (!res.ok) {
     const errText = await res.text().catch(() => "");
-    throw new Error("ارسال ایمیل تأیید ناموفق بود: " + errText);
+    // حالت تست Resend: فقط به آدرس اکانت Resend می‌توان ایمیل زد (خطای 403)
+    if (res.status === 403 || /testing emails/i.test(errText)) {
+      const m = errText.match(/\(([^()]+@[^()]+)\)/);
+      const allowed = m ? m[1] : "همان ایمیلی که با آن در Resend ثبت‌نام کرده‌اید";
+      const e = new Error(
+        "سایت فعلاً در حالت تست Resend است و ایمیل فقط به آدرس «" +
+          allowed +
+          "» ارسال می‌شود. برای فعال‌سازی ارسال به همه‌ی کاربران، یک دامنه را در Resend وریفای کنید و متغیر RESEND_FROM را تنظیم کنید."
+      );
+      e.testMode = true;
+      e.allowedTo = m ? m[1] : null;
+      throw e;
+    }
+    throw new Error("ارسال ایمیل تأیید ناموفق بود: " + errText.slice(0, 300));
   }
 }
 

@@ -50,6 +50,12 @@ export async function onRequestPost(context) {
   try {
     await sendVerificationEmail(env, { to: email, name: user.name, code });
   } catch (err) {
+    logError("resend-code: send", err);
+    if (err && err.testMode) {
+      return jsonError("ارسال کد ناموفق بود: " + err.message, 502, {
+        code: "EMAIL_TEST_MODE",
+      });
+    }
     return jsonError("ارسال ایمیل با خطا مواجه شد. کمی بعد دوباره تلاش کنید.", 502);
   }
 

@@ -77,6 +77,11 @@ export async function onRequestPost(context) {
     });
   } catch (err) {
     logError("login: send code", err);
+    if (err && err.testMode) {
+      return jsonError("ارسال کد ناموفق بود: " + err.message, 502, {
+        code: "EMAIL_TEST_MODE",
+      });
+    }
     return jsonError(
       "ارسال کد ورود با خطا مواجه شد. کمی بعد دوباره تلاش کنید.",
       502

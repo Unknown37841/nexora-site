@@ -44,6 +44,7 @@ export async function onRequestPost(context) {
   const salt = randomHex(16);
   const passwordHash = await hashPassword(password, salt);
   const now = Date.now();
+  const userId = existing ? existing.id : randomHex(16);
 
   if (existing) {
     // ثبت‌نام قبلی ناتمام مونده (تأیید ایمیل انجام نشده) -> اطلاعات رو آپدیت کن و کد جدید بفرست
@@ -53,11 +54,10 @@ export async function onRequestPost(context) {
       .bind(name, passwordHash, salt, existing.id)
       .run();
   } else {
-    const id = randomHex(16);
     await env.DB.prepare(
       "INSERT INTO users (id, name, email, password_hash, salt, created_at, email_verified) VALUES (?, ?, ?, ?, ?, ?, 0)"
     )
-      .bind(id, name, email, passwordHash, salt, now)
+      .bind(userId, name, email, passwordHash, salt, now)
       .run();
   }
 
@@ -66,6 +66,19 @@ export async function onRequestPost(context) {
   try {
     await sendVerificationEmail(env, { to: email, name, code });
   } catch (err) {
+    // اگه کاربر تازه ساخته شده و ایمیلش نرفت (مثلاً محدودیت تست Resend)،
+    // رکورد نیمه‌کاره را پاک می‌کنیم تا حساب "شبح" باقی نماند و کاربر
+    // دوباره بتواند با همین ایمیل ثبت‌نام کند.
+    if (!existing && err && err.testMode) {
+      await env.DB.prepare("DELETE FROM users WHERE id = ?").bind(userId).run();
+      await env.DB.prepare("DELETE FROM email_verifications WHERE email = ?").bind(email).run();
+      return jsonError(
+        "ثبت‌نام انجام نشد: " + err.message,
+        502,
+        { code: "EMAIL_TEST_MODE" }
+      );
+    }
+    logError("register: send email", err);
     return jsonError(
       "ثبت‌نام ذخیره شد اما ارسال ایمیل کد تأیید با خطا مواجه شد. کمی بعد دوباره «ارسال مجدد کد» را بزنید.",
       502
