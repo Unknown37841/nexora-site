@@ -5,4 +5,4 @@ compatibility_date = "2024-09-23"
 [[d1_databases]]
 binding = "DB"
 database_name = "nexora-db"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+database_id = "7446dfde-127f-4fe4-841c-3fc6eff67d01"
