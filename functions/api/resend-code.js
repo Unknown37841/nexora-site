@@ -27,7 +27,6 @@ export async function onRequestPost(context) {
     .first();
 
   if (!user) return jsonError("کاربری با این ایمیل پیدا نشد.", 404);
-  if (user.email_verified) return jsonError("این ایمیل قبلاً تأیید شده است.", 409);
 
   const existing = await env.DB.prepare(
     "SELECT last_sent_at FROM email_verifications WHERE email = ?"

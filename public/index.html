@@ -167,10 +167,12 @@
     color: white;
     font-size: 0.7rem;
     font-weight: 700;
-    width: 18px; height: 18px;
-    border-radius: 50%;
+    min-width: 18px; height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
     display: grid; place-items: center;
   }
+  .cart-badge.hidden { display: none; }
   .theme-toggle svg { transition: transform 0.5s; }
   [data-theme="dark"] .theme-toggle svg { transform: rotate(180deg); }
 
@@ -345,6 +347,8 @@
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
   }
   .service-card::before {
     content: '';
@@ -365,6 +369,15 @@
     transform: scaleX(1);
     transform-origin: left;
   }
+  .service-cover {
+    margin: -28px -28px 20px;
+    height: 130px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    display: grid; place-items: center;
+    overflow: hidden;
+  }
+  .service-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .service-cover .cover-fallback { color: rgba(255,255,255,0.9); font-weight: 800; font-size: 1.6rem; }
   .service-icon {
     width: 56px; height: 56px;
     border-radius: 16px;
@@ -374,7 +387,10 @@
     margin-bottom: 20px;
     color: white;
     position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
   }
+  .service-icon img { width: 100%; height: 100%; object-fit: cover; }
   .service-card h3 {
     font-size: 1.25rem;
     font-weight: 700;
@@ -385,6 +401,7 @@
     font-size: 0.92rem;
     margin-bottom: 20px;
     min-height: 48px;
+    flex: 1;
   }
   .service-meta {
     display: flex;
@@ -421,14 +438,201 @@
     color: white;
     transform: rotate(90deg);
   }
+  .badge-tag {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: rgba(255,255,255,0.92);
+    color: #0f172a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    z-index: 2;
+  }
+  .prod-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-mute);
+    padding: 40px 0;
+  }
 
-  /* Service color variations */
-  .svc-gemini .service-icon { background: linear-gradient(135deg, #4285f4, #34a853); }
-  .svc-chatgpt .service-icon { background: linear-gradient(135deg, #10a37f, #0d8a6a); }
-  .svc-claude .service-icon { background: linear-gradient(135deg, #d97757, #c2410c); }
-  .svc-spotify .service-icon { background: linear-gradient(135deg, #1db954, #0f7a37); }
-  .svc-youtube .service-icon { background: linear-gradient(135deg, #ff0000, #cc0000); }
-  .svc-netflix .service-icon { background: linear-gradient(135deg, #e50914, #831010); }
+  /* ---------- Cart Drawer ---------- */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+    z-index: 300;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .cart-overlay.active { display: block; opacity: 1; }
+  .cart-drawer {
+    position: fixed;
+    top: 0; bottom: 0; left: 0;
+    width: min(420px, 92vw);
+    background: var(--bg-soft);
+    border-right: 1px solid var(--surface-border);
+    z-index: 310;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-105%);
+    transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-lg);
+  }
+  .cart-drawer.active { transform: translateX(0); }
+  .cart-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--surface-border);
+  }
+  .cart-head h3 { font-size: 1.1rem; font-weight: 800; }
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .cart-empty {
+    text-align: center;
+    color: var(--text-mute);
+    margin-top: 60px;
+  }
+  .cart-empty svg { opacity: 0.4; margin-bottom: 12px; }
+  .cart-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+  }
+  .cart-item-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    color: white;
+    font-weight: 800;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .cart-item-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-info .ci-name {
+    font-weight: 700;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cart-item-info .ci-price { color: var(--text-mute); font-size: 0.8rem; }
+  .ci-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .qty-btn {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    display: grid; place-items: center;
+    transition: all 0.2s;
+  }
+  .qty-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .ci-qty { min-width: 20px; text-align: center; font-weight: 700; font-size: 0.9rem; }
+  .ci-remove {
+    border: none;
+    background: transparent;
+    color: var(--text-mute);
+    cursor: pointer;
+    padding: 4px;
+    display: grid; place-items: center;
+    transition: color 0.2s;
+  }
+  .ci-remove:hover { color: #ef4444; }
+  .cart-foot {
+    border-top: 1px solid var(--surface-border);
+    padding: 18px 22px;
+  }
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .cart-total-row .t-label { color: var(--text-soft); font-size: 0.95rem; }
+  .cart-total-row .t-amount { font-size: 1.25rem; font-weight: 800; }
+  .checkout-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: 0 10px 25px -8px rgba(99,102,241,0.6);
+  }
+  .checkout-btn:hover { transform: translateY(-2px); }
+  .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .cart-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-mute);
+    margin-top: 10px;
+  }
+  .cart-toast {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    text-align: center;
+    display: none;
+  }
+  .cart-toast.show { display: block; }
+  .cart-toast.success { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+  .cart-toast.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+  /* ---------- Orders (in account panel) ---------- */
+  .orders-list { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .order-card {
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    background: var(--surface);
+  }
+  .order-card .o-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .order-card .o-id { font-size: 0.8rem; color: var(--text-mute); direction: ltr; }
+  .o-status {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .o-status.pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .o-status.paid { background: rgba(16,185,129,0.15); color: var(--success); }
+  .o-status.cancelled { background: rgba(239,68,68,0.12); color: #ef4444; }
+  .order-card .o-items { font-size: 0.82rem; color: var(--text-soft); }
+  .order-card .o-total { font-weight: 700; font-size: 0.9rem; margin-top: 4px; }
+  .no-orders { color: var(--text-mute); font-size: 0.85rem; text-align: center; margin-top: 14px; }
 
   /* ---------- Features ---------- */
   .features-grid {
@@ -727,39 +931,6 @@
   }
   .auth-modal h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; text-align: center; }
   .auth-modal .auth-sub { text-align: center; color: var(--text-mute); font-size: 0.85rem; margin-bottom: 22px; }
-  .method-switch { display: flex; gap: 8px; margin-bottom: 10px; }
-  .method-btn {
-    flex: 1;
-    padding: 9px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    color: var(--text-soft);
-    font-family: inherit;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .method-btn.active {
-    border-color: var(--primary);
-    color: var(--primary);
-    background: rgba(99,102,241,0.08);
-  }
-  .method-btn[disabled] { opacity: 0.55; cursor: not-allowed; position: relative; }
-  .method-btn .soon-badge {
-    display: block;
-    font-size: 0.68rem;
-    color: var(--text-mute);
-    margin-top: 2px;
-  }
-  .method-note {
-    font-size: 0.75rem;
-    color: var(--text-mute);
-    text-align: center;
-    margin-bottom: 18px;
-    line-height: 1.6;
-  }
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-soft); margin-bottom: 6px; }
   .form-group input {
@@ -806,10 +977,214 @@
   .auth-toast.show { display: block; }
   .auth-toast.success { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
   .auth-toast.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .switch-link {
+    text-align: center;
+    font-size: 0.83rem;
+    color: var(--text-mute);
+    margin-top: 16px;
+  }
+  .switch-link a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
+
+  /* ---------- Admin ---------- */
+  .admin-link { display: none; }
+  .admin-link.show { display: grid; }
+  .admin-page {
+    display: none;
+    min-height: 100vh;
+    padding: 100px 0 60px;
+  }
+  .admin-page.active { display: block; }
+  .admin-wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+  .admin-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 26px;
+  }
+  .admin-head h2 { font-size: 1.5rem; font-weight: 800; }
+  .admin-head .ah-actions { display: flex; gap: 10px; }
+  .admin-tabs { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+  .admin-tab-btn {
+    padding: 9px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .admin-tab-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff;
+    border-color: transparent;
+  }
+  .admin-section { display: none; }
+  .admin-section.active { display: block; }
+  .admin-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .admin-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+  .adm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .adm-grid .full { grid-column: 1 / -1; }
+  .adm-grid label { font-size: 0.8rem; font-weight: 600; color: var(--text-soft); display: block; margin-bottom: 5px; }
+  .adm-grid input, .adm-grid textarea, .adm-grid select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.9rem;
+    outline: none;
+  }
+  .adm-grid input:focus, .adm-grid textarea:focus { border-color: var(--primary); }
+  .adm-grid textarea { resize: vertical; min-height: 70px; }
+  .img-pick-row { display: flex; align-items: center; gap: 12px; }
+  .img-preview {
+    width: 54px; height: 54px;
+    border-radius: 12px;
+    border: 1px dashed var(--surface-border);
+    display: grid; place-items: center;
+    color: var(--text-mute);
+    font-size: 0.7rem;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--surface);
+  }
+  .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .file-btn {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .file-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .color-input { width: 46px !important; height: 36px; padding: 2px !important; cursor: pointer; }
+  .adm-submit {
+    padding: 11px 26px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: #fff;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 14px;
+  }
+  .adm-cancel {
+    padding: 11px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--text-soft);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 14px;
+    margin-right: 8px;
+  }
+  .admin-toast {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    display: none;
+  }
+  .admin-toast.show { display: block; }
+  .admin-toast.success { background: rgba(16,185,129,0.12); color: var(--success); border: 1px solid rgba(16,185,129,0.3); }
+  .admin-toast.error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .admin-prod-list { display: flex; flex-direction: column; gap: 10px; }
+  .admin-prod-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    background: var(--surface);
+  }
+  .admin-prod-row .apr-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    color: #fff;
+    font-weight: 800;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .admin-prod-row .apr-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .apr-info { flex: 1; min-width: 0; }
+  .apr-info .apr-name { font-weight: 700; font-size: 0.95rem; }
+  .apr-info .apr-meta { font-size: 0.78rem; color: var(--text-mute); }
+  .apr-info .apr-meta .inactive-tag { color: #f59e0b; font-weight: 700; }
+  .apr-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .apr-btn {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: transparent;
+    color: var(--text-soft);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .apr-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .apr-btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+  .admin-orders { display: flex; flex-direction: column; gap: 12px; }
+  .adm-order-row {
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    background: var(--surface);
+  }
+  .adm-order-row .ao-head {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .adm-order-row .ao-user { font-weight: 700; font-size: 0.9rem; }
+  .adm-order-row .ao-email { font-size: 0.78rem; color: var(--text-mute); direction: ltr; }
+  .adm-order-row .ao-items { font-size: 0.83rem; color: var(--text-soft); margin-bottom: 8px; }
+  .adm-order-row .ao-foot { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .adm-order-row .ao-total { font-weight: 800; }
+  .ao-status-select {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .admin-empty { text-align: center; color: var(--text-mute); padding: 30px 0; }
 
   /* ---------- Mobile ---------- */
   @media (max-width: 900px) {
     .footer-grid { grid-template-columns: 1fr 1fr; }
+    .adm-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 720px) {
     .nav-links { display: none; }
@@ -821,6 +1196,8 @@
     .trust-strip { gap: 20px; }
     .stats { padding: 35px 20px; }
     .cta-box { padding: 40px 24px; }
+    .admin-page { padding-top: 90px; }
+    .admin-prod-row { flex-wrap: wrap; }
   }
 </style>
 </head>
@@ -837,7 +1214,7 @@
 <header>
   <div class="container">
     <nav class="nav">
-      <a href="#" class="logo">
+      <a href="#" class="logo" id="logoHome">
         <span class="logo-mark">N</span>
         <span>Nexora</span>
       </a>
@@ -856,19 +1233,25 @@
             <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
         </button>
+        <button class="icon-btn admin-link" id="adminBtn" aria-label="پنل مدیریت" title="پنل مدیریت">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
         <button class="icon-btn" id="profileBtn" aria-label="پروفایل">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
         </button>
-        <button class="icon-btn" aria-label="سبد خرید">
+        <button class="icon-btn" id="cartBtn" aria-label="سبد خرید">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="9" cy="21" r="1"/>
             <circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
-          <span class="cart-badge">2</span>
+          <span class="cart-badge hidden" id="cartBadge">0</span>
         </button>
         <button class="icon-btn menu-toggle" aria-label="منو">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -892,28 +1275,37 @@
       </svg>
     </button>
 
-    <div class="auth-tabs">
-      <button type="button" class="auth-tab active" data-tab="register">ثبت‌نام</button>
-      <button type="button" class="auth-tab" data-tab="login">ورود</button>
+    <div class="auth-tabs" id="authTabsWrap">
+      <button type="button" class="auth-tab active" data-tab="login">ورود</button>
+      <button type="button" class="auth-tab" data-tab="register">ثبت‌نام</button>
+    </div>
+
+    <!-- Login panel -->
+    <div class="auth-panel" id="panel-login">
+      <h3>ورود به حساب کاربری</h3>
+      <p class="auth-sub">ایمیل و رمز خود را وارد کنید؛ یک کد ۶ رقمی برایتان می‌فرستیم</p>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">ایمیل</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
+          <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">رمز عبور</label>
+          <input type="password" id="loginPassword" placeholder="رمز عبور" autocomplete="current-password" dir="ltr">
+          <div class="field-error">لطفاً رمز عبور را وارد کنید.</div>
+        </div>
+        <button type="submit" class="auth-submit" id="loginSubmit">ارسال کد ورود</button>
+        <div class="auth-toast" id="loginToast"></div>
+      </form>
+      <div class="switch-link">حساب ندارید؟ <a id="gotoRegister">ثبت‌نام کنید</a></div>
     </div>
 
     <!-- Register panel -->
-    <div class="auth-panel" id="panel-register">
+    <div class="auth-panel" id="panel-register" style="display:none;">
       <h3>ساخت حساب کاربری</h3>
       <p class="auth-sub">برای خرید و مدیریت اشتراک‌هایتان ثبت‌نام کنید</p>
-
-      <div class="method-switch">
-        <button type="button" class="method-btn" disabled>
-          ثبت‌نام با شماره موبایل
-          <span class="soon-badge">به‌زودی</span>
-        </button>
-        <button type="button" class="method-btn active" disabled>
-          ثبت‌نام با ایمیل
-        </button>
-      </div>
-      <p class="method-note">
-        ثبت‌نام با شماره موبایل ایران نیاز به اتصال سایت به یک سامانه ارسال پیامک دارد و به‌زودی اضافه می‌شود. فعلاً ثبت‌نام از طریق ایمیل انجام می‌شود.
-      </p>
 
       <form id="registerForm" novalidate>
         <div class="form-group">
@@ -939,32 +1331,12 @@
         <button type="submit" class="auth-submit">ایجاد حساب کاربری</button>
         <div class="auth-toast" id="regToast"></div>
       </form>
+      <div class="switch-link">قبلاً ثبت‌نام کرده‌اید؟ <a id="gotoLogin">وارد شوید</a></div>
     </div>
 
-    <!-- Login panel -->
-    <div class="auth-panel" id="panel-login" style="display:none;">
-      <h3>ورود به حساب کاربری</h3>
-      <p class="auth-sub">با ایمیل خود وارد شوید</p>
-
-      <form id="loginForm" novalidate>
-        <div class="form-group">
-          <label for="loginEmail">ایمیل</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
-          <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
-        </div>
-        <div class="form-group">
-          <label for="loginPassword">رمز عبور</label>
-          <input type="password" id="loginPassword" placeholder="رمز عبور" autocomplete="current-password" dir="ltr">
-          <div class="field-error">لطفاً رمز عبور را وارد کنید.</div>
-        </div>
-        <button type="submit" class="auth-submit">ورود</button>
-        <div class="auth-toast" id="loginToast"></div>
-      </form>
-    </div>
-
-    <!-- Verify email panel -->
+    <!-- Code verify panel (register verification OR login step 2) -->
     <div class="auth-panel" id="panel-verify" style="display:none;">
-      <h3>تأیید ایمیل</h3>
+      <h3 id="verifyTitle">تأیید ایمیل</h3>
       <p class="auth-sub" id="verifySub">کد ۶ رقمی ارسال‌شده به ایمیلتان را وارد کنید</p>
 
       <form id="verifyForm" novalidate>
@@ -973,7 +1345,7 @@
           <input type="text" id="verifyCode" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="------" autocomplete="one-time-code" dir="ltr">
           <div class="field-error">کد باید ۶ رقم باشد.</div>
         </div>
-        <button type="submit" class="auth-submit">تأیید کد</button>
+        <button type="submit" class="auth-submit" id="verifySubmit">تأیید و ادامه</button>
         <button type="button" class="auth-submit" id="resendCodeBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:10px;">
           ارسال مجدد کد
         </button>
@@ -985,7 +1357,13 @@
     <div class="auth-panel" id="panel-account" style="display:none;">
       <h3>حساب کاربری</h3>
       <p class="auth-sub" id="accountWelcome">خوش آمدید</p>
-      <button type="button" class="auth-submit" id="logoutBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;">
+      <button type="button" class="auth-submit" id="showOrdersBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;">
+        سفارش‌های من
+      </button>
+      <div id="ordersBox" style="display:none;">
+        <div class="orders-list" id="ordersList"></div>
+      </div>
+      <button type="button" class="auth-submit" id="logoutBtn" style="background:transparent;border:1px solid var(--surface-border);color:var(--text);box-shadow:none;margin-top:14px;">
         خروج از حساب
       </button>
       <div class="auth-toast" id="accountToast"></div>
@@ -993,8 +1371,32 @@
   </div>
 </div>
 
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer" aria-label="سبد خرید">
+  <div class="cart-head">
+    <h3>سبد خرید</h3>
+    <button class="modal-close" id="cartClose" aria-label="بستن سبد" style="position:static;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total-row">
+      <span class="t-label">مجموع</span>
+      <span class="t-amount" id="cartTotal">0 تومان</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn">ثبت سفارش</button>
+    <div class="cart-note">پرداخت آنلاین به‌زودی متصل می‌شود؛ سفارش شما ثبت و توسط پشتیبانی نهایی می‌شود.</div>
+    <div class="cart-toast" id="cartToast"></div>
+  </div>
+</div>
+
 <!-- Hero -->
-<section class="hero">
+<section class="hero" id="home">
   <div class="container">
     <div class="hero-badge">
       <span class="dot"></span>
@@ -1041,7 +1443,7 @@
   </div>
 </section>
 
-<!-- Services -->
+<!-- Services (products from D1) -->
 <section class="section" id="services">
   <div class="container">
     <div class="section-head reveal">
@@ -1049,115 +1451,8 @@
       <h2>محبوب‌ترین اشتراک‌ها</h2>
       <p>بهترین سرویس‌های آنلاین دنیا را با قیمت منصفانه و ضمانت کامل دریافت کنید.</p>
     </div>
-
-    <div class="services-grid">
-      <div class="service-card svc-gemini reveal">
-        <div class="service-icon">G</div>
-        <h3>Gemini Pro</h3>
-        <p class="desc">دسترسی کامل به هوش مصنوعی پیشرفته گوگل با قابلیت‌های پریمیوم.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۱۸۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="service-card svc-chatgpt reveal">
-        <div class="service-icon">C</div>
-        <h3>ChatGPT Plus</h3>
-        <p class="desc">اشتراک رسمی OpenAI با دسترسی به GPT-4 و ابزارهای پیشرفته.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۲۴۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="service-card svc-claude reveal">
-        <div class="service-icon">A</div>
-        <h3>Claude Pro</h3>
-        <p class="desc">دستیار هوشمند Anthropic با قابلیت‌های تحلیلی و نوشتاری قوی.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۲۲۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="service-card svc-spotify reveal">
-        <div class="service-icon">S</div>
-        <h3>Spotify Premium</h3>
-        <p class="desc">میلیون‌ها آهنگ و پادکست بدون تبلیغات و با کیفیت بالا.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۸۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="service-card svc-youtube reveal">
-        <div class="service-icon">Y</div>
-        <h3>YouTube Premium</h3>
-        <p class="desc">تماشای ویدیو بدون تبلیغات + YouTube Music به صورت رایگان.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۱۱۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <div class="service-card svc-netflix reveal">
-        <div class="service-icon">N</div>
-        <h3>Netflix Premium</h3>
-        <p class="desc">تماشای فیلم و سریال‌های روز دنیا با کیفیت 4K و بدون محدودیت.</p>
-        <div class="service-meta">
-          <div class="price">
-            <span class="amount">۱۴۹,۰۰۰ ت</span>
-            <span class="period">ماهانه</span>
-          </div>
-          <button class="add-btn" aria-label="افزودن به سبد">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-          </button>
-        </div>
-      </div>
+    <div class="services-grid" id="servicesGrid">
+      <div class="prod-loading">در حال بارگذاری سرویس‌ها…</div>
     </div>
   </div>
 </section>
@@ -1283,13 +1578,41 @@
   </div>
 </section>
 
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-tag">سوالات متداول</span>
+      <h2>هر سوالی داری جوابش اینجاست</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature reveal">
+        <h4>چطور اشتراک بخرم؟</h4>
+        <p>سرویس موردنظر را به سبد خرید اضافه کنید، وارد حساب شوید و سفارش را ثبت کنید. پس از اتصال درگاه پرداخت، به‌صورت آنلاین پرداخت می‌کنید.</p>
+      </div>
+      <div class="feature reveal">
+        <h4>اشتراک‌ها اورجینال هستند؟</h4>
+        <p>بله؛ تمام اشتراک‌ها رسمی و اورجینال هستند و تا پایان دوره فعال می‌مانند.</p>
+      </div>
+      <div class="feature reveal">
+        <h4>کد ورود (لاگین) چطور کار می‌کند؟</h4>
+        <p>برای امنیت بیشتر، هر بار که وارد شوید یک کد ۶ رقمی به ایمیلتان فرستاده می‌شود؛ با وارد کردن آن وارد حساب می‌شوید.</p>
+      </div>
+      <div class="feature reveal">
+        <h4>پشتیبانی چطور جواب می‌دهد؟</h4>
+        <p>تیم پشتیبانی ۲۴ ساعته است؛ کافی است از بخش تماس پیام بدهید.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="section">
   <div class="container">
     <div class="cta-box reveal">
       <h2>آماده‌اید تجربه‌ای متفاوت داشته باشید؟</h2>
       <p>همین حالا اشتراک مورد علاقه‌تان را انتخاب کنید و در کمتر از ۵ دقیقه از آن استفاده کنید.</p>
-      <a href="#services" class="btn">شروع کنید — رایگان</a>
+      <a href="#services" class="btn">شروع کنید</a>
     </div>
   </div>
 </section>
@@ -1326,11 +1649,8 @@
       </div>
       <div class="footer-col">
         <h5>سرویس‌ها</h5>
-        <ul>
-          <li><a href="#">Gemini Pro</a></li>
-          <li><a href="#">ChatGPT Plus</a></li>
-          <li><a href="#">Claude Pro</a></li>
-          <li><a href="#">Spotify</a></li>
+        <ul id="footerProducts">
+          <li><a href="#services">همه سرویس‌ها</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -1345,7 +1665,7 @@
       <div class="footer-col">
         <h5>پشتیبانی</h5>
         <ul>
-          <li><a href="#">سوالات متداول</a></li>
+          <li><a href="#faq">سوالات متداول</a></li>
           <li><a href="#">قوانین و مقررات</a></li>
           <li><a href="#">حریم خصوصی</a></li>
           <li><a href="#">گارانتی بازگشت</a></li>
@@ -1358,314 +1678,746 @@
   </div>
 </footer>
 
-<script>
-  // Theme toggle
-  const themeToggle = document.getElementById('themeToggle');
-  const root = document.documentElement;
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  root.setAttribute('data-theme', savedTheme);
+<!-- Admin Page -->
+<div class="admin-page" id="adminPage">
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <h2>پنل مدیریت Nexora</h2>
+      <div class="ah-actions">
+        <button class="btn btn-ghost" id="adminBackBtn" style="padding:10px 20px;font-size:0.88rem;">بازگشت به سایت</button>
+        <button class="btn btn-ghost" id="adminLogoutBtn" style="padding:10px 20px;font-size:0.88rem;">خروج</button>
+      </div>
+    </div>
 
-  themeToggle.addEventListener('click', () => {
-    const current = root.getAttribute('data-theme');
-    const next = current === 'light' ? 'dark' : 'light';
-    root.setAttribute('data-theme', next);
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab-btn active" data-asec="products">محصولات</button>
+      <button type="button" class="admin-tab-btn" data-asec="orders">سفارش‌ها</button>
+    </div>
+
+    <!-- Products management -->
+    <div class="admin-section active" id="asec-products">
+      <div class="admin-card" id="prodFormCard">
+        <h4 id="prodFormTitle">افزودن محصول جدید</h4>
+        <form id="prodForm">
+          <div class="adm-grid">
+            <div class="full">
+              <label>نام محصول *</label>
+              <input type="text" id="pfName" placeholder="مثلاً ChatGPT Plus" required>
+            </div>
+            <div class="full">
+              <label>توضیحات</label>
+              <textarea id="pfDesc" placeholder="توضیح کوتاه محصول"></textarea>
+            </div>
+            <div>
+              <label>قیمت (تومان) *</label>
+              <input type="number" id="pfPrice" min="0" step="1000" placeholder="249000" required>
+            </div>
+            <div>
+              <label>دوره</label>
+              <input type="text" id="pfPeriod" placeholder="ماهانه" value="ماهانه">
+            </div>
+            <div>
+              <label>متن آیکون (اگر عکس ندارید، یک حرف)</label>
+              <input type="text" id="pfIconText" maxlength="4" placeholder="C">
+            </div>
+            <div>
+              <label>رنگ آیکون</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="color" id="pfColor1" class="color-input" value="#6366f1">
+                <input type="color" id="pfColor2" class="color-input" value="#8b5cf6">
+                <span style="font-size:0.75rem;color:var(--text-mute);">گرادیان آیکون</span>
+              </div>
+            </div>
+            <div>
+              <label>برچسب (اختیاری)</label>
+              <input type="text" id="pfBadge" maxlength="30" placeholder="پرفروش">
+            </div>
+            <div>
+              <label>ترتیب نمایش</label>
+              <input type="number" id="pfSort" min="1" value="99">
+            </div>
+            <div>
+              <label>آیکون محصول</label>
+              <div class="img-pick-row">
+                <div class="img-preview" id="iconPreview">بی‌عکس</div>
+                <input type="file" id="pfIconFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;">
+                <button type="button" class="file-btn" id="pfIconBtn">انتخاب آیکون</button>
+                <button type="button" class="file-btn" id="pfIconClear" title="حذف عکس">×</button>
+              </div>
+            </div>
+            <div>
+              <label>کاور (عکس بالای کارت)</label>
+              <div class="img-pick-row">
+                <div class="img-preview" id="coverPreview" style="width:80px;">بی‌عکس</div>
+                <input type="file" id="pfCoverFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;">
+                <button type="button" class="file-btn" id="pfCoverBtn">انتخاب کاور</button>
+                <button type="button" class="file-btn" id="pfCoverClear" title="حذف عکس">×</button>
+              </div>
+            </div>
+            <div>
+              <label>وضعیت</label>
+              <select id="pfActive">
+                <option value="1">فعال (نمایش در سایت)</option>
+                <option value="0">غیرفعال (مخفی)</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="adm-submit" id="prodSubmitBtn">ذخیره محصول</button>
+          <button type="button" class="adm-cancel" id="prodCancelBtn" style="display:none;">انصراف از ویرایش</button>
+          <div class="admin-toast" id="prodToast"></div>
+        </form>
+      </div>
+
+      <div class="admin-card">
+        <h4>محصولات فعلی</h4>
+        <div class="admin-prod-list" id="adminProdList"></div>
+      </div>
+    </div>
+
+    <!-- Orders management -->
+    <div class="admin-section" id="asec-orders">
+      <div class="admin-card">
+        <h4>همه سفارش‌ها</h4>
+        <div class="admin-orders" id="adminOrdersList"></div>
+        <div class="admin-toast" id="ordersToast"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ================= Helpers =================
+  const $ = (id) => document.getElementById(id);
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function fmt(n) { return Number(n || 0).toLocaleString('en-US') + ' تومان'; }
+  async function api(path, method = 'GET', body) {
+    const res = await fetch(path, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : {},
+      credentials: 'same-origin',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    let data = {};
+    try { data = await res.json(); } catch (e) {}
+    return { ok: res.ok, status: res.status, data };
+  }
+  function showToast(el, msg, type) {
+    el.textContent = msg;
+    el.classList.add('show', type === 'success' ? 'success' : 'error');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 6000);
+  }
+  function setError(inputEl, hasError) {
+    inputEl.closest('.form-group').classList.toggle('error', hasError);
+  }
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  // ================= Theme + Reveal =================
+  const rootEl = document.documentElement;
+  rootEl.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+  $('themeToggle').addEventListener('click', () => {
+    const next = rootEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    rootEl.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
   });
-
-  // Reveal on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(en => { if (en.isIntersecting) en.target.classList.add('visible'); });
   }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  // ================= State =================
+  let currentUser = null;
+  let products = [];
+  let cart = {};
+  try { cart = JSON.parse(localStorage.getItem('nexora_cart') || '{}') || {}; } catch (e) { cart = {}; }
+  function cartSave() { localStorage.setItem('nexora_cart', JSON.stringify(cart)); }
+  function cartCount() { return Object.values(cart).reduce((a, b) => a + Number(b || 0), 0); }
+  function cartTotal() {
+    return products.reduce((sum, p) => cart[p.id] ? sum + p.price * cart[p.id] : sum, 0);
+  }
+  function updateCartBadge() {
+    const n = cartCount();
+    const b = $('cartBadge');
+    b.textContent = n;
+    b.classList.toggle('hidden', n === 0);
+  }
 
-  // Add to cart interaction
-  document.querySelectorAll('.add-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      btn.style.transform = 'scale(0.85)';
-      setTimeout(() => btn.style.transform = '', 150);
-      const badge = document.querySelector('.cart-badge');
-      badge.textContent = parseInt(badge.textContent) + 1;
-      badge.style.transform = 'scale(1.3)';
-      setTimeout(() => badge.style.transform = '', 200);
+  // ================= Auth =================
+  const overlay = $('authOverlay');
+  const authTabsWrap = $('authTabsWrap');
+  const panels = {
+    login: $('panel-login'),
+    register: $('panel-register'),
+    verify: $('panel-verify'),
+    account: $('panel-account'),
+  };
+  let pendingEmail = null;
+  let pendingMode = 'register'; // register | login
+
+  function openModal(tab) {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (currentUser) { showAccountPanel(); return; }
+    authTabsWrap.style.display = 'flex';
+    switchTab(tab || 'login');
+  }
+  function closeModal() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+  function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    panels.login.style.display = tab === 'login' ? 'block' : 'none';
+    panels.register.style.display = tab === 'register' ? 'block' : 'none';
+    panels.verify.style.display = 'none';
+    panels.account.style.display = 'none';
+  }
+  function showOnly(panel) {
+    authTabsWrap.style.display = 'none';
+    Object.values(panels).forEach(p => p.style.display = 'none');
+    panel.style.display = 'block';
+  }
+  function showAccountPanel() {
+    showOnly(panels.account);
+    $('accountWelcome').textContent = 'خوش آمدید ' + currentUser.name + ' (' + currentUser.email + ')';
+    $('ordersBox').style.display = 'none';
+    $('ordersList').innerHTML = '';
+  }
+  function showVerifyPanel(email, message, mode) {
+    pendingEmail = email;
+    pendingMode = mode || 'register';
+    showOnly(panels.verify);
+    $('verifyTitle').textContent = pendingMode === 'login' ? 'ورود به حساب' : 'تأیید ایمیل';
+    $('verifySub').textContent = message || ('کد ۶ رقمی به ' + email + ' ارسال شد. لطفاً آن را وارد کنید.');
+    const ci = $('verifyCode');
+    ci.value = '';
+    setTimeout(() => ci.focus(), 50);
+  }
+  function updateAuthUI() {
+    const show = !!(currentUser && currentUser.is_admin);
+    document.getElementById('adminBtn').classList.toggle('show', show);
+  }
+
+  $('profileBtn').addEventListener('click', () => openModal('login'));
+  $('authClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (overlay.classList.contains('active')) closeModal();
+    else if ($('cartDrawer').classList.contains('active')) closeCart();
+  });
+  document.querySelectorAll('.auth-tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+  $('gotoRegister').addEventListener('click', () => switchTab('register'));
+  $('gotoLogin').addEventListener('click', () => switchTab('login'));
+
+  async function checkSession() {
+    const { ok, data } = await api('/api/me', 'GET');
+    if (ok && data.ok) { currentUser = data.user; updateAuthUI(); }
+  }
+
+  // ---- Register ----
+  $('registerForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const name = $('regName'), email = $('regEmail'), pass = $('regPassword'), pass2 = $('regPassword2');
+    let valid = true;
+    const nameOk = !!name.value.trim(); setError(name, !nameOk); if (!nameOk) valid = false;
+    const emailOk = isValidEmail(email.value.trim()); setError(email, !emailOk); if (!emailOk) valid = false;
+    const passOk = pass.value.length >= 6; setError(pass, !passOk); if (!passOk) valid = false;
+    const pass2Ok = !!pass2.value && pass2.value === pass.value; setError(pass2, !pass2Ok); if (!pass2Ok) valid = false;
+    if (!valid) { showToast($('regToast'), 'لطفاً خطاهای فرم را برطرف کنید.', 'error'); return; }
+
+    const btn = this.querySelector('.auth-submit');
+    btn.disabled = true;
+    const { ok, data } = await api('/api/register', 'POST', {
+      name: name.value.trim(), email: email.value.trim(), password: pass.value,
     });
+    btn.disabled = false;
+
+    if (!ok || !data.ok) {
+      if (data.code === 'EMAIL_TAKEN') {
+        this.reset();
+        switchTab('login');
+        $('loginEmail').value = email.value.trim();
+        showToast($('loginToast'), 'این ایمیل قبلاً ثبت‌نام کرده. برای ورود کد بگیرید.', 'error');
+        return;
+      }
+      showToast($('regToast'), data.error || 'خطایی رخ داد. دوباره تلاش کنید.', 'error');
+      return;
+    }
+    this.reset();
+    startResendCooldown(60);
+    showVerifyPanel(data.email, 'کد ۶ رقمی به ' + data.email + ' ارسال شد. لطفاً آن را وارد کنید.', 'register');
   });
 
-  // ---------- Auth Modal (Register / Login / Account) ----------
-  // Talks to the real backend: Cloudflare Pages Functions + D1, at /api/*
-  (function () {
-    const overlay = document.getElementById('authOverlay');
-    const profileBtn = document.getElementById('profileBtn');
-    const closeBtn = document.getElementById('authClose');
-    const tabs = document.querySelectorAll('.auth-tab');
-    const authTabsWrap = document.querySelector('.auth-tabs');
-    const panelRegister = document.getElementById('panel-register');
-    const panelLogin = document.getElementById('panel-login');
-    const panelVerify = document.getElementById('panel-verify');
-    const panelAccount = document.getElementById('panel-account');
+  // ---- Login (step 1: send code) ----
+  $('loginForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const email = $('loginEmail'), pass = $('loginPassword');
+    let valid = true;
+    const emailOk = isValidEmail(email.value.trim()); setError(email, !emailOk); if (!emailOk) valid = false;
+    const passOk = !!pass.value; setError(pass, !passOk); if (!passOk) valid = false;
+    if (!valid) { showToast($('loginToast'), 'لطفاً اطلاعات را کامل وارد کنید.', 'error'); return; }
 
-    let currentUser = null;
-    let pendingEmail = null; // ایمیلی که منتظر وارد کردن کد تأیید براشه
+    const btn = $('loginSubmit');
+    btn.disabled = true;
+    const { ok, data } = await api('/api/login', 'POST', { email: email.value.trim(), password: pass.value });
+    btn.disabled = false;
 
-    function openModal(tab) {
-      overlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      if (currentUser) {
-        showAccountPanel();
+    if (!ok || !data.ok) {
+      if (data.code === 'USER_NOT_FOUND') {
+        showToast($('loginToast'), 'کاربری با این ایمیل پیدا نشد. ابتدا ثبت‌نام کنید.', 'error');
+        return;
+      }
+      if (data.code === 'COOLDOWN') {
+        // کد قبلی احتمالاً هنوز معتبر است؛ پنل کد را نشان بده
+        showVerifyPanel(email.value.trim(), data.error, 'login');
+        return;
+      }
+      showToast($('loginToast'), data.error || 'ایمیل یا رمز عبور اشتباه است.', 'error');
+      return;
+    }
+    startResendCooldown(60);
+    showVerifyPanel(data.email, 'کد ورود ۶ رقمی به ' + data.email + ' ارسال شد. آن را وارد کنید.', 'login');
+  });
+
+  // ---- Verify code (register + login step 2, same endpoint) ----
+  $('verifyForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const codeInput = $('verifyCode');
+    const code = codeInput.value.trim();
+    const codeOk = /^\d{6}$/.test(code);
+    setError(codeInput, !codeOk);
+    if (!codeOk) { showToast($('verifyToast'), 'کد باید ۶ رقم باشد.', 'error'); return; }
+
+    const btn = $('verifySubmit');
+    btn.disabled = true;
+    const { ok, data } = await api('/api/login-verify', 'POST', { email: pendingEmail, code });
+    btn.disabled = false;
+
+    if (!ok || !data.ok) {
+      showToast($('verifyToast'), data.error || 'کد اشتباه است. دوباره تلاش کنید.', 'error');
+      return;
+    }
+    currentUser = data.user;
+    pendingEmail = null;
+    updateAuthUI();
+    showToast($('verifyToast'), (pendingMode === 'login' ? 'ورود موفق! ' : 'حساب شما فعال شد! ') + 'خوش آمدی ' + currentUser.name, 'success');
+    this.reset();
+    setTimeout(() => { closeModal(); if (adminPage.classList.contains('active')) loadAdminData(); }, 1200);
+  });
+
+  let resendTimer = null;
+  function startResendCooldown(seconds) {
+    clearInterval(resendTimer);
+    let remaining = seconds;
+    const btn = $('resendCodeBtn');
+    btn.disabled = true;
+    btn.textContent = 'ارسال مجدد کد (' + remaining + ')';
+    resendTimer = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        clearInterval(resendTimer);
+        btn.disabled = false;
+        btn.textContent = 'ارسال مجدد کد';
       } else {
-        authTabsWrap.style.display = 'flex';
-        switchTab(tab || 'register');
+        btn.textContent = 'ارسال مجدد کد (' + remaining + ')';
       }
+    }, 1000);
+  }
+  $('resendCodeBtn').addEventListener('click', async function () {
+    if (!pendingEmail || this.disabled) return;
+    this.disabled = true;
+    const { ok, data } = await api('/api/resend-code', 'POST', { email: pendingEmail });
+    if (!ok || !data.ok) {
+      showToast($('verifyToast'), data.error || 'ارسال مجدد کد ناموفق بود.', 'error');
+      this.disabled = false;
+      this.textContent = 'ارسال مجدد کد';
+      return;
     }
-    function closeModal() {
-      overlay.classList.remove('active');
-      document.body.style.overflow = '';
+    showToast($('verifyToast'), 'کد جدید ارسال شد. صندوق ایمیلت را چک کن.', 'success');
+    startResendCooldown(60);
+  });
+
+  // ---- Account / Orders ----
+  $('showOrdersBtn').addEventListener('click', async function () {
+    const box = $('ordersBox');
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    this.disabled = true;
+    const { ok, data } = await api('/api/orders', 'GET');
+    this.disabled = false;
+    if (!ok || !data.ok) { showToast($('accountToast'), data.error || 'خطا در دریافت سفارش‌ها.', 'error'); return; }
+    const statusFa = { pending: 'در انتظار پرداخت', paid: 'پرداخت شده', cancelled: 'لغو شده' };
+    $('ordersList').innerHTML = data.orders.length
+      ? data.orders.map(o => `
+          <div class="order-card">
+            <div class="o-head">
+              <span class="o-id">${esc(o.id)}</span>
+              <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
+            </div>
+            <div class="o-items">${o.items.map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
+            <div class="o-total">${fmt(o.total)}</div>
+          </div>`).join('')
+      : '<div class="no-orders">هنوز سفارشی ثبت نکرده‌اید.</div>';
+    box.style.display = 'block';
+  });
+
+  $('logoutBtn').addEventListener('click', doLogout);
+  async function doLogout() {
+    await api('/api/logout', 'POST');
+    currentUser = null;
+    updateAuthUI();
+    closeAdmin();
+    closeModal();
+  }
+
+  // ================= Products (public site) =================
+  function iconStyle(p) {
+    const [c1, c2] = (p.color || '#6366f1|#8b5cf6').split('|');
+    return `background:linear-gradient(135deg,${esc(c1) || '#6366f1'},${esc(c2) || '#8b5cf6'})`;
+  }
+  function renderProducts() {
+    const grid = $('servicesGrid');
+    if (!products.length) {
+      grid.innerHTML = '<div class="prod-loading">هنوز محصولی اضافه نشده است.</div>';
+      return;
     }
-    function switchTab(tab) {
-      tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-      panelRegister.style.display = tab === 'register' ? 'block' : 'none';
-      panelLogin.style.display = tab === 'login' ? 'block' : 'none';
-      panelVerify.style.display = 'none';
-      panelAccount.style.display = 'none';
+    grid.innerHTML = products.map(p => `
+      <div class="service-card reveal visible" data-id="${esc(p.id)}">
+        ${p.badge ? `<span class="badge-tag">${esc(p.badge)}</span>` : ''}
+        ${p.cover_url
+          ? `<div class="service-cover"><img src="${esc(p.cover_url)}" alt="${esc(p.name)}"></div>`
+          : ''}
+        <div class="service-icon" style="${iconStyle(p)}">
+          ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="">` : esc(p.icon_text || p.name.charAt(0))}
+        </div>
+        <h3>${esc(p.name)}</h3>
+        <p class="desc">${esc(p.description)}</p>
+        <div class="service-meta">
+          <div class="price">
+            <span class="amount">${Number(p.price).toLocaleString('en-US')} ت</span>
+            <span class="period">${esc(p.period)}</span>
+          </div>
+          <button class="add-btn" data-add="${esc(p.id)}" aria-label="افزودن به سبد">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+      </div>`).join('');
+  }
+  async function loadProducts() {
+    const { ok, data } = await api('/api/products', 'GET');
+    if (ok && data.ok) { products = data.products; renderProducts(); renderFooterProducts(); }
+    else $('servicesGrid').innerHTML = '<div class="prod-loading">خطا در بارگذاری سرویس‌ها. صفحه را رفرش کنید.</div>';
+  }
+  function renderFooterProducts() {
+    $('footerProducts').innerHTML =
+      '<li><a href="#services">همه سرویس‌ها</a></li>' +
+      products.slice(0, 4).map(p => `<li><a href="#services">${esc(p.name)}</a></li>`).join('');
+  }
+
+  document.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('[data-add]');
+    if (addBtn) {
+      e.stopPropagation();
+      const id = addBtn.dataset.add;
+      cart[id] = (Number(cart[id]) || 0) + 1;
+      cartSave(); updateCartBadge();
+      addBtn.style.transform = 'scale(0.85)';
+      setTimeout(() => addBtn.style.transform = '', 150);
+      const badge = $('cartBadge');
+      badge.style.transform = 'scale(1.3)';
+      setTimeout(() => badge.style.transform = '', 200);
     }
-    function showAccountPanel() {
-      authTabsWrap.style.display = 'none';
-      panelRegister.style.display = 'none';
-      panelLogin.style.display = 'none';
-      panelVerify.style.display = 'none';
-      panelAccount.style.display = 'block';
-      document.getElementById('accountWelcome').textContent =
-        'خوش آمدید ' + currentUser.name + ' (' + currentUser.email + ')';
+  });
+
+  // ================= Cart Drawer =================
+  const cartDrawer = $('cartDrawer'), cartOverlayEl = $('cartOverlay');
+  function openCart() { renderCart(); cartDrawer.classList.add('active'); cartOverlayEl.classList.add('active'); }
+  function closeCart() { cartDrawer.classList.remove('active'); cartOverlayEl.classList.remove('active'); }
+  $('cartBtn').addEventListener('click', openCart);
+  $('cartClose').addEventListener('click', closeCart);
+  cartOverlayEl.addEventListener('click', closeCart);
+
+  function renderCart() {
+    const box = $('cartItems');
+    const ids = Object.keys(cart).filter(id => cart[id] > 0 && products.some(p => p.id === id));
+    if (!ids.length) {
+      box.innerHTML = `
+        <div class="cart-empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+          <div>سبد خرید شما خالی است.</div>
+        </div>`;
+    } else {
+      box.innerHTML = ids.map(id => {
+        const p = products.find(x => x.id === id);
+        const q = cart[id];
+        return `
+        <div class="cart-item">
+          <div class="cart-item-icon" style="${iconStyle(p)}">
+            ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="">` : esc(p.icon_text || p.name.charAt(0))}
+          </div>
+          <div class="cart-item-info">
+            <div class="ci-name">${esc(p.name)}</div>
+            <div class="ci-price">${Number(p.price).toLocaleString('en-US')} ت × ${q}</div>
+          </div>
+          <div class="ci-controls">
+            <button class="qty-btn" data-dec="${esc(id)}">−</button>
+            <span class="ci-qty">${q}</span>
+            <button class="qty-btn" data-inc="${esc(id)}">+</button>
+          </div>
+          <button class="ci-remove" data-rm="${esc(id)}" aria-label="حذف">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </button>
+        </div>`;
+      }).join('');
     }
-    function showVerifyPanel(email, message) {
-      pendingEmail = email;
-      authTabsWrap.style.display = 'none';
-      panelRegister.style.display = 'none';
-      panelLogin.style.display = 'none';
-      panelAccount.style.display = 'none';
-      panelVerify.style.display = 'block';
-      document.getElementById('verifySub').textContent =
-        message || ('کد ۶ رقمی ارسال‌شده به ' + email + ' را وارد کنید');
-      const codeInput = document.getElementById('verifyCode');
-      codeInput.value = '';
-      setTimeout(() => codeInput.focus(), 50);
+    $('cartTotal').textContent = fmt(cartTotal());
+    $('checkoutBtn').disabled = !ids.length;
+  }
+  $('cartItems').addEventListener('click', (e) => {
+    const inc = e.target.closest('[data-inc]');
+    const dec = e.target.closest('[data-dec]');
+    const rm = e.target.closest('[data-rm]');
+    if (inc) { cart[inc.dataset.inc] = Number(cart[inc.dataset.inc] || 0) + 1; }
+    else if (dec) {
+      const id = dec.dataset.dec;
+      cart[id] = Number(cart[id] || 0) - 1;
+      if (cart[id] <= 0) delete cart[id];
     }
+    else if (rm) { delete cart[rm.dataset.rm]; }
+    else return;
+    cartSave(); updateCartBadge(); renderCart();
+  });
 
-    profileBtn.addEventListener('click', () => openModal('register'));
-    closeBtn.addEventListener('click', closeModal);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
-    });
-    tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
-
-    function setError(inputEl, hasError) {
-      inputEl.closest('.form-group').classList.toggle('error', hasError);
+  $('checkoutBtn').addEventListener('click', async function () {
+    if (!cartCount()) return;
+    if (!currentUser) {
+      closeCart();
+      openModal('login');
+      showToast($('loginToast'), 'برای ثبت سفارش ابتدا وارد حساب شوید.', 'error');
+      return;
     }
-    function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-    function showToast(el, message, type) {
-      el.textContent = message;
-      el.className = 'auth-toast show ' + type;
+    this.disabled = true;
+    const items = Object.keys(cart).filter(id => cart[id] > 0).map(id => ({ id, qty: cart[id] }));
+    const { ok, data } = await api('/api/orders', 'POST', { items });
+    this.disabled = false;
+    if (!ok || !data.ok) {
+      showToast($('cartToast'), data.error || 'ثبت سفارش ناموفق بود.', 'error');
+      return;
     }
+    cart = {}; cartSave(); updateCartBadge(); renderCart();
+    showToast($('cartToast'), 'سفارش ' + data.orderId + ' ثبت شد! مبلغ: ' + fmt(data.total) + ' — پرداخت به‌زودی فعال می‌شود.', 'success');
+  });
 
-    async function api(path, method, body) {
-      const res = await fetch(path, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      let data;
-      try { data = await res.json(); } catch (e) { data = {}; }
-      return { ok: res.ok, status: res.status, data };
+  // ================= Admin =================
+  const adminPage = $('adminPage');
+  let editingId = null;
+  let pfIconData = '', pfCoverData = '';
+
+  $('adminBtn').addEventListener('click', openAdmin);
+  $('adminBackBtn').addEventListener('click', closeAdmin);
+  $('adminLogoutBtn').addEventListener('click', doLogout);
+  function openAdmin() {
+    if (!currentUser || !currentUser.is_admin) {
+      openModal('login');
+      showToast($('loginToast'), 'دسترسی فقط برای مدیر سایت.', 'error');
+      return;
     }
+    document.querySelector('header').style.display = 'none';
+    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = 'none');
+    adminPage.classList.add('active');
+    window.scrollTo(0, 0);
+    loadAdminData();
+  }
+  function closeAdmin() {
+    adminPage.classList.remove('active');
+    document.querySelector('header').style.display = '';
+    document.querySelectorAll('body > section, footer').forEach(el => el.style.display = '');
+  }
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab-btn').forEach(x => x.classList.toggle('active', x === b));
+    document.querySelectorAll('.admin-section').forEach(s => s.classList.toggle('active', s.id === 'asec-' + b.dataset.asec));
+  }));
 
-    // ---- Check existing session on page load ----
-    async function checkSession() {
-      const { ok, data } = await api('/api/me', 'GET');
-      if (ok && data.ok) {
-        currentUser = data.user;
-        profileBtn.setAttribute('aria-label', currentUser.name);
-      }
+  function adminToast(el, msg, type) { showToast(el, msg, type); }
+
+  async function loadAdminData() {
+    const { ok, data } = await api('/api/admin-products', 'GET');
+    if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'خطا در دریافت محصولات.', 'error'); return; }
+    renderAdminProducts(data.products);
+    const res2 = await api('/api/admin-orders', 'GET');
+    if (res2.ok && res2.data.ok) renderAdminOrders(res2.data.orders);
+  }
+
+  function renderAdminProducts(list) {
+    $('adminProdList').innerHTML = list.length ? list.map(p => `
+      <div class="admin-prod-row">
+        <div class="apr-icon" style="${iconStyle(p)}">
+          ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="">` : esc(p.icon_text || p.name.charAt(0))}
+        </div>
+        <div class="apr-info">
+          <div class="apr-name">${esc(p.name)} ${p.active ? '' : '<span class="inactive-tag">(غیرفعال)</span>'}</div>
+          <div class="apr-meta">${Number(p.price).toLocaleString('en-US')} تومان • ${esc(p.period)} • ترتیب ${p.sort_order}${p.cover_url ? ' • کاور دارد' : ''}</div>
+        </div>
+        <div class="apr-actions">
+          <button class="apr-btn" data-edit="${esc(p.id)}">ویرایش</button>
+          <button class="apr-btn danger" data-del="${esc(p.id)}">حذف</button>
+        </div>
+      </div>`).join('') : '<div class="admin-empty">هنوز محصولی نیست. از فرم بالا اضافه کنید.</div>';
+  }
+
+  function renderAdminOrders(list) {
+    const statusFa = { pending: 'در انتظار پرداخت', paid: 'پرداخت شده', cancelled: 'لغو شده' };
+    $('adminOrdersList').innerHTML = list.length ? list.map(o => `
+      <div class="adm-order-row">
+        <div class="ao-head">
+          <div>
+            <div class="ao-user">${esc(o.user_name || '—')} <span class="ao-email">${esc(o.user_email || '')}</span></div>
+            <div class="ao-email">${esc(o.id)} • ${new Date(o.created_at).toLocaleDateString('fa-IR')}</div>
+          </div>
+          <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
+        </div>
+        <div class="ao-items">${o.items.map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
+        <div class="ao-foot">
+          <span class="ao-total">${fmt(o.total)}</span>
+          <select class="ao-status-select" data-ord="${esc(o.id)}">
+            <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>در انتظار پرداخت</option>
+            <option value="paid" ${o.status === 'paid' ? 'selected' : ''}>پرداخت شده</option>
+            <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>لغو شده</option>
+          </select>
+        </div>
+      </div>`).join('') : '<div class="admin-empty">هنوز سفارشی ثبت نشده است.</div>';
+  }
+
+  $('adminOrdersList').addEventListener('change', async (e) => {
+    const sel = e.target.closest('[data-ord]');
+    if (!sel) return;
+    const { ok, data } = await api('/api/admin-orders?id=' + encodeURIComponent(sel.dataset.ord), 'PUT', { status: sel.value });
+    if (ok && data.ok) adminToast($('ordersToast'), 'وضعیت سفارش به‌روزرسانی شد.', 'success');
+    else adminToast($('ordersToast'), data.error || 'به‌روزرسانی ناموفق بود.', 'error');
+  });
+
+  // --- image pickers ---
+  function readImage(file, cb) {
+    if (!file) return;
+    if (file.size > 500 * 1024) { adminToast($('prodToast'), 'حجم عکس باید زیر ۵۰۰ کیلوبایت باشد.', 'error'); return; }
+    const r = new FileReader();
+    r.onload = () => cb(r.result);
+    r.readAsDataURL(file);
+  }
+  $('pfIconBtn').addEventListener('click', () => $('pfIconFile').click());
+  $('pfCoverBtn').addEventListener('click', () => $('pfCoverFile').click());
+  $('pfIconFile').addEventListener('change', function () {
+    readImage(this.files[0], (d) => { pfIconData = d; $('iconPreview').innerHTML = `<img src="${d}">`; });
+  });
+  $('pfCoverFile').addEventListener('change', function () {
+    readImage(this.files[0], (d) => { pfCoverData = d; $('coverPreview').innerHTML = `<img src="${d}">`; });
+  });
+  $('pfIconClear').addEventListener('click', () => { pfIconData = ''; $('iconPreview').textContent = 'بی‌عکس'; $('pfIconFile').value = ''; });
+  $('pfCoverClear').addEventListener('click', () => { pfCoverData = ''; $('coverPreview').textContent = 'بی‌عکس'; $('pfCoverFile').value = ''; });
+
+  // --- product form submit (add or edit) ---
+  $('prodForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const payload = {
+      name: $('pfName').value.trim(),
+      description: $('pfDesc').value.trim(),
+      price: parseInt($('pfPrice').value, 10) || 0,
+      period: $('pfPeriod').value.trim() || 'ماهانه',
+      icon_text: $('pfIconText').value.trim(),
+      color: $('pfColor1').value + '|' + $('pfColor2').value,
+      badge: $('pfBadge').value.trim(),
+      sort_order: parseInt($('pfSort').value, 10) || 99,
+      active: $('pfActive').value === '1',
+      icon_url: pfIconData,
+      cover_url: pfCoverData,
+    };
+    if (!payload.name) { adminToast($('prodToast'), 'نام محصول الزامی است.', 'error'); return; }
+
+    const btn = $('prodSubmitBtn');
+    btn.disabled = true;
+    const { ok, data } = editingId
+      ? await api('/api/admin-products?id=' + encodeURIComponent(editingId), 'PUT', payload)
+      : await api('/api/admin-products', 'POST', payload);
+    btn.disabled = false;
+    if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'ذخیره ناموفق بود.', 'error'); return; }
+    adminToast($('prodToast'), editingId ? 'محصول ویرایش شد.' : 'محصول جدید اضافه شد.', 'success');
+    resetProdForm();
+    loadAdminData();
+    loadProducts();
+  });
+  $('prodCancelBtn').addEventListener('click', resetProdForm);
+  function resetProdForm() {
+    editingId = null;
+    $('prodFormTitle').textContent = 'افزودن محصول جدید';
+    $('prodSubmitBtn').textContent = 'ذخیره محصول';
+    $('prodCancelBtn').style.display = 'none';
+    $('prodForm').reset();
+    pfIconData = ''; pfCoverData = '';
+    $('iconPreview').textContent = 'بی‌عکس';
+    $('coverPreview').textContent = 'بی‌عکس';
+    $('pfPeriod').value = 'ماهانه';
+    $('pfSort').value = 99;
+    $('pfColor1').value = '#6366f1';
+    $('pfColor2').value = '#8b5cf6';
+  }
+
+  $('adminProdList').addEventListener('click', (e) => {
+    const editBtn = e.target.closest('[data-edit]');
+    const delBtn = e.target.closest('[data-del]');
+    if (editBtn) {
+      const p = products.find(x => x.id === editBtn.dataset.edit) ||
+                allAdminProducts.find(x => x.id === editBtn.dataset.edit);
+      if (!p) return;
+      editingId = p.id;
+      $('prodFormTitle').textContent = 'ویرایش: ' + p.name;
+      $('prodSubmitBtn').textContent = 'ذخیره تغییرات';
+      $('prodCancelBtn').style.display = 'inline-block';
+      $('pfName').value = p.name;
+      $('pfDesc').value = p.description || '';
+      $('pfPrice').value = p.price;
+      $('pfPeriod').value = p.period || 'ماهانه';
+      $('pfIconText').value = p.icon_text || '';
+      $('pfBadge').value = p.badge || '';
+      $('pfSort').value = p.sort_order || 99;
+      $('pfActive').value = p.active ? '1' : '0';
+      const [c1, c2] = (p.color || '').split('|');
+      if (c1) $('pfColor1').value = c1;
+      if (c2) $('pfColor2').value = c2;
+      pfIconData = p.icon_url || '';
+      pfCoverData = p.cover_url || '';
+      $('iconPreview').innerHTML = pfIconData ? `<img src="${esc(pfIconData)}">` : 'بی‌عکس';
+      $('coverPreview').innerHTML = pfCoverData ? `<img src="${esc(pfCoverData)}">` : 'بی‌عکس';
+      adminPage.scrollIntoView({ behavior: 'smooth' });
+      $('prodFormCard').scrollIntoView({ behavior: 'smooth' });
     }
-    checkSession();
-
-    // ---- Register ----
-    const registerForm = document.getElementById('registerForm');
-    const regToast = document.getElementById('regToast');
-    registerForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const name = document.getElementById('regName');
-      const email = document.getElementById('regEmail');
-      const pass = document.getElementById('regPassword');
-      const pass2 = document.getElementById('regPassword2');
-      let valid = true;
-
-      const nameOk = !!name.value.trim();
-      setError(name, !nameOk); if (!nameOk) valid = false;
-
-      const emailOk = isValidEmail(email.value.trim());
-      setError(email, !emailOk); if (!emailOk) valid = false;
-
-      const passOk = pass.value.length >= 6;
-      setError(pass, !passOk); if (!passOk) valid = false;
-
-      const pass2Ok = !!pass2.value && pass2.value === pass.value;
-      setError(pass2, !pass2Ok); if (!pass2Ok) valid = false;
-
-      if (!valid) {
-        showToast(regToast, 'لطفاً خطاهای فرم را برطرف کنید.', 'error');
-        return;
-      }
-
-      const submitBtn = registerForm.querySelector('.auth-submit');
-      submitBtn.disabled = true;
-      const { ok, data } = await api('/api/register', 'POST', {
-        name: name.value.trim(),
-        email: email.value.trim(),
-        password: pass.value,
-      });
-      submitBtn.disabled = false;
-
-      if (!ok || !data.ok) {
-        showToast(regToast, data.error || 'خطایی رخ داد. دوباره تلاش کنید.', 'error');
-        return;
-      }
-
-      registerForm.reset();
-      startResendCooldown(60);
-      showVerifyPanel(data.email, 'کد ۶ رقمی به ' + data.email + ' ارسال شد. لطفاً آن را وارد کنید.');
-    });
-
-    // ---- Login ----
-    const loginForm = document.getElementById('loginForm');
-    const loginToast = document.getElementById('loginToast');
-    loginForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail');
-      const pass = document.getElementById('loginPassword');
-      let valid = true;
-
-      const emailOk = isValidEmail(email.value.trim());
-      setError(email, !emailOk); if (!emailOk) valid = false;
-
-      const passOk = !!pass.value;
-      setError(pass, !passOk); if (!passOk) valid = false;
-
-      if (!valid) {
-        showToast(loginToast, 'لطفاً اطلاعات را کامل وارد کنید.', 'error');
-        return;
-      }
-
-      const submitBtn = loginForm.querySelector('.auth-submit');
-      submitBtn.disabled = true;
-      const { ok, data } = await api('/api/login', 'POST', {
-        email: email.value.trim(),
-        password: pass.value,
-      });
-      submitBtn.disabled = false;
-
-      if (!ok || !data.ok) {
-        if (data.code === 'EMAIL_NOT_VERIFIED') {
-          loginForm.reset();
-          startResendCooldown(60);
-          showVerifyPanel(data.email, 'ایمیل شما هنوز تأیید نشده. کد جدیدی براتون فرستادیم؛ وارد کنید.');
-          api('/api/resend-code', 'POST', { email: data.email });
-          return;
-        }
-        showToast(loginToast, data.error || 'ایمیل یا رمز عبور اشتباه است.', 'error');
-        return;
-      }
-
-      currentUser = data.user;
-      showToast(loginToast, 'خوش آمدید ' + currentUser.name + '! ورود موفقیت‌آمیز بود.', 'success');
-      loginForm.reset();
-      setTimeout(() => { closeModal(); }, 1200);
-    });
-
-    // ---- Verify email code ----
-    const verifyForm = document.getElementById('verifyForm');
-    const verifyToast = document.getElementById('verifyToast');
-    const resendCodeBtn = document.getElementById('resendCodeBtn');
-    let resendTimer = null;
-
-    function startResendCooldown(seconds) {
-      clearInterval(resendTimer);
-      let remaining = seconds;
-      resendCodeBtn.disabled = true;
-      resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
-      resendTimer = setInterval(() => {
-        remaining -= 1;
-        if (remaining <= 0) {
-          clearInterval(resendTimer);
-          resendCodeBtn.disabled = false;
-          resendCodeBtn.textContent = 'ارسال مجدد کد';
-        } else {
-          resendCodeBtn.textContent = 'ارسال مجدد کد (' + remaining + ')';
-        }
-      }, 1000);
+    if (delBtn && confirm('این محصول کاملاً حذف شود؟')) {
+      api('/api/admin-products?id=' + encodeURIComponent(delBtn.dataset.del), 'DELETE')
+        .then(({ ok, data }) => {
+          if (ok && data.ok) { adminToast($('prodToast'), 'محصول حذف شد.', 'success'); loadAdminData(); loadProducts(); }
+          else adminToast($('prodToast'), data.error || 'حذف ناموفق بود.', 'error');
+        });
     }
+  });
+  let allAdminProducts = [];
 
-    verifyForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const codeInput = document.getElementById('verifyCode');
-      const code = codeInput.value.trim();
-
-      const codeOk = /^\d{6}$/.test(code);
-      setError(codeInput, !codeOk);
-      if (!codeOk) {
-        showToast(verifyToast, 'کد باید ۶ رقم باشد.', 'error');
-        return;
-      }
-
-      const submitBtn = verifyForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
-      const { ok, data } = await api('/api/verify-email', 'POST', {
-        email: pendingEmail,
-        code,
-      });
-      submitBtn.disabled = false;
-
-      if (!ok || !data.ok) {
-        showToast(verifyToast, data.error || 'کد اشتباه است. دوباره تلاش کنید.', 'error');
-        return;
-      }
-
-      currentUser = data.user;
-      pendingEmail = null;
-      showToast(verifyToast, 'ایمیل تأیید شد! خوش آمدید ' + currentUser.name + ' 🎉', 'success');
-      verifyForm.reset();
-      setTimeout(() => { closeModal(); }, 1200);
-    });
-
-    resendCodeBtn.addEventListener('click', async function () {
-      if (!pendingEmail || resendCodeBtn.disabled) return;
-      resendCodeBtn.disabled = true;
-      const { ok, data } = await api('/api/resend-code', 'POST', { email: pendingEmail });
-
-      if (!ok || !data.ok) {
-        showToast(verifyToast, data.error || 'ارسال مجدد کد ناموفق بود.', 'error');
-        resendCodeBtn.disabled = false;
-        return;
-      }
-
-      showToast(verifyToast, 'کد جدید ارسال شد. صندوق ایمیلتون رو چک کنید.', 'success');
-      startResendCooldown(60);
-    });
-
-    // ---- Logout ----
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', async function () {
-      await api('/api/logout', 'POST');
-      currentUser = null;
-      profileBtn.setAttribute('aria-label', 'پروفایل');
-      closeModal();
-    });
+  // ================= Init =================
+  (async function init() {
+    updateCartBadge();
+    await Promise.all([checkSession(), loadProducts()]);
+    // بعد از لود محصولات، لیست ادمین هم برای ویرایش آماده باشد
+    if (currentUser && currentUser.is_admin) {
+      const { ok, data } = await api('/api/admin-products', 'GET');
+      if (ok && data.ok) allAdminProducts = data.products;
+    }
   })();
 </script>
 

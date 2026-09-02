@@ -172,9 +172,22 @@ export async function getSessionUser(request, env) {
   }
 
   const user = await env.DB.prepare(
-    "SELECT id, name, email, created_at FROM users WHERE id = ?"
+    "SELECT id, name, email, created_at, is_admin FROM users WHERE id = ?"
   )
     .bind(session.user_id)
     .first();
   return user || null;
+}
+
+// فقط کاربرهای ادمین اجازه عبور دارند؛ در غیر این صورت 403 برمی‌گردد
+export async function requireAdmin(request, env) {
+  const user = await getSessionUser(request, env);
+  if (!user) return { user: null, error: jsonError("ابتدا وارد حساب شوید.", 401) };
+  if (!user.is_admin) return { user: null, error: jsonError("دسترسی فقط برای مدیر سایت.", 403) };
+  return { user, error: null };
+}
+
+// لاگ خطا در لاگ کلادفلر (با wrangler pages deployment tail قابل مشاهده است)
+export function logError(context, err) {
+  console.error("[NEXORA-ERROR]", context, err && err.stack ? err.stack : String(err));
 }

@@ -34,7 +34,11 @@ export async function onRequestPost(context) {
 
   // اگه قبلاً با همین ایمیل ثبت‌نام شده و تأیید هم شده، دیگه اجازه نده.
   if (existing && existing.email_verified) {
-    return jsonError("این ایمیل قبلاً ثبت‌نام کرده است.", 409);
+    return jsonError(
+      "این ایمیل قبلاً ثبت‌نام کرده است. از بخش «ورود» وارد شوید.",
+      409,
+      { code: "EMAIL_TAKEN" }
+    );
   }
 
   const salt = randomHex(16);
