@@ -104,6 +104,40 @@ export async function onRequestPost(context) {
       message: "فیش واریزی و اطلاعات تماس شما با موفقیت ثبت شد و در صف بررسی مدیر قرار گرفت."
     });
   } catch (err) {
+    if (err && String(err.message || err).includes('transaction_time')) {
+      try {
+        await env.DB.prepare("ALTER TABLE orders ADD COLUMN transaction_time TEXT").run();
+        await env.DB.prepare(`
+          UPDATE orders SET
+            status = 'awaiting_verification',
+            tracking_code = ?,
+            sender_card = ?,
+            customer_contact = ?,
+            receipt_text = ?,
+            receipt_image = ?,
+            transaction_time = ?,
+            submitted_at = ?,
+            admin_note = NULL
+          WHERE id = ?
+        `).bind(
+          trackingCode,
+          senderCard,
+          customerContact,
+          receiptText,
+          receiptImage,
+          transactionTime,
+          now,
+          orderId
+        ).run();
+
+        return jsonResponse({
+          ok: true,
+          message: "فیش واریزی و اطلاعات تماس شما با موفقیت ثبت شد و در صف بررسی مدیر قرار گرفت."
+        });
+      } catch (retryErr) {
+        logError("pay-receipt: retry with column", retryErr);
+      }
+    }
     logError("pay-receipt: submit", err);
     return jsonError("خطا در ثبت اطلاعات فیش واریز. لطفاً دوباره تلاش کنید.", 500);
   }
