@@ -1,7 +1,5 @@
 -- ============================================================
---  Nexora — ساختار کامل دیتابیس (نسخه ۲)
---  برای دیتابیس تازه: همین فایل را در Console اجرا کنید.
---  برای دیتابیس موجود: migration_v2.sql را اجرا کنید.
+--  Nexora — ساختار کامل دیتابیس (نسخه ۳)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS users (
@@ -52,15 +50,32 @@ CREATE TABLE IF NOT EXISTS products (
   created_at INTEGER NOT NULL
 );
 
--- سفارش‌ها (سبد خرید ثبت‌شده؛ پرداخت بعداً وصل می‌شود)
+-- سفارش‌ها (سبد خرید ثبت‌شده؛ پرداخت کارت به کارت دستی و تحویل اشتراک)
 CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
   items TEXT NOT NULL,                       -- JSON: [{id, name, price, qty}]
   total INTEGER NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending',    -- pending | paid | cancelled
+  status TEXT NOT NULL DEFAULT 'pending',    -- pending | awaiting_verification | paid | rejected | cancelled
+  tracking_code TEXT,                        -- شماره یا کد پیگیری بانکی
+  sender_card TEXT,                          -- شماره کارت یا ۴ رقم آخر واریزکننده
+  customer_contact TEXT,                     -- شماره تماس یا آیدی تلگرام مشتری
+  receipt_text TEXT,                         -- توضیحات یا تاریخ و ساعت واریز
+  receipt_image TEXT,                        -- تصویر رسید بانکی (data URL)
+  admin_note TEXT,                           -- یادداشت ادمین (مثلاً دلیل رد یا توضیحات)
+  delivery_text TEXT,                        -- متن اکانت/اشتراک تحویل داده شده به مشتری
+  delivered_at INTEGER,                      -- زمان تحویل اشتراک
+  paid_at INTEGER,                           -- زمان تایید پرداخت توسط مدیر
+  submitted_at INTEGER,                      -- زمان ارسال فیش توسط کاربر
   created_at INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+
+-- تنظیمات سایت و حساب بانکی جهت دریافت کارت به کارت
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);

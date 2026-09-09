@@ -633,8 +633,60 @@
     border-radius: 999px;
   }
   .o-status.pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
-  .o-status.paid { background: rgba(16,185,129,0.15); color: var(--success); }
+  .o-status.awaiting_verification { background: rgba(245,158,11,0.22); color: #f59e0b; border: 1px solid #f59e0b; }
+  .o-status.paid { background: rgba(16,185,129,0.18); color: var(--success); border: 1px solid var(--success); }
+  .o-status.rejected { background: rgba(239,68,68,0.18); color: #ef4444; border: 1px solid #ef4444; }
   .o-status.cancelled { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+  /* Delivery account card for customer */
+  .deliv-account-card {
+    margin-top: 10px;
+    background: rgba(16,185,129,0.08);
+    border: 1.5px solid rgba(16,185,129,0.35);
+    border-radius: 12px;
+    padding: 14px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .dac-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--success);
+  }
+  .dac-text {
+    font-family: monospace, inherit;
+    font-size: 0.88rem;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--surface-border);
+    padding: 12px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text);
+    line-height: 1.65;
+    direction: ltr;
+    text-align: left;
+  }
+  .order-notice {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .order-notice.awaiting {
+    background: rgba(245,158,11,0.1);
+    color: var(--warning);
+    border: 1px dashed rgba(245,158,11,0.4);
+  }
+  .order-notice.rejected {
+    background: rgba(239,68,68,0.1);
+    color: #ef4444;
+    border: 1px dashed rgba(239,68,68,0.4);
+  }
   .order-card .o-items { font-size: 0.82rem; color: var(--text-soft); }
   .order-card .o-total { font-weight: 700; font-size: 0.9rem; margin-top: 4px; }
   .no-orders { color: var(--text-mute); font-size: 0.85rem; text-align: center; margin-top: 14px; }
@@ -2159,121 +2211,6 @@
   </div>
 </footer>
 
-<!-- Admin Page -->
-<div class="admin-page" id="adminPage">
-  <div class="admin-wrap">
-    <div class="admin-head">
-      <h2>پنل مدیریت Nexora</h2>
-      <div class="ah-actions">
-        <button class="btn btn-ghost" id="adminBackBtn" style="padding:10px 20px;font-size:0.88rem;">بازگشت به سایت</button>
-        <button class="btn btn-ghost" id="adminLogoutBtn" style="padding:10px 20px;font-size:0.88rem;">خروج</button>
-      </div>
-    </div>
-
-    <div class="admin-tabs">
-      <button type="button" class="admin-tab-btn active" data-asec="products">محصولات</button>
-      <button type="button" class="admin-tab-btn" data-asec="orders">سفارش‌ها</button>
-    </div>
-
-    <div class="adm-stats" id="admStats">
-      <div class="adm-stat"><div class="as-num" id="stProducts">—</div><div class="as-label">محصول فعال</div></div>
-      <div class="adm-stat"><div class="as-num" id="stOrders">—</div><div class="as-label">کل سفارش‌ها</div></div>
-      <div class="adm-stat"><div class="as-num" id="stPending">—</div><div class="as-label">در انتظار پرداخت</div></div>
-      <div class="adm-stat"><div class="as-num" id="stRevenue">—</div><div class="as-label">گردش (تومان)</div></div>
-    </div>
-
-    <!-- Products management -->
-    <div class="admin-section active" id="asec-products">
-      <div class="admin-card" id="prodFormCard">
-        <h4 id="prodFormTitle">افزودن محصول جدید</h4>
-        <form id="prodForm">
-          <div class="adm-grid">
-            <div class="full">
-              <label>نام محصول *</label>
-              <input type="text" id="pfName" placeholder="مثلاً ChatGPT Plus" required>
-            </div>
-            <div class="full">
-              <label>توضیحات</label>
-              <textarea id="pfDesc" placeholder="توضیح کوتاه محصول"></textarea>
-            </div>
-            <div>
-              <label>قیمت (تومان) *</label>
-              <input type="number" id="pfPrice" min="0" step="1000" placeholder="249000" required>
-            </div>
-            <div>
-              <label>دوره</label>
-              <input type="text" id="pfPeriod" placeholder="ماهانه" value="ماهانه">
-            </div>
-            <div>
-              <label>متن آیکون (اگر عکس ندارید، یک حرف)</label>
-              <input type="text" id="pfIconText" maxlength="4" placeholder="C">
-            </div>
-            <div>
-              <label>رنگ آیکون</label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input type="color" id="pfColor1" class="color-input" value="#6366f1">
-                <input type="color" id="pfColor2" class="color-input" value="#8b5cf6">
-                <span style="font-size:0.75rem;color:var(--text-mute);">گرادیان آیکون</span>
-              </div>
-            </div>
-            <div>
-              <label>برچسب (اختیاری)</label>
-              <input type="text" id="pfBadge" maxlength="30" placeholder="پرفروش">
-            </div>
-            <div>
-              <label>ترتیب نمایش</label>
-              <input type="number" id="pfSort" min="1" value="99">
-            </div>
-            <div>
-              <label>آیکون محصول</label>
-              <div class="img-pick-row">
-                <div class="img-preview" id="iconPreview">بی‌عکس</div>
-                <input type="file" id="pfIconFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;">
-                <button type="button" class="file-btn" id="pfIconBtn">انتخاب آیکون</button>
-                <button type="button" class="file-btn" id="pfIconClear" title="حذف عکس">×</button>
-              </div>
-            </div>
-            <div>
-              <label>کاور (عکس بالای کارت)</label>
-              <div class="img-pick-row">
-                <div class="img-preview" id="coverPreview" style="width:80px;">بی‌عکس</div>
-                <input type="file" id="pfCoverFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none;">
-                <button type="button" class="file-btn" id="pfCoverBtn">انتخاب کاور</button>
-                <button type="button" class="file-btn" id="pfCoverClear" title="حذف عکس">×</button>
-              </div>
-            </div>
-            <div>
-              <label>وضعیت</label>
-              <select id="pfActive">
-                <option value="1">فعال (نمایش در سایت)</option>
-                <option value="0">غیرفعال (مخفی)</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="adm-submit" id="prodSubmitBtn">ذخیره محصول</button>
-          <button type="button" class="adm-cancel" id="prodCancelBtn" style="display:none;">انصراف از ویرایش</button>
-          <div class="admin-toast" id="prodToast"></div>
-        </form>
-      </div>
-
-      <div class="admin-card">
-        <h4>محصولات فعلی</h4>
-        <input type="text" class="adm-search" id="admProdSearch" placeholder="🔍 جستجو در محصولات…">
-        <div class="admin-prod-list" id="adminProdList"></div>
-      </div>
-    </div>
-
-    <!-- Orders management -->
-    <div class="admin-section" id="asec-orders">
-      <div class="admin-card">
-        <h4>همه سفارش‌ها</h4>
-        <div class="admin-orders" id="adminOrdersList"></div>
-        <div class="admin-toast" id="ordersToast"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Profile Page -->
 <div class="app-page" id="profilePage">
   <div class="app-wrap">
@@ -2362,14 +2299,15 @@
 </div>
 
 <!-- Payment Page -->
+<!-- Payment Page (کارت به کارت) -->
 <div class="app-page" id="paymentPage">
-  <div class="app-wrap" style="max-width:560px;">
+  <div class="app-wrap" style="max-width:580px;">
     <div class="page-head">
       <button class="page-back" id="payBackBtn" aria-label="بازگشت">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
       <div>
-        <h2>پرداخت سفارش</h2>
+        <h2>پرداخت کارت به کارت</h2>
         <div class="ph-sub" id="payOrderId">—</div>
       </div>
     </div>
@@ -2377,63 +2315,112 @@
     <div class="pay-steps">
       <div class="pay-step done"><span class="ps-dot">✓</span> ثبت سفارش</div>
       <div class="pay-line"></div>
-      <div class="pay-step active"><span class="ps-dot">۲</span> پرداخت</div>
+      <div class="pay-step active" id="stepPayIndicator"><span class="ps-dot">۲</span> واریز و ارسال فیش</div>
       <div class="pay-line"></div>
-      <div class="pay-step"><span class="ps-dot">۳</span> فعال‌سازی</div>
+      <div class="pay-step" id="stepVerifyIndicator"><span class="ps-dot">۳</span> تأیید مدیر</div>
     </div>
 
-    <div class="app-card">
-      <div class="card-visual">
-        <div class="cv-top">
-          <div class="cv-chip"></div>
-          <div class="cv-brand">SHETAB · PAY</div>
-        </div>
-        <div class="cv-number" id="cvNumber">•••• •••• •••• ••••</div>
-        <div class="cv-bottom">
-          <div>انقضا<span class="cvb-v" id="cvExpiry" style="display:block;">••/••</span></div>
-          <div style="text-align:left;">کارت به نام<span class="cvb-v" id="cvHolder" style="display:block;text-align:right;">—</span></div>
-        </div>
-      </div>
-
-      <div class="pay-amount">
-        <span class="pa-label">مبلغ قابل پرداخت</span>
-        <span class="pa-num" id="payAmount">—</span>
-      </div>
-
-      <div id="paySummary"></div>
-
-      <form id="payForm" novalidate>
-        <div class="pay-fields">
-          <div class="pf-full">
-            <label>شماره کارت</label>
-            <input type="text" id="payCard" inputmode="numeric" maxlength="19" placeholder="6037 9911 2233 4455" autocomplete="cc-number">
-            <div class="pf-hint">۱۶ رقم — فقط ارقام مجاز</div>
+    <!-- Container for active payment flow -->
+    <div id="payFlowActive">
+      <div class="app-card">
+        <!-- Target Bank Card -->
+        <div class="card-visual">
+          <div class="cv-top">
+            <div class="cv-chip"></div>
+            <div class="cv-brand" id="destBankName">بانک سامان</div>
           </div>
+          <div class="cv-number" id="destCardNum">۶۲۱۹ - ۸۶۱۹ - ۱۲۶۵ - ۲۱۸۶</div>
+          <div class="cv-bottom">
+            <div>به نام<span class="cvb-v" id="destCardHolder" style="display:block;text-align:right;">محمد اورک</span></div>
+            <div style="text-align:left;">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnCopyCard" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:5px 12px;font-size:0.76rem;">کپی شماره کارت 📋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amount Box -->
+        <div class="pay-amount">
           <div>
-            <label>تاریخ انقضا</label>
-            <input type="text" id="payExp" inputmode="numeric" maxlength="7" placeholder="۱۴۰۵/۰۶" autocomplete="cc-exp">
+            <div class="pa-label">مبلغ دقیق قابل پرداخت:</div>
+            <div class="pa-num" id="payAmount">—</div>
           </div>
-          <div>
-            <label>CVV2</label>
-            <input type="text" id="payCvv" inputmode="numeric" maxlength="4" placeholder="1234" autocomplete="cc-csc">
-          </div>
-          <div class="pf-full">
-            <label>رمز دوم (پویا)</label>
-            <input type="password" id="payPass" inputmode="numeric" maxlength="8" placeholder="••••••" autocomplete="off">
-            <div class="pf-hint">رمز پویا از پیامک بانک — در مرحله‌ی بعدی سایت، توسط API استعلام می‌شود.</div>
-          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnCopyAmount" style="padding:6px 12px;font-size:0.8rem;">کپی مبلغ 📋</button>
         </div>
-        <button type="submit" class="pay-submit" id="paySubmitBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-left:6px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          پرداخت امن
-        </button>
-        <div class="pay-secure">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          اطلاعات کارت شما فقط برای استعلام به درگاه ارسال می‌شود و در سایت ذخیره نمی‌گردد.
+
+        <!-- Help notice -->
+        <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:12px 14px;font-size:0.82rem;color:var(--text);margin-bottom:18px;line-height:1.7;" id="destCardHelp">
+          لطفاً مبلغ بالا را به شماره کارت درج‌شده واریز کنید و سپس کد پیگیری، شماره تماس/تلگرام و عکس رسید را در فرم زیر ارسال نمایید.
         </div>
-        <div class="admin-toast" id="payToast"></div>
-      </form>
+
+        <div id="paySummary" style="margin-bottom:16px;"></div>
+
+        <!-- Receipt Submission Form -->
+        <form id="payReceiptForm">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">شماره پیگیری / کد رهگیری بانکی *</label>
+            <input type="text" id="payTracking" class="form-input" placeholder="مثلاً 9876543210" required dir="ltr" style="font-family:monospace;font-size:1.05rem;font-weight:700;">
+            <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">کد رهگیری ۶ تا ۲۰ رقمی پیامک یا رسید بانک</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">شماره تماس یا آیدی تلگرام شما (جهت هماهنگی و ارسال) *</label>
+            <input type="text" id="payCustomerContact" class="form-input" placeholder="مثلاً 09123456789 یا @username" required dir="ltr">
+            <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">برای هماهنگی تحویل اکانت و ارتباط در صورت نیاز</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">شماره کارت واریزکننده (یا ۴ رقم آخر کارت شما - اختیاری)</label>
+            <input type="text" id="paySenderCard" class="form-input" placeholder="مثلاً 6219... یا 4 رقم آخر" dir="ltr" maxlength="19">
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">تصویر فیش واریزی (عکس رسید) *</label>
+            <div class="img-preview-box" id="receiptDropzone" style="height:150px;border-radius:12px;cursor:pointer;background:var(--surface);">
+              <div class="img-preview-empty" id="receiptEmptyState" style="text-align:center;padding:10px;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span style="font-size:0.85rem;font-weight:600;margin-top:6px;display:block;">برای انتخاب عکس یا عکس گرفتن با دوربین کلیک کنید</span>
+                <span style="font-size:0.74rem;color:var(--text-mute);">فرمت‌های JPG، PNG و WebP</span>
+              </div>
+              <img id="receiptPreviewImg" style="display:none;width:100%;height:100%;object-fit:contain;background:#000;" alt="پیش‌نمایش رسید">
+            </div>
+            <input type="file" id="receiptFileInput" accept="image/*" style="display:none;">
+            <button type="button" class="btn btn-ghost btn-sm" id="receiptRemoveBtn" style="margin-top:8px;display:none;width:100%;">حذف / تغییر تصویر فیش</button>
+          </div>
+
+          <div class="form-group" style="margin-bottom:18px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">توضیحات یا تاریخ و ساعت واریز (اختیاری)</label>
+            <textarea id="payReceiptText" class="form-input" rows="2" placeholder="توضیحات اضافی، ساعت یا بانک مبدا…"></textarea>
+          </div>
+
+          <button type="submit" class="pay-submit" id="payReceiptSubmitBtn">
+            ارسال و ثبت فیش واریزی جهت بررسی ✓
+          </button>
+        </form>
+      </div>
     </div>
+
+    <!-- Success View (Shown after receipt submitted) -->
+    <div id="payFlowSuccess" style="display:none;">
+      <div class="app-card" style="text-align:center;padding:36px 20px;">
+        <div style="width:68px;height:68px;border-radius:50%;background:rgba(16,185,129,0.15);color:var(--success);display:grid;place-items:center;margin:0 auto 16px;font-size:2rem;">
+          ✓
+        </div>
+        <h3 style="font-size:1.3rem;font-weight:800;margin-bottom:10px;">فیش واریزی شما ثبت شد! 🎉</h3>
+        <p style="font-size:0.9rem;color:var(--text-soft);line-height:1.8;margin-bottom:20px;">
+          سفارش شما در وضعیت <strong>«در انتظار تأیید مدیریت»</strong> قرار گرفت.<br>
+          مدیریت به زودی فیش شما را بررسی و پس از تأیید، اکانت یا سرویس شما فعال خواهد شد.
+        </p>
+        <div style="background:var(--surface);border-radius:12px;padding:14px;margin-bottom:24px;font-size:0.84rem;color:var(--text-mute);">
+          شماره سفارش: <strong id="successPayOrderId" style="color:var(--text);font-family:monospace;">—</strong><br>
+          کد پیگیری بانکی: <strong id="successPayTracking" style="color:var(--warning);font-family:monospace;">—</strong>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button type="button" class="btn btn-primary" id="btnGoProfileOrders" style="padding:13px;">مشاهده سفارش در حساب کاربری</button>
+          <button type="button" class="btn btn-ghost" id="btnGoShopHome" style="padding:12px;">بازگشت به فروشگاه</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -3074,10 +3061,10 @@
     }
     cart = {}; cartSave(); updateCartBadge(); renderCart();
     this.disabled = false;
+    closeCart();
     lastOrder = { id: data.orderId, total: data.total, items: finalItemsSnapshot };
-    $('scOrderId').textContent = 'شماره سفارش: ' + data.orderId;
-    $('scTotal').textContent = fmt(data.total);
-    $('successModal').classList.add('active');
+    openPayment(lastOrder);
+    gToast('سفارش ثبت شد! لطفاً مبلغ را به شماره کارت زیر کارت‌به‌کارت فرمایید.', 'success');
   });
   let lastOrder = null;
   let finalItemsSnapshot = [];
@@ -3173,19 +3160,51 @@
     }
     const res2 = await api('/api/orders', 'GET');
     if (res2.ok && res2.data.ok) {
-      const statusFa = { pending: 'در انتظار پرداخت', paid: 'پرداخت شده', cancelled: 'لغو شده' };
+      const statusFa = {
+        pending: 'در انتظار پرداخت ⏳',
+        awaiting_verification: 'در حال بررسی فیش 🔔',
+        paid: 'تأیید و تحویل شده ✅',
+        rejected: 'فیش رد شده ❌',
+        cancelled: 'لغو شده'
+      };
       $('pfOrdersList').innerHTML = res2.data.orders.length
         ? res2.data.orders.map(o => `
             <div class="order-card">
               <div class="o-head">
-                <span class="o-id">${esc(o.id)}</span>
+                <span class="o-id">سفارش #${esc(o.id)}</span>
                 <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
               </div>
-              <div class="o-items">${o.items.map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
-              <div class="o-total" style="display:flex;justify-content:space-between;align-items:center;">
-                <span>${fmt(o.total)}</span>
-                ${o.status === 'pending' ? `<button class="file-btn" data-pay="${esc(o.id)}" data-total="${o.total}" data-items="${esc(JSON.stringify(o.items))}">پرداخت</button>` : ''}
+              <div class="o-items">${(o.items || []).map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
+              <div class="o-total" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+                <span>مبلغ: ${fmt(o.total)}</span>
+                ${(o.status === 'pending' || o.status === 'rejected') ? `
+                  <button class="file-btn" data-pay="${esc(o.id)}" data-total="${o.total}" data-items="${esc(JSON.stringify(o.items || []))}">
+                    ${o.status === 'rejected' ? 'ارسال مجدد فیش 💳' : 'پرداخت کارت به کارت 💳'}
+                  </button>
+                ` : ''}
               </div>
+
+              ${o.delivery_text ? `
+                <div class="deliv-account-card">
+                  <div class="dac-head">
+                    <span>🎉 مشخصات اکانت و اشتراک تحویل داده شده:</span>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyDelivText('${esc(o.id)}')">کپی اطلاعات 📋</button>
+                  </div>
+                  <pre class="dac-text" id="delivText_${esc(o.id)}">${esc(o.delivery_text)}</pre>
+                </div>
+              ` : ''}
+
+              ${o.status === 'awaiting_verification' ? `
+                <div class="order-notice awaiting">
+                  🔔 فیش واریزی با کد پیگیری <strong>${esc(o.tracking_code || '')}</strong> ارسال شده و در صف بررسی مدیر است. به محض تأیید، مشخصات اشتراک در همین کادر برای شما قرار می‌گیرد.
+                </div>
+              ` : ''}
+
+              ${(o.status === 'rejected' && o.admin_note) ? `
+                <div class="order-notice rejected">
+                  ❌ علت رد فیش توسط مدیر: <strong>${esc(o.admin_note)}</strong> — لطفاً در صورت تمایل فیش صحیح را مجدداً ارسال نمایید.
+                </div>
+              ` : ''}
             </div>`).join('')
         : '<div class="no-orders">هنوز سفارشی ثبت نکرده‌اید.</div>';
     } else {
@@ -3194,7 +3213,7 @@
   }
   $('profBackBtn').addEventListener('click', closeAppPages);
   $('pfLogoutBtn').addEventListener('click', doLogout);
-  $('pfAdminBtn').addEventListener('click', () => { closeAppPages(); openAdmin(); });
+  $('pfAdminBtn').addEventListener('click', () => { window.location.href = '/admin.html'; });
   $('pfThemeSwitch').addEventListener('change', function () {
     const next = this.checked ? 'dark' : 'light';
     rootEl.setAttribute('data-theme', next);
@@ -3212,6 +3231,19 @@
       gToast('نام کاربری ذخیره شد ✓', 'success');
     } else gToast(data.error || 'ذخیره ناموفق بود.', 'error');
   });
+
+  // کپی مشخصات اکانت تحویل داده شده به کاربر
+  window.copyDelivText = function(orderId) {
+    const el = document.getElementById('delivText_' + orderId);
+    if (!el) return;
+    const text = el.innerText || el.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => gToast('مشخصات اشتراک کپی شد 📋', 'success'));
+    } else {
+      gToast('مشخصات اشتراک کپی شد 📋', 'success');
+    }
+  };
+
   // پرداخت از لیست سفارش‌ها
   $('pfOrdersList').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-pay]');
@@ -3244,74 +3276,178 @@
     } else showToast($('pwToast'), data.error || 'تغییر رمز ناموفق بود.', 'error');
   });
 
-  // ---- Payment ----
+  // ---- Helper: فشرده‌سازی تصویر در مرورگر قبل از ارسال ----
+  function compressImage(file, maxDimension = 1200, quality = 0.82) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDimension || h > maxDimension) {
+            if (w > h) { h = Math.round((h * maxDimension) / w); w = maxDimension; }
+            else { w = Math.round((w * maxDimension) / h); h = maxDimension; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---- Payment (Card to Card) ----
   const payPage = $('paymentPage');
   let payOrder = null;
-  function openPayment(order) {
-    if (!currentUser) { openModal('login'); showToast($('loginToast'), 'برای پرداخت وارد شوید.', 'error'); return; }
+  let payReceiptBase64 = '';
+
+  async function openPayment(order) {
+    if (!currentUser) { openModal('login'); showToast($('loginToast'), 'برای پرداخت ابتدا وارد شوید.', 'error'); return; }
     payOrder = order;
+    payReceiptBase64 = '';
     showAppPage('paymentPage');
-    $('payOrderId').textContent = 'شماره سفارش: ' + order.id;
+
+    $('payFlowActive').style.display = 'block';
+    $('payFlowSuccess').style.display = 'none';
+
+    $('payOrderId').textContent = 'شماره سفارش: #' + order.id;
     $('payAmount').textContent = fmt(order.total);
     $('paySummary').innerHTML = (order.items || []).map(it =>
       `<div class="pay-summary-item"><span class="psi-name">${esc(it.name)} × ${it.qty}</span><span class="psi-val">${fmt(it.price * it.qty)}</span></div>`
     ).join('');
-    $('cvNumber').textContent = '•••• •••• •••• ••••';
-    $('cvExpiry').textContent = '••/••';
-    $('cvHolder').textContent = currentUser.name || '—';
+
+    $('payTracking').value = '';
+    $('paySenderCard').value = '';
+    $('payCustomerContact').value = (currentUser && currentUser.email) ? currentUser.email : '';
+    $('payReceiptText').value = '';
+    resetReceiptUpload();
+
+    // بارگذاری مشخصات حساب بانکی فعال
+    try {
+      const { ok, data } = await api('/api/payment-settings', 'GET');
+      if (ok && data && data.settings) {
+        const s = data.settings;
+        if (s.card_number) $('destCardNum').textContent = s.card_number;
+        if (s.card_bank) $('destBankName').textContent = s.card_bank;
+        if (s.card_holder) $('destCardHolder').textContent = s.card_holder;
+        if (s.card_help) $('destCardHelp').textContent = s.card_help;
+      }
+    } catch (err) {
+      console.error('Error loading payment settings:', err);
+    }
   }
   $('payBackBtn').addEventListener('click', () => { closeAppPages(); openProfile(); });
 
-  // فرمت زنده شماره کارت: 6037 9911 2233 4455
-  $('payCard').addEventListener('input', function () {
-    const d = this.value.replace(/\D/g, '').slice(0, 16);
-    this.value = d.replace(/(\d{4})(?=\d)/g, '$1 ');
-    $('cvNumber').textContent = (this.value || '•••• •••• •••• ••••').padEnd(19, '•');
-  });
-  $('payExp').addEventListener('input', function () {
-    let d = this.value.replace(/[^\d۰-۹]/g, '').replace(/[۰-۹]/g, c => '۰۱۲۳۴۵۶۷۸۹'.indexOf(c));
-    d = d.slice(0, 6);
-    this.value = d.length > 4 ? d.slice(0, 4) + '/' + d.slice(4) : d;
-    $('cvExpiry').textContent = this.value || '••/••';
-  });
-  $('payCvv').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 4); });
-  $('payPass').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 8); });
-
-  // اعتبارسنجی شماره کارت ایرانی (الگوریتم Luhn)
-  function luhnValid(num) {
-    let sum = 0, dbl = false;
-    for (let i = num.length - 1; i >= 0; i--) {
-      let d = Number(num[i]);
-      if (dbl) { d *= 2; if (d > 9) d -= 9; }
-      sum += d; dbl = !dbl;
+  // کپی شماره کارت
+  $('btnCopyCard').addEventListener('click', () => {
+    const raw = $('destCardNum').textContent.replace(/\D/g, '');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(() => gToast('شماره کارت کپی شد 📋', 'success'));
+    } else {
+      gToast('شماره کارت کپی شد 📋', 'success');
     }
-    return num.length === 16 && sum % 10 === 0;
+  });
+
+  // کپی مبلغ
+  $('btnCopyAmount').addEventListener('click', () => {
+    if (!payOrder) return;
+    const raw = String(payOrder.total);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(() => gToast('مبلغ ' + fmt(payOrder.total) + ' کپی شد 📋', 'success'));
+    } else {
+      gToast('مبلغ کپی شد 📋', 'success');
+    }
+  });
+
+  // کنترل فیلد آپلود فیش
+  const receiptDropzone = $('receiptDropzone');
+  const receiptFileInput = $('receiptFileInput');
+  const receiptPreviewImg = $('receiptPreviewImg');
+  const receiptEmptyState = $('receiptEmptyState');
+  const receiptRemoveBtn = $('receiptRemoveBtn');
+
+  function resetReceiptUpload() {
+    payReceiptBase64 = '';
+    receiptFileInput.value = '';
+    receiptPreviewImg.src = '';
+    receiptPreviewImg.style.display = 'none';
+    receiptEmptyState.style.display = 'block';
+    receiptRemoveBtn.style.display = 'none';
   }
 
-  $('payForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const card = $('payCard').value.replace(/\s/g, '');
-    const exp = $('payExp').value.trim();
-    const cvv = $('payCvv').value;
-    const pass = $('payPass').value;
-    let bad = false;
-    const mark = (el, cond) => { el.classList.toggle('err', cond); if (cond) bad = true; };
-    mark($('payCard'), !luhnValid(card));
-    mark($('payExp'), !/^1[34]\d{2}\/(0[1-9]|1[0-2])$/.test(exp));
-    mark($('payCvv'), cvv.length < 4);
-    mark($('payPass'), pass.length < 6);
-    if (bad) { showToast($('payToast'), 'لطفاً اطلاعات کارت را دقیق وارد کنید (شماره کارت نامعتبر است؟).', 'error'); return; }
+  receiptDropzone.addEventListener('click', () => receiptFileInput.click());
+  receiptRemoveBtn.addEventListener('click', (e) => { e.stopPropagation(); resetReceiptUpload(); });
 
-    const btn = $('paySubmitBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> در حال اتصال به درگاه…';
-    // === نقطه‌ی اتصال API پرداخت در آینده ===
-    // فعلاً درگاه واقعی وصل نیست؛ درخواست شبیه‌سازی می‌شود.
-    await new Promise(r => setTimeout(r, 1800));
-    btn.disabled = false;
-    btn.innerHTML = 'پرداخت امن';
-    showToast($('payToast'), 'درگاه پرداخت هنوز فعال نشده است. به‌محض اتصال، همین‌جا پرداخت خواهید کرد. سفارش شما در وضعیت «در انتظار پرداخت» ذخیره شده است.', 'error');
+  receiptFileInput.addEventListener('change', async function() {
+    const file = this.files && this.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      gToast('لطفاً یک فایل تصویری (عکس فیش) انتخاب کنید.', 'error');
+      return;
+    }
+    try {
+      receiptEmptyState.style.display = 'none';
+      receiptPreviewImg.style.display = 'block';
+      const b64 = await compressImage(file, 1200, 0.82);
+      payReceiptBase64 = b64;
+      receiptPreviewImg.src = b64;
+      receiptRemoveBtn.style.display = 'block';
+      gToast('تصویر رسید پیوست شد ✓', 'success');
+    } catch (err) {
+      resetReceiptUpload();
+      gToast('خطا در پردازش تصویر فیش.', 'error');
+    }
   });
+
+  // ارسال فرم فیش واریز
+  $('payReceiptForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!payOrder) { gToast('اطلاعات سفارش در دسترس نیست.', 'error'); return; }
+
+    const trackingCode = $('payTracking').value.trim();
+    const customerContact = $('payCustomerContact').value.trim();
+    const senderCard = $('paySenderCard').value.trim();
+    const receiptText = $('payReceiptText').value.trim();
+
+    if (!trackingCode) { gToast('لطفاً کد یا شماره پیگیری بانکی را وارد کنید.', 'error'); return; }
+    if (!customerContact) { gToast('شماره تماس یا آیدی تلگرام الزامی است.', 'error'); return; }
+    if (!payReceiptBase64) { gToast('بارگذاری تصویر یا عکس رسید واریزی اجباری است.', 'error'); return; }
+
+    const btn = $('payReceiptSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> در حال ارسال و ثبت رسید…';
+
+    const { ok, data } = await api('/api/pay-receipt', 'POST', {
+      orderId: payOrder.id,
+      trackingCode,
+      senderCard,
+      customerContact,
+      receiptImage: payReceiptBase64,
+      receiptText
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = 'ارسال و ثبت فیش واریزی جهت بررسی ✓';
+
+    if (ok && data.ok) {
+      $('payFlowActive').style.display = 'none';
+      $('payFlowSuccess').style.display = 'block';
+      $('successPayOrderId').textContent = '#' + payOrder.id;
+      $('successPayTracking').textContent = trackingCode;
+      gToast('فیش واریزی شما با موفقیت ثبت شد 🎉', 'success');
+    } else {
+      gToast(data.error || 'خطا در ثبت فیش واریزی.', 'error');
+    }
+  });
+
+  $('btnGoProfileOrders').addEventListener('click', () => { closeAppPages(); openProfile(); });
+  $('btnGoShopHome').addEventListener('click', () => { closeAppPages(); });
 
   // ---- Contact ----
   $('ctBackBtn').addEventListener('click', closeAppPages);
@@ -3329,36 +3465,24 @@
       title: 'قوانین و مقررات',
       body: `<h5>۱. ثبت‌نام و حساب کاربری</h5>
         <p>کاربر با ثبت‌نام در نکسورا، اطلاعات صحیح (یوزرنیم و ایمیل معتبر) را متعهد می‌شود وارد کند. مسئولیت حفظ رمز عبور بر عهده‌ی کاربر است.</p>
-        <h5>۲. خرید اشتراک</h5>
-        <p>تمام قیمت‌ها به تومان است. پس از ثبت سفارش، فعال‌سازی معمولاً زیر ۵ دقیقه (در ساعات اداری حداکثر تا ۲۴ ساعت) انجام می‌شود.</p>
+        <h5>۲. خرید اشتراک و پرداخت کارت به کارت</h5>
+        <p>تمام قیمت‌ها به تومان است. پس از واریز به کارت و ارسال عکس رسید، مدیریت سفارش را بررسی و اشتراک را مستقیماً در پنل کاربری شما تحویل می‌دهد.</p>
         <h5>۳. ضمانت بازگشت وجه</h5>
-        <p>در صورت عدم تحویل یا مشکل فنی از سمت ما، تا ۷ روز پس از خرید، وجه کامل بازگردانده می‌شود.</p>
-        <h5>۴. تخلفات</h5>
-        <p>سوءاستفاده از اشتراک‌ها (فروش مجدد، اشتراک‌گذاری غیرمجاز با افراد خارج از تعریف سرویس) باعث ابطال بدون بازگشت وجه می‌شود.</p>`
+        <p>در صورت عدم تحویل یا مشکل فنی از سمت ما، وجه کامل به حساب شما بازگردانده می‌شود.</p>
+        <h5>۴. پشتیبانی</h5>
+        <p>پشتیبانی ۲۴ ساعته از طریق فرم تماس و پنل سایت در خدمت شماست.</p>`
     },
     privacy: {
       title: 'حریم خصوصی',
-      body: `<h5>چه اطلاعاتی ذخیره می‌شود؟</h5>
+      body: `<h5>اطلاعات ثبت‌شده</h5>
         <ul>
-          <li>یوزرنیم، ایمیل و رمز عبور <b>هش‌شده</b> (PBKDF2) — رمز شما هیچ‌جا به‌صورت متن ساده ذخیره نمی‌شود.</li>
-          <li>تاریخچه‌ی سفارش‌ها برای پشتیبانی و تمدید اشتراک.</li>
-        </ul>
-        <h5>اطلاعات کارت بانکی</h5>
-        <p>هیچ‌گاه در سرور نکسورا ذخیره نمی‌شود؛ مستقیماً به درگاه پرداخت امن ارسال می‌گردد.</p>
-        <h5>اشتراک‌گذاری با دیگران</h5>
-        <p>اطلاعات شما فروخته یا در اختیار شخص ثالث قرار نمی‌گیرد.</p>`
+          <li>اطلاعات حساب کاربری به صورت امن و رمزنگاری‌شده نگهداری می‌شود.</li>
+          <li>تصویر فیش‌های واریزی صرفاً جهت تأیید مالی توسط مدیریت استفاده می‌شود.</li>
+        </ul>`
     },
     about: {
       title: 'درباره Nexora',
-      body: `<p>نکسورا پلتفرم فروش اشتراک سرویس‌های پریمیوم جهانی است؛ با هدف دور زدن تحریم‌ها، مشکل پرداخت ارزی و نوسان ارز برای کاربران ایرانی.</p>
-        <h5>چرا ما؟</h5>
-        <ul>
-          <li>فعال‌سازی سریع و ضمانت اصالت اشتراک‌ها</li>
-          <li>پشتیبانی انسانی ۲۴/۷</li>
-          <li>قیمت‌های منصفانه و شفاف</li>
-          <li>بیش از ۳ سال سابقه و هزاران کاربر فعال</li>
-        </ul>
-        <p>تیم ما متشکل از متخصصان فناوری است که تجربه‌ی خرید سرویس‌های خارجی را برای شما ساده و مطمئن کرده‌اند.</p>`
+      body: `<p>نکسورا پلتفرم تخصصی ارائه اشتراک‌های دیجیتال، اکانت‌های هوش مصنوعی و سرویس‌های بین‌المللی با پرداخت ریالی کارت به کارت آسان است.</p>`
     },
   };
   function openLegal(key) {
@@ -3390,220 +3514,14 @@
     else openLegal(p);
   }));
 
-  // ================= Admin =================
-  const adminPage = $('adminPage');
-  let editingId = null;
-  let pfIconData = '', pfCoverData = '';
-
-  $('adminBtn').addEventListener('click', openAdmin);
-  $('adminBackBtn').addEventListener('click', closeAdmin);
-  $('adminLogoutBtn').addEventListener('click', doLogout);
-  function openAdmin() {
-    if (!currentUser || !currentUser.is_admin) {
-      openModal('login');
-      showToast($('loginToast'), 'دسترسی فقط برای مدیر سایت.', 'error');
-      return;
-    }
-    showAppPage('adminPage');
-    loadAdminData();
-  }
-  function closeAdmin() {
-    closeAppPages();
-  }
-  document.querySelectorAll('.admin-tab-btn').forEach(b => b.addEventListener('click', () => {
-    document.querySelectorAll('.admin-tab-btn').forEach(x => x.classList.toggle('active', x === b));
-    document.querySelectorAll('.admin-section').forEach(s => s.classList.toggle('active', s.id === 'asec-' + b.dataset.asec));
-  }));
-
-  function adminToast(el, msg, type) { showToast(el, msg, type); }
-
-  let allAdminProducts = [];
-  let allAdminOrders = [];
-
-  async function loadAdminData() {
-    const { ok, data } = await api('/api/admin-products', 'GET');
-    if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'خطا در دریافت محصولات.', 'error'); return; }
-    allAdminProducts = data.products || [];
-    renderAdminProducts(allAdminProducts);
-    const res2 = await api('/api/admin-orders', 'GET');
-    if (res2.ok && res2.data.ok) { allAdminOrders = res2.data.orders || []; renderAdminOrders(allAdminOrders); }
-    updateAdmStats();
-  }
-  function updateAdmStats() {
-    $('stProducts').textContent = allAdminProducts.filter(p => p.active).length;
-    $('stOrders').textContent = allAdminOrders.length;
-    $('stPending').textContent = allAdminOrders.filter(o => o.status === 'pending').length;
-    const rev = allAdminOrders.filter(o => o.status === 'paid').reduce((s, o) => s + (o.total || 0), 0);
-    $('stRevenue').textContent = rev.toLocaleString('en-US');
-  }
-  $('admProdSearch').addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
-    renderAdminProducts(q ? allAdminProducts.filter(p => (p.name + ' ' + (p.description || '')).toLowerCase().includes(q)) : allAdminProducts);
-  });
-
-  function renderAdminProducts(list) {
-    $('adminProdList').innerHTML = list.length ? list.map(p => `
-      <div class="admin-prod-row">
-        <div class="apr-icon" style="${iconStyle(p)}">
-          ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="">` : esc(p.icon_text || p.name.charAt(0))}
-        </div>
-        <div class="apr-info">
-          <div class="apr-name">${esc(p.name)} ${p.active ? '' : '<span class="inactive-tag">(غیرفعال)</span>'}</div>
-          <div class="apr-meta">${Number(p.price).toLocaleString('en-US')} تومان • ${esc(p.period)} • ترتیب ${p.sort_order}${p.cover_url ? ' • کاور دارد' : ''}</div>
-        </div>
-        <div class="apr-actions">
-          <button class="apr-btn" data-edit="${esc(p.id)}">ویرایش</button>
-          <button class="apr-btn danger" data-del="${esc(p.id)}">حذف</button>
-        </div>
-      </div>`).join('') : '<div class="admin-empty">هنوز محصولی نیست. از فرم بالا اضافه کنید.</div>';
-  }
-
-  function renderAdminOrders(list) {
-    const statusFa = { pending: 'در انتظار پرداخت', paid: 'پرداخت شده', cancelled: 'لغو شده' };
-    $('adminOrdersList').innerHTML = list.length ? list.map(o => `
-      <div class="adm-order-row">
-        <div class="ao-head">
-          <div>
-            <div class="ao-user">${esc(o.user_name || '—')} <span class="ao-email">${esc(o.user_email || '')}</span></div>
-            <div class="ao-email">${esc(o.id)} • ${new Date(o.created_at).toLocaleDateString('fa-IR')}</div>
-          </div>
-          <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
-        </div>
-        <div class="ao-items">${o.items.map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
-        <div class="ao-foot">
-          <span class="ao-total">${fmt(o.total)}</span>
-          <select class="ao-status-select" data-ord="${esc(o.id)}">
-            <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>در انتظار پرداخت</option>
-            <option value="paid" ${o.status === 'paid' ? 'selected' : ''}>پرداخت شده</option>
-            <option value="cancelled" ${o.status === 'cancelled' ? 'selected' : ''}>لغو شده</option>
-          </select>
-        </div>
-      </div>`).join('') : '<div class="admin-empty">هنوز سفارشی ثبت نشده است.</div>';
-  }
-
-  $('adminOrdersList').addEventListener('change', async (e) => {
-    const sel = e.target.closest('[data-ord]');
-    if (!sel) return;
-    const { ok, data } = await api('/api/admin-orders?id=' + encodeURIComponent(sel.dataset.ord), 'PUT', { status: sel.value });
-    if (ok && data.ok) gToast('وضعیت سفارش به‌روزرسانی شد ✓', 'success');
-    else adminToast($('ordersToast'), data.error || 'به‌روزرسانی ناموفق بود.', 'error');
-  });
-
-  // --- image pickers ---
-  function readImage(file, cb) {
-    if (!file) return;
-    if (file.size > 500 * 1024) { adminToast($('prodToast'), 'حجم عکس باید زیر ۵۰۰ کیلوبایت باشد.', 'error'); return; }
-    const r = new FileReader();
-    r.onload = () => cb(r.result);
-    r.readAsDataURL(file);
-  }
-  $('pfIconBtn').addEventListener('click', () => $('pfIconFile').click());
-  $('pfCoverBtn').addEventListener('click', () => $('pfCoverFile').click());
-  $('pfIconFile').addEventListener('change', function () {
-    readImage(this.files[0], (d) => { pfIconData = d; $('iconPreview').innerHTML = `<img src="${d}">`; });
-  });
-  $('pfCoverFile').addEventListener('change', function () {
-    readImage(this.files[0], (d) => { pfCoverData = d; $('coverPreview').innerHTML = `<img src="${d}">`; });
-  });
-  $('pfIconClear').addEventListener('click', () => { pfIconData = ''; $('iconPreview').textContent = 'بی‌عکس'; $('pfIconFile').value = ''; });
-  $('pfCoverClear').addEventListener('click', () => { pfCoverData = ''; $('coverPreview').textContent = 'بی‌عکس'; $('pfCoverFile').value = ''; });
-
-  // --- product form submit (add or edit) ---
-  $('prodForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const payload = {
-      name: $('pfName').value.trim(),
-      description: $('pfDesc').value.trim(),
-      price: parseInt($('pfPrice').value, 10) || 0,
-      period: $('pfPeriod').value.trim() || 'ماهانه',
-      icon_text: $('pfIconText').value.trim(),
-      color: $('pfColor1').value + '|' + $('pfColor2').value,
-      badge: $('pfBadge').value.trim(),
-      sort_order: parseInt($('pfSort').value, 10) || 99,
-      active: $('pfActive').value === '1',
-      icon_url: pfIconData,
-      cover_url: pfCoverData,
-    };
-    if (!payload.name) { adminToast($('prodToast'), 'نام محصول الزامی است.', 'error'); return; }
-
-    const btn = $('prodSubmitBtn');
-    btn.disabled = true;
-    const { ok, data } = editingId
-      ? await api('/api/admin-products?id=' + encodeURIComponent(editingId), 'PUT', payload)
-      : await api('/api/admin-products', 'POST', payload);
-    btn.disabled = false;
-    if (!ok || !data.ok) { adminToast($('prodToast'), data.error || 'ذخیره ناموفق بود.', 'error'); return; }
-    gToast(editingId ? 'محصول ویرایش شد ✓' : 'محصول جدید اضافه شد ✓', 'success');
-    resetProdForm();
-    loadAdminData();
-    loadProducts();
-  });
-  $('prodCancelBtn').addEventListener('click', resetProdForm);
-  function resetProdForm() {
-    editingId = null;
-    $('prodFormTitle').textContent = 'افزودن محصول جدید';
-    $('prodSubmitBtn').textContent = 'ذخیره محصول';
-    $('prodCancelBtn').style.display = 'none';
-    $('prodForm').reset();
-    pfIconData = ''; pfCoverData = '';
-    $('iconPreview').textContent = 'بی‌عکس';
-    $('coverPreview').textContent = 'بی‌عکس';
-    $('pfPeriod').value = 'ماهانه';
-    $('pfSort').value = 99;
-    $('pfColor1').value = '#6366f1';
-    $('pfColor2').value = '#8b5cf6';
-  }
-
-  $('adminProdList').addEventListener('click', (e) => {
-    const editBtn = e.target.closest('[data-edit]');
-    const delBtn = e.target.closest('[data-del]');
-    if (editBtn) {
-      const p = products.find(x => x.id === editBtn.dataset.edit) ||
-                allAdminProducts.find(x => x.id === editBtn.dataset.edit);
-      if (!p) return;
-      editingId = p.id;
-      $('prodFormTitle').textContent = 'ویرایش: ' + p.name;
-      $('prodSubmitBtn').textContent = 'ذخیره تغییرات';
-      $('prodCancelBtn').style.display = 'inline-block';
-      $('pfName').value = p.name;
-      $('pfDesc').value = p.description || '';
-      $('pfPrice').value = p.price;
-      $('pfPeriod').value = p.period || 'ماهانه';
-      $('pfIconText').value = p.icon_text || '';
-      $('pfBadge').value = p.badge || '';
-      $('pfSort').value = p.sort_order || 99;
-      $('pfActive').value = p.active ? '1' : '0';
-      const [c1, c2] = (p.color || '').split('|');
-      if (c1) $('pfColor1').value = c1;
-      if (c2) $('pfColor2').value = c2;
-      pfIconData = p.icon_url || '';
-      pfCoverData = p.cover_url || '';
-      $('iconPreview').innerHTML = pfIconData ? `<img src="${esc(pfIconData)}">` : 'بی‌عکس';
-      $('coverPreview').innerHTML = pfCoverData ? `<img src="${esc(pfCoverData)}">` : 'بی‌عکس';
-      adminPage.scrollIntoView({ behavior: 'smooth' });
-      $('prodFormCard').scrollIntoView({ behavior: 'smooth' });
-    }
-    if (delBtn) {
-      askConfirm('حذف محصول', 'محصول «' + (allAdminProducts.find(x => x.id === delBtn.dataset.del) || {}).name + '» کاملاً حذف شود؟ این عملیات قابل بازگشت نیست.').then((yes) => {
-        if (!yes) return;
-        api('/api/admin-products?id=' + encodeURIComponent(delBtn.dataset.del), 'DELETE')
-          .then(({ ok, data }) => {
-            if (ok && data.ok) { gToast('محصول حذف شد.', 'success'); loadAdminData(); loadProducts(); }
-            else adminToast($('prodToast'), data.error || 'حذف ناموفق بود.', 'error');
-          });
-      });
-    }
-  });
+  // ================= Admin Panel Redirect =================
+  $('adminBtn').addEventListener('click', () => { window.location.href = '/admin.html'; });
+  function openAdmin() { window.location.href = '/admin.html'; }
 
   // ================= Init =================
   (async function init() {
     updateCartBadge();
     await Promise.all([checkSession(), loadProducts()]);
-    // بعد از لود محصولات، لیست ادمین هم برای ویرایش آماده باشد
-    if (currentUser && currentUser.is_admin) {
-      const { ok, data } = await api('/api/admin-products', 'GET');
-      if (ok && data.ok) allAdminProducts = data.products;
-    }
   })();
 </script>
 

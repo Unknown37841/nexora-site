@@ -1,4 +1,5 @@
 import { jsonResponse, jsonError, requireAdmin, logError } from "../_utils.js";
+import { ensureDatabaseSchema } from "./admin-migrate.js";
 
 const MAX_IMAGE_CHARS = 700_000; // حدود ۷۰۰ کیلوبایت برای هر data URL
 

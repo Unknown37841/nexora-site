@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>پنل مدیریت Nexora</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --bg-alt: #111827;
+      --surface: #151d30;
+      --surface-hover: #1c2640;
+      --surface-border: rgba(255, 255, 255, 0.08);
+      --surface-border-strong: rgba(255, 255, 255, 0.16);
+      --text: #f9fafb;
+      --text-mute: #9ca3af;
+      --text-dim: #6b7280;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.2);
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.2);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.2);
+      --radius-sm: 8px;
+      --radius: 14px;
+      --radius-lg: 20px;
+      --font: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+      --sidebar-w: 260px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Auth Screen */
+    .auth-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+      padding: 20px;
+      background: radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.15), transparent 60%);
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border-strong);
+      border-radius: var(--radius-lg);
+      padding: 36px 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+    .auth-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .auth-logo span { color: var(--primary); }
+    .auth-sub { font-size: 0.88rem; color: var(--text-mute); margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; text-align: right; }
+    .form-group label { display: block; font-size: 0.84rem; margin-bottom: 6px; color: var(--text-mute); font-weight: 500; }
+    .form-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--surface-border);
+      background: var(--bg-alt);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .otp-row { display: flex; gap: 8px; justify-content: center; direction: ltr; margin: 20px 0; }
+    .otp-box {
+      width: 48px; height: 56px; text-align: center; font-size: 1.4rem; font-weight: 700;
+      background: var(--bg-alt); border: 1.5px solid var(--surface-border); border-radius: var(--radius-sm);
+      color: var(--text); outline: none; transition: all 0.2s;
+    }
+    .otp-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+    /* Layout */
+    #appWrap { display: none; width: 100%; min-height: 100vh; }
+    #appWrap.active { display: flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-alt);
+      border-left: 1px solid var(--surface-border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .sb-brand {
+      padding: 22px 20px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .sb-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; }
+    .sb-logo span { color: var(--primary); }
+    .sb-tag { font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; background: var(--primary-glow); color: var(--primary); border: 1px solid var(--primary); }
+
+    .sb-nav { flex: 1; padding: 16px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+    .sb-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-mute);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      width: 100%;
+      cursor: pointer;
+      text-align: right;
+      transition: all 0.15s;
+    }
+    .sb-item:hover { color: var(--text); background: var(--surface); }
+    .sb-item.active { color: #fff; background: var(--primary); box-shadow: 0 4px 12px var(--primary-glow); }
+    .sb-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sb-badge {
+      margin-right: auto;
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: var(--warning);
+      color: #000;
+      font-weight: 700;
+    }
+
+    .sb-footer {
+      padding: 16px 14px;
+      border-top: 1px solid var(--surface-border);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .sb-user { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+    .sb-avatar {
+      width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;
+    }
+    .sb-uname { font-size: 0.88rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sb-uemail { font-size: 0.74rem; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+    }
+    .topbar {
+      height: 64px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--surface-border);
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    .tb-title { font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .tb-actions { display: flex; align-items: center; gap: 10px; }
+    .menu-toggle { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 6px; }
+
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Tab views */
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 4px 14px var(--primary-glow); }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-success:hover { box-shadow: 0 4px 14px var(--success-glow); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { box-shadow: 0 4px 14px var(--danger-glow); }
+    .btn-ghost { background: var(--surface); color: var(--text); border-color: var(--surface-border); }
+    .btn-ghost:hover { background: var(--surface-hover); border-color: var(--surface-border-strong); }
+    .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .stat-info { min-width: 0; }
+    .stat-val { font-size: 1.5rem; font-weight: 800; line-height: 1.2; }
+    .stat-label { font-size: 0.82rem; color: var(--text-mute); margin-top: 4px; }
+
+    /* Cards & Panels */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    /* Tables & Responsive Lists */
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; text-align: right; font-size: 0.88rem; }
+    th { padding: 12px 14px; background: var(--bg-alt); color: var(--text-mute); font-weight: 600; border-bottom: 1px solid var(--surface-border); white-space: nowrap; }
+    td { padding: 14px; border-bottom: 1px solid var(--surface-border); vertical-align: middle; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-pending { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.3); }
+    .badge-awaiting { background: var(--warning-glow); color: var(--warning); border: 1px solid var(--warning); animation: pulse 2s infinite; }
+    .badge-paid { background: var(--success-glow); color: var(--success); border: 1px solid var(--success); }
+    .badge-rejected { background: var(--danger-glow); color: var(--danger); border: 1px solid var(--danger); }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+      background: var(--surface);
+      color: var(--text-mute);
+      border: 1px solid var(--surface-border);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { color: var(--text); border-color: var(--surface-border-strong); }
+    .filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 600; }
+
+    /* Search input */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: var(--bg-alt);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      padding: 0 12px;
+      width: 260px;
+    }
+    .search-box input {
+      border: none;
+      background: transparent;
+      padding: 10px 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      width: 100%;
+    }
+
+    /* Receipt thumbnail */
+    .receipt-thumb {
+      width: 52px; height: 52px; border-radius: 8px; object-fit: cover;
+      cursor: pointer; border: 1px solid var(--surface-border-strong);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .receipt-thumb:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--surface-border-strong);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+    }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .modal-close { background: none; border: none; color: var(--text-mute); cursor: pointer; font-size: 1.5rem; line-height: 1; }
+    .modal-close:hover { color: var(--text); }
+
+    /* Toast */
+    .toast-wrap { position: fixed; bottom: 24px; left: 24px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      padding: 12px 18px; border-radius: var(--radius-sm); font-size: 0.88rem; font-weight: 500;
+      color: #fff; background: var(--surface); border: 1px solid var(--surface-border-strong);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px;
+      animation: slideIn 0.25s ease-out;
+    }
+    .toast.success { background: #065f46; border-color: var(--success); }
+    .toast.error { background: #7f1d1d; border-color: var(--danger); }
+    .toast.info { background: #1e1b4b; border-color: var(--primary); }
+    @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* Bank Card Preview in Admin */
+    .bank-card-preview {
+      background: linear-gradient(135deg, #1e1b4b, #312e81 60%, #4338ca);
+      border-radius: 16px;
+      padding: 24px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(49, 46, 129, 0.4);
+      max-width: 440px;
+      margin: 0 auto 20px;
+    }
+    .bcp-chip { width: 44px; height: 32px; background: linear-gradient(135deg, #fbbf24, #d97706); border-radius: 6px; margin-bottom: 16px; }
+    .bcp-number { font-size: 1.35rem; font-weight: 700; letter-spacing: 3px; font-family: monospace; direction: ltr; text-align: center; margin-bottom: 16px; }
+    .bcp-meta { display: flex; justify-content: space-between; font-size: 0.82rem; }
+    .bcp-name { font-weight: 600; }
+    .bcp-bank { opacity: 0.85; }
+
+    /* Product Grid */
+    .prods-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .p-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+    .p-card:hover { border-color: var(--surface-border-strong); }
+    .p-top { display: flex; align-items: center; gap: 12px; }
+    .p-icon-box {
+      width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.2rem; flex-shrink: 0; overflow: hidden;
+    }
+    .p-icon-box img { width: 100%; height: 100%; object-fit: cover; }
+    .p-title { font-weight: 700; font-size: 0.98rem; }
+    .p-period { font-size: 0.78rem; color: var(--text-mute); }
+    .p-price { font-size: 1.15rem; font-weight: 800; color: var(--success); }
+    .p-desc { font-size: 0.82rem; color: var(--text-mute); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
+    .p-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--surface-border); }
+
+    /* Toggle switch */
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background-color: #374151; border-radius: 24px; transition: .2s; cursor: pointer; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; right: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .2s; }
+    input:checked + .slider { background-color: var(--success); }
+    input:checked + .slider:before { transform: translateX(-20px); }
+
+    /* Image Preview in Modal */
+    .img-preview-box {
+      width: 100%; height: 140px; border-radius: var(--radius-sm); border: 1.5px dashed var(--surface-border-strong);
+      display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 6px; position: relative;
+      background: var(--bg-alt); cursor: pointer;
+    }
+    .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+    .img-preview-empty { color: var(--text-dim); font-size: 0.82rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+    /* Mobile Responsive */
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed; right: 0; top: 0; bottom: 0;
+        transform: translateX(100%);
+        box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .menu-toggle { display: block; }
+      .content-area { padding: 16px; }
+      .search-box { width: 100%; }
+      .filter-bar { overflow-x: auto; width: 100%; padding-bottom: 4px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 540px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .bcp-number { font-size: 1.1rem; letter-spacing: 1px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== AUTH VIEW (ADMIN LOGIN) ==================== -->
+  <div class="auth-wrap" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Nexora</span> پنل مدیریت
+      </div>
+      <div class="auth-sub" id="authSub">برای دسترسی به پنل مدیریت ابتدا وارد شوید</div>
+
+      <!-- Step 1: Email & Password -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label>ایمیل مدیر</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="admin@example.com" required dir="ltr">
+        </div>
+        <div class="form-group">
+          <label>رمز عبور</label>
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required dir="ltr">
+        </div>
+        <button type="submit" class="btn btn-primary" id="loginSubmitBtn" style="width:100%;margin-top:8px;padding:12px;">ورود به مدیریت</button>
+      </form>
+
+      <!-- Step 2: 2FA OTP Code -->
+      <form id="otpForm" style="display:none;">
+        <p style="font-size:0.85rem;color:var(--text-mute);margin-bottom:12px;">کد تأیید ۶ رقمی به ایمیل شما ارسال شد. لطفاً آن را وارد کنید:</p>
+        <div class="otp-row">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="0">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="1">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="2">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="3">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="4">
+          <input type="text" maxlength="1" class="otp-box" inputmode="numeric" data-idx="5">
+        </div>
+        <button type="submit" class="btn btn-primary" id="otpSubmitBtn" style="width:100%;margin-top:8px;padding:12px;">تأیید و ورود</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="otpBackBtn" style="width:100%;margin-top:10px;">بازگشت به فرم ورود</button>
+      </form>
+
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--surface-border);">
+        <a href="/" style="color:var(--text-mute);font-size:0.82rem;text-decoration:none;">← بازگشت به صفحه اصلی فروشگاه</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MAIN DASHBOARD ==================== -->
+  <div id="appWrap">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-brand">
+        <div class="sb-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <span>Nexora</span>
+          <span class="sb-tag">مدیریت</span>
+        </div>
+        <button class="menu-toggle" id="closeSidebarBtn" aria-label="بستن منو">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sb-nav">
+        <button class="sb-item active" data-tab="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          <span>داشبورد و آمار</span>
+        </button>
+
+        <button class="sb-item" data-tab="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <span>سفارشات و فیش‌ها</span>
+          <span class="sb-badge" id="sbPendingBadge" style="display:none;">0</span>
+        </button>
+
+        <button class="sb-item" data-tab="products">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span>مدیریت محصولات</span>
+        </button>
+
+        <button class="sb-item" data-tab="users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>کاربران و مشتریان</span>
+        </button>
+
+        <button class="sb-item" data-tab="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          <span>تنظیمات حساب بانکی</span>
+        </button>
+      </nav>
+
+      <div class="sb-footer">
+        <div class="sb-user">
+          <div class="sb-avatar" id="admAvatar">M</div>
+          <div style="min-width:0;">
+            <div class="sb-uname" id="admName">مدیر سیستم</div>
+            <div class="sb-uemail" id="admEmail">admin@nexora.com</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <a href="/" target="_blank" class="btn btn-ghost btn-sm" style="flex:1;">مشاهده سایت</a>
+          <button class="btn btn-danger btn-sm" id="logoutBtn">خروج</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="tb-title">
+          <button class="menu-toggle" id="openSidebarBtn" aria-label="منو">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <span id="pageTitle">داشبورد و وضعیت کل</span>
+        </div>
+        <div class="tb-actions">
+          <button class="btn btn-ghost btn-sm" id="refreshBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            بروزرسانی
+          </button>
+        </div>
+      </header>
+
+      <div class="content-area">
+
+        <!-- ==================== TAB 1: DASHBOARD ==================== -->
+        <section class="tab-view active" id="view-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon" style="background:var(--success-glow);color:var(--success);">💰</div>
+              <div class="stat-info">
+                <div class="stat-val" id="statRevenue">۰ تومان</div>
+                <div class="stat-label">کل فروش تأیید شده</div>
+              </div>
+            </div>
+            <div class="stat-card" style="border-color:var(--warning);">
+              <div class="stat-icon" style="background:var(--warning-glow);color:var(--warning);">🔔</div>
+              <div class="stat-info">
+                <div class="stat-val" id="statPendingReceipts">۰</div>
+                <div class="stat-label">فیش‌های منتظر بررسی</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:var(--primary-glow);color:var(--primary);">👥</div>
+              <div class="stat-info">
+                <div class="stat-val" id="statUsers">۰</div>
+                <div class="stat-label">کل کاربران</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon" style="background:rgba(139, 92, 246, 0.2);color:var(--accent);">📦</div>
+              <div class="stat-info">
+                <div class="stat-val" id="statActiveProds">۰</div>
+                <div class="stat-label">محصولات فعال</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">
+                <span>🔔 فیش‌های نیازمند بررسی فوری</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" id="btnGoOrders">مشاهده همه سفارش‌ها →</button>
+            </div>
+            <div id="urgentReceiptsList">
+              <p style="color:var(--text-mute);font-size:0.88rem;text-align:center;padding:24px 0;">در حال بارگذاری…</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 2: ORDERS & RECEIPTS ==================== -->
+        <section class="tab-view" id="view-orders">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>سفارشات و رسیدهای کارت به کارت</span>
+              </div>
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="orderSearchInput" placeholder="جستجو کد رهگیری، سفارش یا خریدار…">
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <button class="filter-btn active" data-filter="">همه سفارش‌ها (<span id="cntAll">0</span>)</button>
+              <button class="filter-btn" data-filter="awaiting_verification" style="color:var(--warning);border-color:var(--warning);">در انتظار بررسی فیش 🔔 (<span id="cntAwaiting">0</span>)</button>
+              <button class="filter-btn" data-filter="paid">تأیید شده ✅ (<span id="cntPaid">0</span>)</button>
+              <button class="filter-btn" data-filter="rejected">رد شده ❌ (<span id="cntRejected">0</span>)</button>
+              <button class="filter-btn" data-filter="pending">در انتظار واریز ⏳ (<span id="cntPending">0</span>)</button>
+            </div>
+
+            <div class="table-wrap">
+              <table id="ordersTable">
+                <thead>
+                  <tr>
+                    <th>کد سفارش / تاریخ</th>
+                    <th>مشتری</th>
+                    <th>اقلام و مبلغ</th>
+                    <th>اطلاعات واریز</th>
+                    <th>تصویر فیش</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                  <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-mute);">در حال بارگذاری سفارشات…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 3: PRODUCTS ==================== -->
+        <section class="tab-view" id="view-products">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                <span>لیست محصولات و سرویس‌ها</span>
+              </div>
+              <button class="btn btn-primary" id="openAddProdBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                افزودن محصول جدید
+              </button>
+            </div>
+
+            <div class="prods-grid" id="prodsGrid">
+              <p style="color:var(--text-mute);padding:30px;text-align:center;">در حال بارگذاری محصولات…</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 4: USERS ==================== -->
+        <section class="tab-view" id="view-users">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <span>لیست کاربران عضو</span>
+              </div>
+              <div class="search-box">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="userSearchInput" placeholder="جستجوی ایمیل یا نام کاربر…">
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>کاربر</th>
+                    <th>ایمیل</th>
+                    <th>وضعیت ایمیل</th>
+                    <th>تعداد سفارش</th>
+                    <th>کل خرید (تومان)</th>
+                    <th>نقش</th>
+                    <th>عملیات</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-mute);">در حال بارگذاری کاربران…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB 5: BANK SETTINGS ==================== -->
+        <section class="tab-view" id="view-settings">
+          <div class="card" style="max-width:700px;margin:0 auto;">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                <span>تنظیمات حساب بانکی جهت دریافت وجه</span>
+              </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="bank-card-preview">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <span style="font-size:0.85rem;font-weight:700;letter-spacing:1px;">NEXORA SHOP</span>
+                <span style="font-size:0.75rem;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.2);">کارت شتاب</span>
+              </div>
+              <div class="bcp-chip"></div>
+              <div class="bcp-number" id="previewCardNum">۶۲۱۹ - ۸۶۱۹ - ۱۲۶۵ - ۲۱۸۶</div>
+              <div class="bcp-meta">
+                <div>
+                  <div style="font-size:0.7rem;opacity:0.7;">صاحب حساب</div>
+                  <div class="bcp-name" id="previewCardHolder">محمد اورک</div>
+                </div>
+                <div style="text-align:left;">
+                  <div style="font-size:0.7rem;opacity:0.7;">بانک</div>
+                  <div class="bcp-bank" id="previewCardBank">بانک سامان</div>
+                </div>
+              </div>
+            </div>
+
+            <form id="settingsForm">
+              <div class="form-group">
+                <label>شماره کارت ۱۶ رقمی (مقصد واریز خریدار) *</label>
+                <input type="text" id="setCardNumber" class="form-input" placeholder="6219-8619-1265-2186" dir="ltr" required>
+              </div>
+              <div class="form-group">
+                <label>نام و نام خانوادگی صاحب حساب *</label>
+                <input type="text" id="setCardHolder" class="form-input" placeholder="محمد اورک" required>
+              </div>
+              <div class="form-group">
+                <label>نام بانک صادرکننده *</label>
+                <input type="text" id="setCardBank" class="form-input" placeholder="بانک سامان" required>
+              </div>
+              <div class="form-group">
+                <label>شماره شبا (اختیاری)</label>
+                <input type="text" id="setCardSheba" class="form-input" placeholder="IR000000000000000000000000" dir="ltr">
+              </div>
+              <div class="form-group">
+                <label>متن راهنمای پرداخت (برای نمایش به مشتری در صفحه پرداخت)</label>
+                <textarea id="setCardHelp" class="form-input" rows="3" placeholder="لطفاً پس از واریز، شماره پیگیری را وارد نمایید."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="saveSettingsBtn" style="width:100%;padding:12px;margin-top:8px;">
+                ذخیره تنظیمات بانکی
+              </button>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 1: Product Add / Edit -->
+  <div class="modal-backdrop" id="prodModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="prodModalTitle">افزودن محصول جدید</h3>
+        <button class="modal-close" id="closeProdModalBtn">&times;</button>
+      </div>
+      <form id="prodModalForm">
+        <input type="hidden" id="pmId">
+        <div class="form-group">
+          <label>نام محصول / سرویس *</label>
+          <input type="text" id="pmName" class="form-input" placeholder="مثلاً اشتراک هوش مصنوعی ChatGPT Plus" required>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>قیمت (تومان) *</label>
+            <input type="number" id="pmPrice" class="form-input" min="0" step="1000" placeholder="250000" required>
+          </div>
+          <div class="form-group">
+            <label>دوره اشتراک</label>
+            <input type="text" id="pmPeriod" class="form-input" placeholder="ماهانه" value="ماهانه">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>برچسب / نشان (اختیاری)</label>
+            <input type="text" id="pmBadge" class="form-input" placeholder="پرفروش / ویژه">
+          </div>
+          <div class="form-group">
+            <label>ترتیب نمایش</label>
+            <input type="number" id="pmSort" class="form-input" value="1" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>توضیحات کوتاه محصول</label>
+          <textarea id="pmDesc" class="form-input" rows="2" placeholder="توضیح مختصر درباره امکانات سرویس…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>متن آیکون (اگر عکس نباشد)</label>
+            <input type="text" id="pmIconText" class="form-input" maxlength="4" placeholder="C">
+          </div>
+          <div class="form-group">
+            <label>رنگ گرادیان آیکون</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:4px;">
+              <input type="color" id="pmColor1" value="#6366f1" style="height:36px;width:44px;border:none;border-radius:6px;cursor:pointer;">
+              <input type="color" id="pmColor2" value="#8b5cf6" style="height:36px;width:44px;border:none;border-radius:6px;cursor:pointer;">
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>تصویر کاور یا لوگوی محصول (انتخاب فایل یا عکس)</label>
+          <div class="img-preview-box" id="coverBox">
+            <div class="img-preview-empty" id="coverEmpty">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>برای انتخاب یا عکس گرفتن کلیک کنید</span>
+            </div>
+            <img id="coverImg" style="display:none;" alt="کاور">
+          </div>
+          <input type="file" id="coverFileInput" accept="image/*" style="display:none;">
+          <input type="hidden" id="pmCoverData">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnRemoveCover" style="margin-top:6px;display:none;">حذف عکس</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+          <span style="font-size:0.9rem;font-weight:600;">وضعیت فعال در فروشگاه</span>
+          <label class="toggle">
+            <input type="checkbox" id="pmActive" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="submit" class="btn btn-primary" id="saveProdBtn" style="flex:1;">ذخیره محصول</button>
+          <button type="button" class="btn btn-ghost" id="cancelProdBtn">انصراف</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: View Receipt Image Fullscreen -->
+  <div class="modal-backdrop" id="receiptModal">
+    <div class="modal" style="max-width:700px;text-align:center;">
+      <div class="modal-head">
+        <h3 id="rmTitle">تصویر فیش واریزی</h3>
+        <button class="modal-close" id="closeReceiptModalBtn">&times;</button>
+      </div>
+      <div style="max-height:70vh;overflow:auto;margin-bottom:16px;border-radius:8px;background:#000;">
+        <img id="rmImg" src="" alt="فیش واریز" style="max-width:100%;height:auto;display:inline-block;">
+      </div>
+      <div id="rmMeta" style="text-align:right;font-size:0.86rem;color:var(--text-mute);margin-bottom:16px;line-height:1.8;"></div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn btn-success" id="rmApproveBtn">تأیید پرداخت ✅</button>
+        <button class="btn btn-danger" id="rmRejectBtn">رد فیش ❌</button>
+        <button class="btn btn-ghost" id="rmCloseBtn">بستن</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Reject Order Note -->
+  <div class="modal-backdrop" id="rejectModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-head">
+        <h3>رد فیش واریزی</h3>
+        <button class="modal-close" id="closeRejectModalBtn">&times;</button>
+      </div>
+      <form id="rejectForm">
+        <input type="hidden" id="rejOrderId">
+        <div class="form-group">
+          <label>علت رد فیش (برای مشتری نمایش داده می‌شود) *</label>
+          <textarea id="rejReason" class="form-input" rows="3" placeholder="مثال: شماره پیگیری در صورت‌حساب بانک مشاهده نشد یا مبلغ واریز شده کمتر است." required></textarea>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn btn-danger" style="flex:1;">تأیید رد فیش</button>
+          <button type="button" class="btn btn-ghost" id="cancelRejectBtn">انصراف</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3.5: Deliver Subscription & Credentials to Customer -->
+  <div class="modal-backdrop" id="deliverModal">
+    <div class="modal" style="max-width:580px;">
+      <div class="modal-head">
+        <h3>🚀 تأیید پرداخت و تحویل اشتراک به مشتری</h3>
+        <button class="modal-close" id="closeDeliverModalBtn">&times;</button>
+      </div>
+      <form id="deliverForm">
+        <input type="hidden" id="delivOrderId">
+        <div style="background:var(--bg-alt);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:0.83rem;line-height:1.7;">
+          <div style="display:flex;justify-content:space-between;">
+            <span>شماره سفارش: <strong id="delivOrderNum" style="font-family:monospace;color:var(--warning);">—</strong></span>
+            <span>مبلغ: <strong id="delivOrderTotal" style="color:var(--success);">—</strong></span>
+          </div>
+          <div>مشتری: <strong id="delivCustomerName">—</strong> (<span id="delivCustomerEmail">—</span>)</div>
+          <div>ارتباط مشتری (تلفن/تلگرام): <strong id="delivCustomerContact" style="color:var(--primary);direction:ltr;display:inline-block;">—</strong></div>
+          <div>سفارش: <strong id="delivItems">—</strong></div>
+        </div>
+
+        <div class="form-group">
+          <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;">متن مشخصات اکانت / اشتراک تحویلی به مشتری *</span>
+            <span style="font-size:0.75rem;color:var(--success);">مستقیماً در پنل کاربری خریدار قرار می‌گیرد</span>
+          </label>
+          <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('account')">قالب اکانت (یوزر/پسورد)</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('invite')">قالب لینک دعوت فمیلی</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('license')">قالب کد لایسنس</button>
+          </div>
+          <textarea id="delivText" class="form-input" rows="7" placeholder="مشخصات اکانت تحویلی (ایمیل، رمز عبور، راهنما و نکات استفاده)..." required style="font-family:monospace;font-size:0.9rem;line-height:1.65;direction:ltr;text-align:left;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>پیام یا یادداشت مدیر به مشتری (اختیاری)</label>
+          <input type="text" id="delivAdminNote" class="form-input" placeholder="مثال: سفارش شما فعال شد. از خرید شما سپاسگزاریم!">
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="submit" class="btn btn-success" id="btnSubmitDeliver" style="flex:1;">تأیید پرداخت و تحویل به مشتری ✅</button>
+          <button type="button" class="btn btn-ghost" id="cancelDeliverBtn">انصراف</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Edit User Role / Info -->
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-head">
+        <h3>مدیریت کاربر</h3>
+        <button class="modal-close" id="closeUserModalBtn">&times;</button>
+      </div>
+      <form id="userForm">
+        <input type="hidden" id="umUserId">
+        <div class="form-group">
+          <label>نام کاربر</label>
+          <input type="text" id="umName" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label>ایمیل</label>
+          <input type="text" id="umEmail" class="form-input" disabled dir="ltr">
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+          <span style="font-size:0.9rem;font-weight:600;">دسترسی مدیر سیستم (Admin)</span>
+          <label class="toggle">
+            <input type="checkbox" id="umIsAdmin">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="submit" class="btn btn-primary" style="flex:1;">ذخیره تغییرات</button>
+          <button type="button" class="btn btn-danger" id="btnDeleteUser">حذف کاربر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Wrap -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- ==================== LOGIC JAVASCRIPT ==================== -->
+  <script>
+    // Global State
+    let currentAdmin = null;
+    let pendingOtpEmail = null;
+    let allOrders = [];
+    let allProducts = [];
+    let allUsers = [];
+    let bankSettings = {};
+    let activeOrderFilter = '';
+
+    const $ = id => document.getElementById(id);
+
+    // Toast
+    function toast(msg, type = 'info') {
+      const wrap = $('toastWrap');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.innerHTML = `<span>${msg}</span>`;
+      wrap.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3500);
+    }
+
+    // Number format (English digits as required by user)
+    function fmt(n) {
+      return (Number(n) || 0).toLocaleString('en-US');
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '—';
+      const d = new Date(ts);
+      return d.toLocaleDateString('fa-IR') + ' ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Image compression helper (keeps max dimension 1200px, jpeg 0.8)
+    function compressImage(file, maxDimension = 1200, quality = 0.8) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let { width, height } = img;
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // API Helper
+    async function api(path, method = 'GET', body = null) {
+      const opts = { method, headers: {} };
+      if (body) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body);
+      }
+      try {
+        const res = await fetch(path, opts);
+        const data = await res.json().catch(() => ({ ok: false, error: 'پاسخ نامعتبر سرور' }));
+        return { ok: res.ok && data.ok, status: res.status, data };
+      } catch (err) {
+        return { ok: false, status: 0, data: { ok: false, error: 'خطا در اتصال به سرور' } };
+      }
+    }
+
+    // Check Auth on load
+    async function initAuth() {
+      const { ok, data } = await api('/api/me');
+      if (ok && data.user && data.user.is_admin) {
+        currentAdmin = data.user;
+        showDashboard();
+      } else {
+        $('authScreen').style.display = 'flex';
+        $('appWrap').classList.remove('active');
+        if (ok && data.user && !data.user.is_admin) {
+          $('authSub').textContent = 'حساب شما دسترسی مدیریت ندارد. لطفاً با حساب ادمین وارد شوید.';
+          $('authSub').style.color = 'var(--danger)';
+        }
+      }
+    }
+
+    // Login Form Submit
+    $('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = $('loginEmail').value.trim();
+      const password = $('loginPass').value;
+      const btn = $('loginSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال بررسی…';
+
+      const { ok, data } = await api('/api/login', 'POST', { email, password });
+      btn.disabled = false;
+      btn.textContent = 'ورود به مدیریت';
+
+      if (ok && data.pendingVerification) {
+        pendingOtpEmail = email;
+        $('loginForm').style.display = 'none';
+        $('otpForm').style.display = 'block';
+        $('authSub').textContent = `کد ۶ رقمی به ${email} ارسال شد.`;
+        document.querySelector('.otp-box[data-idx="0"]').focus();
+      } else if (ok && data.ok) {
+        // Direct session
+        initAuth();
+      } else {
+        toast(data.error || 'ورود ناموفق بود.', 'error');
+      }
+    });
+
+    // OTP Input Controls
+    const otpBoxes = document.querySelectorAll('.otp-box');
+    otpBoxes.forEach(box => {
+      box.addEventListener('input', e => {
+        const val = e.target.value.replace(/[^0-9]/g, '');
+        e.target.value = val;
+        if (val) {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          if (idx < 5) otpBoxes[idx + 1].focus();
+        }
+      });
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !e.target.value) {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          if (idx > 0) otpBoxes[idx - 1].focus();
+        }
+      });
+      box.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        if (text.length >= 6) {
+          for (let i = 0; i < 6; i++) otpBoxes[i].value = text[i];
+          otpBoxes[5].focus();
+        }
+      });
+    });
+
+    $('otpBackBtn').addEventListener('click', () => {
+      $('otpForm').style.display = 'none';
+      $('loginForm').style.display = 'block';
+      $('authSub').textContent = 'برای دسترسی به پنل مدیریت ابتدا وارد شوید';
+    });
+
+    $('otpForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const code = Array.from(otpBoxes).map(b => b.value).join('');
+      if (code.length < 6) {
+        toast('لطفاً کد ۶ رقمی را کامل وارد کنید.', 'error');
+        return;
+      }
+      const btn = $('otpSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال بررسی کد…';
+
+      const { ok, data } = await api('/api/login-verify', 'POST', { email: pendingOtpEmail, code });
+      btn.disabled = false;
+      btn.textContent = 'تأیید و ورود';
+
+      if (ok && data.ok) {
+        toast('خوش آمدید!', 'success');
+        initAuth();
+      } else {
+        toast(data.error || 'کد وارد شده صحیح نیست.', 'error');
+      }
+    });
+
+    // Logout
+    $('logoutBtn').addEventListener('click', async () => {
+      if (!confirm('آیا از خروج از پنل مدیریت اطمینان دارید؟')) return;
+      await api('/api/logout', 'POST');
+      location.reload();
+    });
+
+    // Show Dashboard
+    function showDashboard() {
+      $('authScreen').style.display = 'none';
+      $('appWrap').classList.add('active');
+      $('admName').textContent = currentAdmin.name || 'مدیر سایت';
+      $('admEmail').textContent = currentAdmin.email;
+      $('admAvatar').textContent = (currentAdmin.name || 'M').charAt(0).toUpperCase();
+
+      loadStats();
+      loadOrders();
+      loadProducts();
+      loadUsers();
+      loadSettings();
+    }
+
+    // Tabs switching
+    const tabBtns = document.querySelectorAll('.sb-item[data-tab]');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+        $('view-' + tab).classList.add('active');
+
+        const titles = {
+          dashboard: 'داشبورد و وضعیت کل',
+          orders: 'سفارشات و رسیدهای واریزی',
+          products: 'مدیریت محصولات فروشگاه',
+          users: 'مدیریت کاربران و مشتریان',
+          settings: 'تنظیمات حساب بانکی'
+        };
+        $('pageTitle').textContent = titles[tab] || 'مدیریت';
+
+        // Close mobile sidebar
+        $('sidebar').classList.remove('open');
+      });
+    });
+
+    $('openSidebarBtn').addEventListener('click', () => $('sidebar').classList.add('open'));
+    $('closeSidebarBtn').addEventListener('click', () => $('sidebar').classList.remove('open'));
+    $('btnGoOrders').addEventListener('click', () => {
+      document.querySelector('.sb-item[data-tab="orders"]').click();
+    });
+    $('refreshBtn').addEventListener('click', () => {
+      loadStats();
+      loadOrders();
+      loadProducts();
+      loadUsers();
+      loadSettings();
+      toast('اطلاعات با موفقیت به‌روزرسانی شد.', 'success');
+    });
+
+    // Load Stats
+    async function loadStats() {
+      const { ok, data } = await api('/api/admin-stats');
+      if (ok && data.stats) {
+        const s = data.stats;
+        $('statRevenue').textContent = fmt(s.totalRevenue) + ' تومان';
+        $('statPendingReceipts').textContent = fmt(s.pendingReceipts);
+        $('statUsers').textContent = fmt(s.totalUsers);
+        $('statActiveProds').textContent = fmt(s.activeProducts);
+
+        const badge = $('sbPendingBadge');
+        if (s.pendingReceipts > 0) {
+          badge.textContent = s.pendingReceipts;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+
+        renderUrgentReceipts(s.recentPending || []);
+      }
+    }
+
+    function renderUrgentReceipts(list) {
+      const el = $('urgentReceiptsList');
+      if (!list.length) {
+        el.innerHTML = '<p style="color:var(--text-dim);font-size:0.88rem;text-align:center;padding:24px 0;">هیچ فیشی در انتظار بررسی نیست. همه پرداخت‌ها بررسی شده‌اند ✓</p>';
+        return;
+      }
+      let html = '<div style="display:flex;flex-direction:column;gap:10px;">';
+      for (const ord of list) {
+        html += `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg-alt);border-radius:10px;border:1px solid var(--surface-border);flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-weight:700;font-size:0.92rem;color:var(--text);">${ord.user_name || 'کاربر'} (${ord.user_email || '—'})</div>
+              <div style="font-size:0.78rem;color:var(--text-mute);margin-top:2px;">
+                کد سفارش: <strong>${ord.id}</strong> | پیگیری: <span style="font-family:monospace;color:var(--warning);">${ord.tracking_code || 'ثبت نشده'}</span> | زمان: ${formatDate(ord.submitted_at || ord.created_at)}
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="font-weight:800;color:var(--success);font-size:1.05rem;">${fmt(ord.total)} تومان</span>
+              <button class="btn btn-primary btn-sm" onclick="openOrderDetails('${ord.id}')">بررسی فیش 🔍</button>
+            </div>
+          </div>
+        `;
+      }
+      html += '</div>';
+      el.innerHTML = html;
+    }
+
+    // Load Orders
+    async function loadOrders() {
+      const url = activeOrderFilter ? `/api/admin-orders?status=${activeOrderFilter}` : '/api/admin-orders';
+      const { ok, data } = await api(url);
+      if (ok && data.orders) {
+        allOrders = data.orders;
+        updateOrderCounts();
+        renderOrders();
+      }
+    }
+
+    function updateOrderCounts() {
+      $('cntAll').textContent = allOrders.length;
+      $('cntAwaiting').textContent = allOrders.filter(o => o.status === 'awaiting_verification').length;
+      $('cntPaid').textContent = allOrders.filter(o => o.status === 'paid').length;
+      $('cntRejected').textContent = allOrders.filter(o => o.status === 'rejected').length;
+      $('cntPending').textContent = allOrders.filter(o => o.status === 'pending').length;
+    }
+
+    // Filter Buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeOrderFilter = btn.dataset.filter;
+        renderOrders();
+      });
+    });
+
+    $('orderSearchInput').addEventListener('input', renderOrders);
+
+    function renderOrders() {
+      const tbody = $('ordersTableBody');
+      const q = $('orderSearchInput').value.trim().toLowerCase();
+
+      let filtered = allOrders;
+      if (activeOrderFilter) {
+        filtered = filtered.filter(o => o.status === activeOrderFilter);
+      }
+      if (q) {
+        filtered = filtered.filter(o =>
+          (o.id && o.id.toLowerCase().includes(q)) ||
+          (o.tracking_code && o.tracking_code.toLowerCase().includes(q)) ||
+          (o.sender_card && o.sender_card.toLowerCase().includes(q)) ||
+          (o.user_name && o.user_name.toLowerCase().includes(q)) ||
+          (o.user_email && o.user_email.toLowerCase().includes(q))
+        );
+      }
+
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-mute);">سفارشی یافت نشد.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(o => {
+        const statusMap = {
+          pending: '<span class="badge badge-pending">در انتظار پرداخت</span>',
+          awaiting_verification: '<span class="badge badge-awaiting">در انتظار بررسی فیش 🔔</span>',
+          paid: '<span class="badge badge-paid">تأیید شده ✓</span>',
+          rejected: '<span class="badge badge-rejected">رد شده ✕</span>',
+          cancelled: '<span class="badge badge-pending">لغو شده</span>'
+        };
+
+        const itemsSummary = (o.items || []).map(it => `${it.name} (${it.qty} عدد)`).join('، ');
+
+        let receiptThumb = '<span style="color:var(--text-dim);font-size:0.75rem;">ندارد</span>';
+        if (o.receipt_image) {
+          receiptThumb = `<img src="${o.receipt_image}" class="receipt-thumb" onclick="viewReceiptImage('${o.id}')" title="مشاهده تصویر رسید" alt="فیش">`;
+        }
+
+        let actions = `
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="openDeliverModal('${o.id}')" title="تحویل اشتراک و ارسال اطلاعات به مشتری">
+              ${o.delivery_text ? 'ویرایش اکانت 📝' : 'تحویل اشتراک 🚀'}
+            </button>
+            ${o.receipt_image ? `
+              <button class="btn btn-ghost btn-sm" onclick="viewReceiptImage('${o.id}')" title="بررسی فیش">فیش 🔍</button>
+            ` : ''}
+            ${o.status === 'awaiting_verification' ? `
+              <button class="btn btn-danger btn-sm" onclick="openRejectModal('${o.id}')" title="رد فیش">رد ❌</button>
+            ` : o.status === 'paid' ? `
+              <button class="btn btn-ghost btn-sm" onclick="setOrderStatus('${o.id}', 'pending')" title="برگشت به در انتظار">برگشت</button>
+            ` : `
+              <button class="btn btn-ghost btn-sm" onclick="openRejectModal('${o.id}')" title="رد فیش">رد ❌</button>
+            `}
+            <button class="btn btn-ghost btn-sm" onclick="deleteOrder('${o.id}')" style="color:var(--danger);" title="حذف سفارش">🗑️</button>
+          </div>
+        `;
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;font-family:monospace;font-size:0.9rem;">${o.id}</div>
+              <div style="font-size:0.74rem;color:var(--text-mute);">${formatDate(o.submitted_at || o.created_at)}</div>
+            </td>
+            <td>
+              <div style="font-weight:600;">${o.user_name || 'کاربر'}</div>
+              <div style="font-size:0.78rem;color:var(--text-dim);direction:ltr;text-align:right;">${o.user_email || '—'}</div>
+              ${o.customer_contact ? `
+                <div style="font-size:0.76rem;color:var(--primary);margin-top:3px;font-weight:600;">
+                  📞 تماس: <span dir="ltr">${o.customer_contact}</span>
+                </div>
+              ` : ''}
+            </td>
+            <td>
+              <div style="font-weight:800;color:var(--success);font-size:0.98rem;">${fmt(o.total)} تومان</div>
+              <div style="font-size:0.75rem;color:var(--text-mute);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${itemsSummary}">${itemsSummary || '—'}</div>
+            </td>
+            <td>
+              <div style="font-size:0.82rem;">
+                پیگیری: <strong style="color:var(--warning);font-family:monospace;">${o.tracking_code || '—'}</strong>
+              </div>
+              ${o.sender_card ? `<div style="font-size:0.75rem;color:var(--text-mute);">کارت: ${o.sender_card}</div>` : ''}
+              ${o.receipt_text ? `<div style="font-size:0.74rem;color:var(--text-dim);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${o.receipt_text}">${o.receipt_text}</div>` : ''}
+              ${o.delivery_text ? `
+                <div style="margin-top:4px;display:inline-block;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,0.15);color:var(--success);font-size:0.72rem;font-weight:600;">
+                  ✓ اشتراک تحویل داده شد
+                </div>
+              ` : ''}
+            </td>
+            <td style="text-align:center;">${receiptThumb}</td>
+            <td>
+              ${statusMap[o.status] || o.status}
+              ${o.admin_note ? `<div style="font-size:0.72rem;color:var(--danger);margin-top:4px;" title="${o.admin_note}">علت: ${o.admin_note}</div>` : ''}
+            </td>
+            <td>${actions}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // View Receipt Image Fullscreen
+    window.viewReceiptImage = function(orderId) {
+      const ord = allOrders.find(o => o.id === orderId);
+      if (!ord || !ord.receipt_image) {
+        toast('تصویر رسیدی برای این سفارش یافت نشد.', 'error');
+        return;
+      }
+      $('rmTitle').textContent = `تصویر فیش سفارش #${ord.id}`;
+      $('rmImg').src = ord.receipt_image;
+      $('rmMeta').innerHTML = `
+        <div>خریدار: <strong>${ord.user_name || '—'}</strong> (${ord.user_email || '—'})</div>
+        ${ord.customer_contact ? `<div>شماره تماس / تلگرام: <strong style="color:var(--primary);direction:ltr;display:inline-block;">${ord.customer_contact}</strong></div>` : ''}
+        <div>مبلغ سفارش: <strong style="color:var(--success);">${fmt(ord.total)} تومان</strong></div>
+        <div>شماره پیگیری: <strong style="color:var(--warning);font-family:monospace;">${ord.tracking_code || '—'}</strong></div>
+        ${ord.sender_card ? `<div>کارت واریزکننده: <strong>${ord.sender_card}</strong></div>` : ''}
+        ${ord.receipt_text ? `<div>توضیحات واریز: <em>${ord.receipt_text}</em></div>` : ''}
+      `;
+      $('rmApproveBtn').textContent = 'تأیید و ارسال مشخصات اکانت 🚀';
+      $('rmApproveBtn').onclick = () => { closeReceiptModal(); openDeliverModal(ord.id); };
+      $('rmRejectBtn').onclick = () => { closeReceiptModal(); openRejectModal(ord.id); };
+      $('receiptModal').classList.add('active');
+    };
+
+    function closeReceiptModal() {
+      $('receiptModal').classList.remove('active');
+    }
+    $('closeReceiptModalBtn').addEventListener('click', closeReceiptModal);
+    $('rmCloseBtn').addEventListener('click', closeReceiptModal);
+
+    // ================= Deliver & Fulfillment Modal =================
+    window.openDeliverModal = function(orderId) {
+      const ord = allOrders.find(o => o.id === orderId);
+      if (!ord) return;
+      $('delivOrderId').value = ord.id;
+      $('delivOrderNum').textContent = '#' + ord.id;
+      $('delivOrderTotal').textContent = fmt(ord.total) + ' تومان';
+      $('delivCustomerName').textContent = ord.user_name || 'کاربر';
+      $('delivCustomerEmail').textContent = ord.user_email || '—';
+      $('delivCustomerContact').textContent = ord.customer_contact || ord.sender_card || 'ثبت نشده';
+      const itemsText = (ord.items || []).map(it => `${it.name} ×${it.qty}`).join('، ');
+      $('delivItems').textContent = itemsText || '—';
+      $('delivText').value = ord.delivery_text || '';
+      $('delivAdminNote').value = ord.admin_note || '';
+      $('deliverModal').classList.add('active');
+    };
+    function closeDeliverModal() { $('deliverModal').classList.remove('active'); }
+    $('closeDeliverModalBtn').addEventListener('click', closeDeliverModal);
+    $('cancelDeliverBtn').addEventListener('click', closeDeliverModal);
+
+    window.insertDelivTemplate = function(type) {
+      const t = $('delivText');
+      if (type === 'account') {
+        t.value = `مشخصات اشتراک شما فعال شد:\n` +
+                  `👤 ایمیل / نام کاربری: \n` +
+                  `🔑 رمز عبور: \n` +
+                  `🌐 آدرس ورود: \n` +
+                  `📌 قوانین: لطفاً مشخصات پروفایل و پسورد را تغییر ندهید. تیم نکسورا در خدمت شماست.`;
+      } else if (type === 'invite') {
+        t.value = `اشتراک اختصاصی شما آماده است:\n` +
+                  `🔗 لینک دعوت به فمیلی: https://\n` +
+                  `📌 راهنما: کافیست با اکانت شخصی خود روی لینک بالا کلیک و عضو شوید.`;
+      } else if (type === 'license') {
+        t.value = `کد لایسنس سرویس خریداری‌شده:\n` +
+                  `🔑 لایسنس: \n` +
+                  `🌐 راهنمای فعال‌سازی: \n` +
+                  `با تشکر از اعتماد و خرید شما از نکسورا 💜`;
+      }
+      t.focus();
+    };
+
+    $('deliverForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const id = $('delivOrderId').value;
+      const deliveryText = $('delivText').value.trim();
+      const adminNote = $('delivAdminNote').value.trim();
+      if (!deliveryText) { toast('لطفاً متن مشخصات اکانت یا اشتراک را بنویسید.', 'error'); return; }
+
+      const btn = $('btnSubmitDeliver');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> در حال ثبت و تحویل…';
+      const { ok, data } = await api(`/api/admin-orders?id=${id}`, 'PUT', {
+        status: 'paid',
+        deliveryText,
+        adminNote: adminNote || 'سفارش تأیید و اکانت تحویل داده شد'
+      });
+      btn.disabled = false;
+      btn.innerHTML = 'تأیید پرداخت و تحویل به مشتری ✅';
+      if (ok && data.ok) {
+        toast(`سفارش #${id} تأیید و مشخصات اکانت برای مشتری ارسال شد 🚀`, 'success');
+        closeDeliverModal();
+        loadStats();
+        loadOrders();
+      } else {
+        toast(data.error || 'خطا در تحویل سفارش', 'error');
+      }
+    });
+
+    window.openOrderDetails = function(orderId) {
+      const ord = allOrders.find(o => o.id === orderId);
+      if (ord && ord.receipt_image) {
+        viewReceiptImage(orderId);
+      } else {
+        document.querySelector('.sb-item[data-tab="orders"]').click();
+        $('orderSearchInput').value = orderId;
+        renderOrders();
+      }
+    };
+
+    // Approve Order
+    window.approveOrder = async function(orderId) {
+      if (!confirm(`آیا پرداخت سفارش ${orderId} را تأیید می‌کنید؟ وضعیت به "پرداخت شده" تغییر می‌کند.`)) return;
+      const { ok, data } = await api(`/api/admin-orders?id=${orderId}`, 'PUT', { status: 'paid', adminNote: 'تأیید شد' });
+      if (ok && data.ok) {
+        toast(`سفارش ${orderId} با موفقیت تأیید شد ✓`, 'success');
+        loadStats();
+        loadOrders();
+      } else {
+        toast(data.error || 'خطا در تأیید سفارش', 'error');
+      }
+    };
+
+    // Reject Modal & Submit
+    window.openRejectModal = function(orderId) {
+      $('rejOrderId').value = orderId;
+      $('rejReason').value = '';
+      $('rejectModal').classList.add('active');
+    };
+    function closeRejectModal() { $('rejectModal').classList.remove('active'); }
+    $('closeRejectModalBtn').addEventListener('click', closeRejectModal);
+    $('cancelRejectBtn').addEventListener('click', closeRejectModal);
+
+    $('rejectForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('rejOrderId').value;
+      const reason = $('rejReason').value.trim();
+      const { ok, data } = await api(`/api/admin-orders?id=${id}`, 'PUT', { status: 'rejected', adminNote: reason });
+      if (ok && data.ok) {
+        toast('فیش واریزی رد شد.', 'info');
+        closeRejectModal();
+        loadStats();
+        loadOrders();
+      } else {
+        toast(data.error || 'خطا در ثبت رد فیش', 'error');
+      }
+    });
+
+    window.setOrderStatus = async function(orderId, status) {
+      const { ok, data } = await api(`/api/admin-orders?id=${orderId}`, 'PUT', { status });
+      if (ok && data.ok) {
+        toast('وضعیت سفارش تغییر کرد.', 'success');
+        loadStats();
+        loadOrders();
+      } else {
+        toast(data.error || 'خطا در تغییر وضعیت', 'error');
+      }
+    };
+
+    window.deleteOrder = async function(orderId) {
+      if (!confirm(`آیا از حذف سفارش ${orderId} اطمینان دارید؟ این عمل غیرقابل بازگشت است.`)) return;
+      const { ok, data } = await api(`/api/admin-orders?id=${orderId}`, 'DELETE');
+      if (ok && data.ok) {
+        toast('سفارش حذف شد.', 'success');
+        loadStats();
+        loadOrders();
+      } else {
+        toast(data.error || 'خطا در حذف سفارش', 'error');
+      }
+    };
+
+    // ==================== PRODUCTS ====================
+    async function loadProducts() {
+      const { ok, data } = await api('/api/admin-products');
+      if (ok && data.products) {
+        allProducts = data.products;
+        renderProducts();
+      }
+    }
+
+    function renderProducts() {
+      const grid = $('prodsGrid');
+      if (!allProducts.length) {
+        grid.innerHTML = '<p style="color:var(--text-mute);padding:30px;text-align:center;">هنوز محصولی ثبت نشده است. با دکمه بالا اولین محصول را اضافه کنید.</p>';
+        return;
+      }
+      grid.innerHTML = allProducts.map(p => {
+        let iconHtml;
+        if (p.cover_url) {
+          iconHtml = `<img src="${p.cover_url}" alt="${p.name}">`;
+        } else if (p.icon_url) {
+          iconHtml = `<img src="${p.icon_url}" alt="${p.name}">`;
+        } else {
+          const colors = (p.color || '#6366f1|#8b5cf6').split('|');
+          iconHtml = `<div style="width:100%;height:100%;background:linear-gradient(135deg, ${colors[0]}, ${colors[1] || colors[0]});color:#fff;display:flex;align-items:center;justify-content:center;">${p.icon_text || p.name.charAt(0)}</div>`;
+        }
+
+        return `
+          <div class="p-card" style="opacity:${p.active ? 1 : 0.65};">
+            <div class="p-top">
+              <div class="p-icon-box">${iconHtml}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="p-title" title="${p.name}">${p.name}</div>
+                <div class="p-period">${p.period || 'ماهانه'} ${p.badge ? `• <span style="color:var(--warning);">${p.badge}</span>` : ''}</div>
+              </div>
+            </div>
+            <div class="p-price">${fmt(p.price)} تومان</div>
+            <div class="p-desc">${p.description || 'بدون توضیحات'}</div>
+            <div class="p-actions">
+              <div style="display:flex;align-items:center;gap:6px;flex:1;">
+                <label class="toggle" style="transform:scale(0.85);margin-right:-4px;">
+                  <input type="checkbox" ${p.active ? 'checked' : ''} onchange="toggleProductActive('${p.id}', this.checked)">
+                  <span class="slider"></span>
+                </label>
+                <span style="font-size:0.75rem;color:var(--text-mute);">${p.active ? 'فعال' : 'غیرفعال'}</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">ویرایش ✏️</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteProduct('${p.id}')">حذف 🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toggle Product Active
+    window.toggleProductActive = async function(id, active) {
+      const prod = allProducts.find(p => p.id === id);
+      if (!prod) return;
+      const { ok, data } = await api(`/api/admin-products?id=${id}`, 'PUT', { ...prod, active });
+      if (ok && data.ok) {
+        toast(`محصول ${active ? 'فعال' : 'غیرفعال'} شد.`, 'success');
+        loadProducts();
+      } else {
+        toast(data.error || 'خطا در تغییر وضعیت محصول', 'error');
+        loadProducts();
+      }
+    };
+
+    // Product Modal (Add / Edit)
+    $('openAddProdBtn').addEventListener('click', () => {
+      $('prodModalTitle').textContent = 'افزودن محصول جدید';
+      $('prodModalForm').reset();
+      $('pmId').value = '';
+      $('pmActive').checked = true;
+      $('pmCoverData').value = '';
+      $('coverImg').style.display = 'none';
+      $('coverEmpty').style.display = 'flex';
+      $('btnRemoveCover').style.display = 'none';
+      $('prodModal').classList.add('active');
+    });
+
+    function closeProdModal() { $('prodModal').classList.remove('active'); }
+    $('closeProdModalBtn').addEventListener('click', closeProdModal);
+    $('cancelProdBtn').addEventListener('click', closeProdModal);
+
+    // Edit Product
+    window.editProduct = function(id) {
+      const p = allProducts.find(x => x.id === id);
+      if (!p) return;
+      $('prodModalTitle').textContent = 'ویرایش محصول';
+      $('pmId').value = p.id;
+      $('pmName').value = p.name || '';
+      $('pmPrice').value = p.price || 0;
+      $('pmPeriod').value = p.period || 'ماهانه';
+      $('pmBadge').value = p.badge || '';
+      $('pmSort').value = p.sort_order || 1;
+      $('pmDesc').value = p.description || '';
+      $('pmIconText').value = p.icon_text || '';
+      $('pmActive').checked = p.active !== 0;
+
+      const colors = (p.color || '#6366f1|#8b5cf6').split('|');
+      $('pmColor1').value = colors[0] || '#6366f1';
+      $('pmColor2').value = colors[1] || '#8b5cf6';
+
+      const cover = p.cover_url || p.icon_url || '';
+      $('pmCoverData').value = cover;
+      if (cover) {
+        $('coverImg').src = cover;
+        $('coverImg').style.display = 'block';
+        $('coverEmpty').style.display = 'none';
+        $('btnRemoveCover').style.display = 'inline-block';
+      } else {
+        $('coverImg').style.display = 'none';
+        $('coverEmpty').style.display = 'flex';
+        $('btnRemoveCover').style.display = 'none';
+      }
+
+      $('prodModal').classList.add('active');
+    };
+
+    // Image Upload & Compression in Modal
+    $('coverBox').addEventListener('click', () => $('coverFileInput').click());
+    $('coverFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const compressed = await compressImage(file, 800, 0.82);
+        $('pmCoverData').value = compressed;
+        $('coverImg').src = compressed;
+        $('coverImg').style.display = 'block';
+        $('coverEmpty').style.display = 'none';
+        $('btnRemoveCover').style.display = 'inline-block';
+      } catch (err) {
+        toast('خطا در پردازش تصویر', 'error');
+      }
+    });
+
+    $('btnRemoveCover').addEventListener('click', () => {
+      $('pmCoverData').value = '';
+      $('coverFileInput').value = '';
+      $('coverImg').style.display = 'none';
+      $('coverEmpty').style.display = 'flex';
+      $('btnRemoveCover').style.display = 'none';
+    });
+
+    // Save Product Form
+    $('prodModalForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('pmId').value;
+      const isEdit = !!id;
+      const payload = {
+        name: $('pmName').value.trim(),
+        price: parseInt($('pmPrice').value, 10) || 0,
+        period: $('pmPeriod').value.trim() || 'ماهانه',
+        badge: $('pmBadge').value.trim(),
+        sort_order: parseInt($('pmSort').value, 10) || 1,
+        description: $('pmDesc').value.trim(),
+        icon_text: $('pmIconText').value.trim(),
+        color: `${$('pmColor1').value}|${$('pmColor2').value}`,
+        cover_url: $('pmCoverData').value || '',
+        active: $('pmActive').checked
+      };
+
+      const btn = $('saveProdBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال ذخیره…';
+
+      const url = isEdit ? `/api/admin-products?id=${id}` : '/api/admin-products';
+      const method = isEdit ? 'PUT' : 'POST';
+      const { ok, data } = await api(url, method, payload);
+      btn.disabled = false;
+      btn.textContent = 'ذخیره محصول';
+
+      if (ok && (data.ok || data.id)) {
+        toast(isEdit ? 'محصول با موفقیت ویرایش شد ✓' : 'محصول جدید اضافه شد ✓', 'success');
+        closeProdModal();
+        loadProducts();
+        loadStats();
+      } else {
+        toast(data.error || 'خطا در ذخیره محصول', 'error');
+      }
+    });
+
+    // Delete Product
+    window.deleteProduct = async function(id) {
+      if (!confirm('آیا از حذف این محصول اطمینان دارید؟')) return;
+      const { ok, data } = await api(`/api/admin-products?id=${id}`, 'DELETE');
+      if (ok && data.ok) {
+        toast('محصول حذف شد.', 'success');
+        loadProducts();
+        loadStats();
+      } else {
+        toast(data.error || 'خطا در حذف محصول', 'error');
+      }
+    };
+
+    // ==================== USERS ====================
+    async function loadUsers() {
+      const q = $('userSearchInput').value.trim();
+      const url = q ? `/api/admin-users?q=${encodeURIComponent(q)}` : '/api/admin-users';
+      const { ok, data } = await api(url);
+      if (ok && data.users) {
+        allUsers = data.users;
+        renderUsers();
+      }
+    }
+
+    $('userSearchInput').addEventListener('input', loadUsers);
+
+    function renderUsers() {
+      const tbody = $('usersTableBody');
+      if (!allUsers.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-mute);">کاربری یافت نشد.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = allUsers.map(u => {
+        const isSelf = currentAdmin && currentAdmin.id === u.id;
+        return `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.82rem;">${(u.name || 'U').charAt(0).toUpperCase()}</div>
+                <div>
+                  <div style="font-weight:700;">${u.name || 'بی‌نام'}</div>
+                  <div style="font-size:0.72rem;color:var(--text-dim);">عضویت: ${formatDate(u.created_at)}</div>
+                </div>
+              </div>
+            </td>
+            <td dir="ltr" style="text-align:right;">${u.email}</td>
+            <td>
+              ${u.email_verified ? '<span style="color:var(--success);font-weight:600;font-size:0.8rem;">تأیید شده ✓</span>' : '<span style="color:var(--warning);font-size:0.8rem;">در انتظار تأیید</span>'}
+            </td>
+            <td>${u.order_count || 0}</td>
+            <td style="font-weight:700;color:var(--success);">${fmt(u.total_spent || 0)} تومان</td>
+            <td>
+              ${u.is_admin ? '<span class="badge" style="background:var(--primary-glow);color:var(--primary);border:1px solid var(--primary);">مدیر سیستم ⭐</span>' : '<span class="badge badge-pending">کاربر عادی</span>'}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <button class="btn btn-ghost btn-sm" onclick="editUser('${u.id}')">مدیریت ⚙️</button>
+                ${!isSelf ? `<button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteUser('${u.id}')">حذف</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // User Edit Modal
+    window.editUser = function(id) {
+      const u = allUsers.find(x => x.id === id);
+      if (!u) return;
+      $('umUserId').value = u.id;
+      $('umName').value = u.name || '';
+      $('umEmail').value = u.email;
+      $('umIsAdmin').checked = !!u.is_admin;
+      $('userModal').classList.add('active');
+    };
+    function closeUserModal() { $('userModal').classList.remove('active'); }
+    $('closeUserModalBtn').addEventListener('click', closeUserModal);
+
+    $('userForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('umUserId').value;
+      const payload = {
+        name: $('umName').value.trim(),
+        is_admin: $('umIsAdmin').checked ? 1 : 0
+      };
+      const { ok, data } = await api(`/api/admin-users?id=${id}`, 'PUT', payload);
+      if (ok && data.ok) {
+        toast('اطلاعات کاربر به‌روزرسانی شد.', 'success');
+        closeUserModal();
+        loadUsers();
+      } else {
+        toast(data.error || 'خطا در ذخیره اطلاعات کاربر', 'error');
+      }
+    });
+
+    window.deleteUser = async function(id) {
+      if (!confirm('آیا از حذف این کاربر اطمینان دارید؟ تمام سشن‌ها و سفارش‌های کاربر نیز متأثر می‌شوند.')) return;
+      const { ok, data } = await api(`/api/admin-users?id=${id}`, 'DELETE');
+      if (ok && data.ok) {
+        toast('کاربر حذف شد.', 'success');
+        loadUsers();
+        loadStats();
+      } else {
+        toast(data.error || 'خطا در حذف کاربر', 'error');
+      }
+    };
+
+    // ==================== BANK SETTINGS ====================
+    async function loadSettings() {
+      const { ok, data } = await api('/api/payment-settings');
+      if (ok && data.settings) {
+        bankSettings = data.settings;
+        $('setCardNumber').value = bankSettings.cardNumber || '';
+        $('setCardHolder').value = bankSettings.cardHolder || '';
+        $('setCardBank').value = bankSettings.cardBank || '';
+        $('setCardSheba').value = bankSettings.cardSheba || '';
+        $('setCardHelp').value = bankSettings.cardHelp || '';
+
+        updateCardPreview();
+      }
+    }
+
+    function updateCardPreview() {
+      $('previewCardNum').textContent = $('setCardNumber').value || '۶۰۳۷ - ۹۹۱۱ - ۲۲۳۳ - ۴۴۵۵';
+      $('previewCardHolder').textContent = $('setCardHolder').value || 'محمد اورک';
+      $('previewCardBank').textContent = $('setCardBank').value || 'بانک ملی ایران';
+    }
+
+    $('setCardNumber').addEventListener('input', updateCardPreview);
+    $('setCardHolder').addEventListener('input', updateCardPreview);
+    $('setCardBank').addEventListener('input', updateCardPreview);
+
+    $('settingsForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const payload = {
+        cardNumber: $('setCardNumber').value.trim(),
+        cardHolder: $('setCardHolder').value.trim(),
+        cardBank: $('setCardBank').value.trim(),
+        cardSheba: $('setCardSheba').value.trim(),
+        cardHelp: $('setCardHelp').value.trim()
+      };
+      const btn = $('saveSettingsBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال ذخیره…';
+
+      const { ok, data } = await api('/api/payment-settings', 'PUT', payload);
+      btn.disabled = false;
+      btn.textContent = 'ذخیره تنظیمات بانکی';
+
+      if (ok && data.ok) {
+        toast('تنظیمات حساب بانکی با موفقیت ذخیره شد ✓', 'success');
+        updateCardPreview();
+      } else {
+        toast(data.error || 'خطا در ذخیره تنظیمات', 'error');
+      }
+    });
+
+    // Start
+    initAuth();
+  </script>
+</body>
+</html>

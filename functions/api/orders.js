@@ -1,12 +1,13 @@
 import { jsonResponse, jsonError, getSessionUser, logError } from "../_utils.js";
+import { ensureDatabaseSchema } from "./admin-migrate.js";
 
 // POST /api/orders → ثبت سفارش از سبد خرید (نیاز به ورود)
-// توجه: پرداخت هنوز وصل نشده؛ سفارش با وضعیت pending ثبت می‌شود
-//       و بعداً با اتصال درگاه، به paid تغییر می‌کند.
 export async function onRequestPost(context) {
   const { request, env } = context;
   const user = await getSessionUser(request, env);
   if (!user) return jsonError("برای ثبت سفارش ابتدا وارد حساب شوید.", 401);
+
+  await ensureDatabaseSchema(env);
 
   let body;
   try {
@@ -54,18 +55,26 @@ export async function onRequestPost(context) {
     return jsonError("ثبت سفارش ناموفق بود. دوباره تلاش کنید.", 500);
   }
 
-  return jsonResponse({ ok: true, orderId: id, total }, 201);
+  return jsonResponse({ ok: true, orderId: id, total, items: finalItems }, 201);
 }
 
-// GET /api/orders → سفارش‌های خود کاربر
+// GET /api/orders → سفارش‌های خود کاربر همراه با اطلاعات فیش و اکانت تحویل داده شده
 export async function onRequestGet(context) {
   const { request, env } = context;
   const user = await getSessionUser(request, env);
   if (!user) return jsonError("ابتدا وارد حساب شوید.", 401);
 
-  const { results } = await env.DB.prepare(
-    "SELECT id, items, total, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 50"
-  )
+  await ensureDatabaseSchema(env);
+
+  const { results } = await env.DB.prepare(`
+    SELECT id, items, total, status, created_at,
+           tracking_code, sender_card, customer_contact, receipt_text, receipt_image,
+           admin_note, delivery_text, delivered_at, paid_at, submitted_at
+    FROM orders
+    WHERE user_id = ?
+    ORDER BY created_at DESC
+    LIMIT 50
+  `)
     .bind(user.id)
     .all();
 
