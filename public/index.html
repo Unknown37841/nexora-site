@@ -2832,7 +2832,7 @@
     updateAuthUI();
     gToast((pendingMode === 'login' ? 'ورود موفق 🎉' : 'حساب فعال شد 🎉') + ' خوش آمدی ' + currentUser.name, 'success');
     this.reset();
-    setTimeout(() => { closeModal(); if (adminPage.classList.contains('active')) loadAdminData(); }, 900);
+    setTimeout(() => { closeModal(); }, 900);
   });
 
   let resendTimer = null;
@@ -3113,34 +3113,43 @@
   $('confirmModal').addEventListener('click', (e) => { if (e.target === $('confirmModal')) closeConfirm(false); });
 
   // ================= Page router (profile / payment / contact / legal) =================
-  const appPages = ['profilePage', 'paymentPage', 'contactPage', 'legalPage', 'adminPage'];
+  const appPages = ['profilePage', 'paymentPage', 'contactPage', 'legalPage'];
   let siteHidden = false;
   function hideSite() {
-    if (siteHidden) return;
-    document.querySelector('header').style.display = 'none';
+    const hdr = document.querySelector('header');
+    if (hdr) hdr.style.display = 'none';
     document.querySelectorAll('body > section, footer').forEach(el => el.style.display = 'none');
     siteHidden = true;
   }
   function showSite() {
-    if (!siteHidden) return;
-    document.querySelector('header').style.display = '';
+    const hdr = document.querySelector('header');
+    if (hdr) hdr.style.display = '';
     document.querySelectorAll('body > section, footer').forEach(el => el.style.display = '');
     siteHidden = false;
   }
   function showAppPage(id) {
     hideSite();
-    appPages.forEach(p => $(p).classList.toggle('active', p === id));
+    appPages.forEach(p => {
+      const el = $(p);
+      if (el) el.classList.toggle('active', p === id);
+    });
     window.scrollTo(0, 0);
   }
   function closeAppPages() {
-    appPages.forEach(p => $(p).classList.remove('active'));
+    appPages.forEach(p => {
+      const el = $(p);
+      if (el) el.classList.remove('active');
+    });
     showSite();
+    setBnActive('home');
+    window.scrollTo(0, 0);
   }
-  function currentPage() { return appPages.find(p => $(p).classList.contains('active')) || null; }
+  function currentPage() { return appPages.find(p => { const el = $(p); return el && el.classList.contains('active'); }) || null; }
 
   // ---- Profile ----
   async function openProfile() {
     if (!currentUser) { openModal('login'); return; }
+    setBnActive('profile');
     showAppPage('profilePage');
     const nm = (currentUser.name || '؟').trim();
     $('pfAvatar').textContent = nm.charAt(0).toUpperCase();
@@ -3499,6 +3508,8 @@
   }
   document.querySelectorAll('.bn-item').forEach(b => b.addEventListener('click', (e) => {
     const act = b.dataset.bn;
+    if (act === 'home') { closeAppPages(); setBnActive('home'); return; }
+    if (act === 'services') { closeAppPages(); setBnActive('services'); return; }
     if (act === 'cart') { e.preventDefault(); openCart(); return; }
     if (act === 'profile') { e.preventDefault(); openProfile(); return; }
     setBnActive(act);
