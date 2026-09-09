@@ -1557,6 +1557,48 @@
   .pay-summary-item .psi-name { color: var(--text-soft); }
   .pay-summary-item .psi-val { font-weight: 700; }
 
+  /* Time Picker without keyboard */
+  .btn-time-step {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.15s;
+  }
+  .btn-time-step:active {
+    transform: scale(0.92);
+    background: var(--primary);
+    color: #fff;
+  }
+  .chip-time {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chip-time:hover, .chip-time:active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(99,102,241,0.12);
+  }
+
   /* contact / legal */
   .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   .contact-info-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--surface-border); }
@@ -2324,18 +2366,31 @@
     <div id="payFlowActive">
       <div class="app-card">
         <!-- Target Bank Card -->
-        <div class="card-visual">
+        <div class="card-visual" id="destCardVisual" title="برای کپی شماره کارت کلیک کنید" style="cursor:pointer;">
           <div class="cv-top">
             <div class="cv-chip"></div>
             <div class="cv-brand" id="destBankName">بانک سامان</div>
           </div>
-          <div class="cv-number" id="destCardNum">۶۲۱۹ - ۸۶۱۹ - ۱۲۶۵ - ۲۱۸۶</div>
+          <div class="cv-number" id="destCardNum" data-card="6219861912652186">۶۲۱۹ - ۸۶۱۹ - ۱۲۶۵ - ۲۱۸۶</div>
           <div class="cv-bottom">
-            <div>به نام<span class="cvb-v" id="destCardHolder" style="display:block;text-align:right;">محمد اورک</span></div>
+            <div>
+              <span style="display:block;font-size:0.68rem;opacity:0.75;">صاحب حساب</span>
+              <span class="cvb-v" id="destCardHolder" style="display:block;text-align:right;">محمد اورک</span>
+            </div>
             <div style="text-align:left;">
-              <button type="button" class="btn btn-ghost btn-sm" id="btnCopyCard" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:5px 12px;font-size:0.76rem;">کپی شماره کارت 📋</button>
+              <span style="display:block;font-size:0.68rem;opacity:0.75;">مبلغ دقیق سفارش</span>
+              <span class="cvb-v" id="cardVisualAmount" style="display:block;color:#fef08a;font-weight:800;font-size:0.95rem;">—</span>
             </div>
           </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button type="button" class="btn btn-primary" id="btnCopyCard" style="flex:1;padding:11px 14px;font-size:0.86rem;font-weight:700;">
+            کپی شماره کارت 📋
+          </button>
+          <button type="button" class="btn btn-ghost" id="btnCopyAmount" style="padding:11px 14px;font-size:0.86rem;font-weight:700;border:1px solid var(--surface-border);">
+            کپی مبلغ 📋
+          </button>
         </div>
 
         <!-- Amount Box -->
@@ -2344,12 +2399,14 @@
             <div class="pa-label">مبلغ دقیق قابل پرداخت:</div>
             <div class="pa-num" id="payAmount">—</div>
           </div>
-          <button type="button" class="btn btn-ghost btn-sm" id="btnCopyAmount" style="padding:6px 12px;font-size:0.8rem;">کپی مبلغ 📋</button>
+          <div style="font-size:0.78rem;color:var(--text-mute);text-align:left;">
+            شناسه: <strong id="payOrderIdSub" style="color:var(--text);font-family:monospace;">—</strong>
+          </div>
         </div>
 
         <!-- Help notice -->
         <div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:12px 14px;font-size:0.82rem;color:var(--text);margin-bottom:18px;line-height:1.7;" id="destCardHelp">
-          لطفاً مبلغ بالا را به شماره کارت درج‌شده واریز کنید و سپس کد پیگیری، شماره تماس/تلگرام و عکس رسید را در فرم زیر ارسال نمایید.
+          لطفاً مبلغ بالا را به شماره کارت درج‌شده کارت‌به‌کارت فرمایید و سپس شماره تماس، کد پیگیری و عکس رسید را در فرم زیر ارسال نمایید.
         </div>
 
         <div id="paySummary" style="margin-bottom:16px;"></div>
@@ -2357,15 +2414,78 @@
         <!-- Receipt Submission Form -->
         <form id="payReceiptForm">
           <div class="form-group" style="margin-bottom:14px;">
-            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">شماره پیگیری / کد رهگیری بانکی *</label>
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">
+              شماره پیگیری / کد رهگیری بانکی * <span style="color:var(--danger);font-size:0.75rem;">(اجباری)</span>
+            </label>
             <input type="text" id="payTracking" class="form-input" placeholder="مثلاً 9876543210" required dir="ltr" style="font-family:monospace;font-size:1.05rem;font-weight:700;">
             <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">کد رهگیری ۶ تا ۲۰ رقمی پیامک یا رسید بانک</div>
           </div>
 
           <div class="form-group" style="margin-bottom:14px;">
-            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">شماره تماس یا آیدی تلگرام شما (جهت هماهنگی و ارسال) *</label>
-            <input type="text" id="payCustomerContact" class="form-input" placeholder="مثلاً 09123456789 یا @username" required dir="ltr">
-            <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">برای هماهنگی تحویل اکانت و ارتباط در صورت نیاز</div>
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">
+              شماره تماس / موبایل شما * <span style="color:var(--danger);font-size:0.75rem;">(اجباری)</span>
+            </label>
+            <input type="tel" id="payCustomerPhone" class="form-input" placeholder="مثلاً 09123456789" required dir="ltr" maxlength="15" style="font-family:monospace;font-size:1.02rem;">
+            <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">برای هماهنگی تحویل اکانت و تماس در صورت بروز مشکل</div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">
+              آیدی تلگرام شما <span style="color:var(--text-dim);font-weight:400;font-size:0.75rem;">(اختیاری)</span>
+            </label>
+            <input type="text" id="payCustomerTelegram" class="form-input" placeholder="مثلاً username@ یا بدون @" dir="ltr" maxlength="40">
+            <div style="font-size:0.74rem;color:var(--text-mute);margin-top:4px;">در صورت تمایل جهت ارسال سریع‌تر اکانت در تلگرام وارد کنید</div>
+          </div>
+
+          <!-- Transaction Time Selection (Without Keyboard) -->
+          <div class="form-group" style="margin-bottom:16px;">
+            <label style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:0.84rem;font-weight:700;">
+                ساعت ثبت تراکنش / واریز * <span style="color:var(--danger);font-size:0.75rem;">(اجباری)</span>
+              </span>
+              <span style="font-size:0.75rem;color:var(--primary);font-weight:600;">بدون نیاز به کیبورد 👇</span>
+            </label>
+
+            <div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 14px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+                <!-- Hour Control -->
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button type="button" class="btn-time-step" id="btnHourMinus" aria-label="کاهش ساعت">−</button>
+                  <div style="text-align:center;min-width:54px;">
+                    <div style="font-size:0.68rem;color:var(--text-mute);">ساعت</div>
+                    <div id="dispTxHour" style="font-size:1.3rem;font-weight:800;font-family:monospace;color:var(--text);">19</div>
+                  </div>
+                  <button type="button" class="btn-time-step" id="btnHourPlus" aria-label="افزایش ساعت">+</button>
+                </div>
+
+                <div style="font-size:1.4rem;font-weight:800;color:var(--primary);padding:0 2px;">:</div>
+
+                <!-- Minute Control -->
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <button type="button" class="btn-time-step" id="btnMinMinus" aria-label="کاهش دقیقه">−۵</button>
+                  <div style="text-align:center;min-width:54px;">
+                    <div style="font-size:0.68rem;color:var(--text-mute);">دقیقه</div>
+                    <div id="dispTxMin" style="font-size:1.3rem;font-weight:800;font-family:monospace;color:var(--text);">45</div>
+                  </div>
+                  <button type="button" class="btn-time-step" id="btnMinPlus" aria-label="افزایش دقیقه">+۵</button>
+                </div>
+
+                <!-- Current Time Button -->
+                <button type="button" class="btn btn-ghost btn-sm" id="btnTimeNow" style="background:rgba(99,102,241,0.18);color:var(--primary);border:1px solid rgba(99,102,241,0.35);padding:7px 10px;font-size:0.78rem;font-weight:700;white-space:nowrap;border-radius:8px;">
+                  ⚡ الان
+                </button>
+              </div>
+
+              <!-- Quick Time Chips -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+                <button type="button" class="chip-time" data-offset="0">هم‌اکنون</button>
+                <button type="button" class="chip-time" data-offset="5">۵ دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="15">۱۵ دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="30">۳۰ دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="60">۱ ساعت پیش</button>
+              </div>
+            </div>
+            <input type="hidden" id="payTxTime" name="payTxTime" value="">
           </div>
 
           <div class="form-group" style="margin-bottom:14px;">
@@ -2374,7 +2494,9 @@
           </div>
 
           <div class="form-group" style="margin-bottom:14px;">
-            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">تصویر فیش واریزی (عکس رسید) *</label>
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">
+              تصویر فیش واریزی (عکس رسید) * <span style="color:var(--danger);font-size:0.75rem;">(اجباری)</span>
+            </label>
             <div class="img-preview-box" id="receiptDropzone" style="height:150px;border-radius:12px;cursor:pointer;background:var(--surface);">
               <div class="img-preview-empty" id="receiptEmptyState" style="text-align:center;padding:10px;">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
@@ -2388,8 +2510,8 @@
           </div>
 
           <div class="form-group" style="margin-bottom:18px;">
-            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">توضیحات یا تاریخ و ساعت واریز (اختیاری)</label>
-            <textarea id="payReceiptText" class="form-input" rows="2" placeholder="توضیحات اضافی، ساعت یا بانک مبدا…"></textarea>
+            <label style="display:block;font-size:0.84rem;font-weight:700;margin-bottom:6px;">توضیحات اضافی (اختیاری)</label>
+            <textarea id="payReceiptText" class="form-input" rows="2" placeholder="توضیحات اضافی، بانک مبدا…"></textarea>
           </div>
 
           <button type="submit" class="pay-submit" id="payReceiptSubmitBtn">
@@ -3311,41 +3433,143 @@
     });
   }
 
+  // تابع کپی امن و چندلایه (سازگار با همه مرورگرها و موبایل)
+  async function copyToClipboard(text) {
+    if (!text) return false;
+    let ok = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        ok = true;
+      } catch (_) {}
+    }
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        ta.style.fontSize = '16px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, 99999);
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch (_) {}
+    }
+    return ok;
+  }
+
   // ---- Payment (Card to Card) ----
   const payPage = $('paymentPage');
   let payOrder = null;
   let payReceiptBase64 = '';
+  let activeCardNumberRaw = '6219861912652186';
+
+  // کنترل زمان تراکنش بدون نیاز به کیبورد
+  let txHour = 12, txMin = 0;
+  function updateTxTimeUI() {
+    const pad = n => String(n).padStart(2, '0');
+    $('dispTxHour').textContent = pad(txHour);
+    $('dispTxMin').textContent = pad(txMin);
+    $('payTxTime').value = pad(txHour) + ':' + pad(txMin);
+  }
+  function setTxTimeToNow(offsetMinutes = 0) {
+    const d = new Date(Date.now() - offsetMinutes * 60 * 1000);
+    txHour = d.getHours();
+    txMin = d.getMinutes();
+    updateTxTimeUI();
+  }
+  $('btnHourPlus').addEventListener('click', () => { txHour = (txHour + 1) % 24; updateTxTimeUI(); });
+  $('btnHourMinus').addEventListener('click', () => { txHour = (txHour - 1 + 24) % 24; updateTxTimeUI(); });
+  $('btnMinPlus').addEventListener('click', () => { txMin = (txMin + 5) % 60; updateTxTimeUI(); });
+  $('btnMinMinus').addEventListener('click', () => { txMin = (txMin - 5 + 60) % 60; updateTxTimeUI(); });
+  $('btnTimeNow').addEventListener('click', () => { setTxTimeToNow(0); gToast('ساعت به هم‌اکنون تنظیم شد ⚡', 'info'); });
+  document.querySelectorAll('.chip-time').forEach(ch => ch.addEventListener('click', function() {
+    const off = Number(this.dataset.offset || 0);
+    setTxTimeToNow(off);
+  }));
 
   async function openPayment(order) {
     if (!currentUser) { openModal('login'); showToast($('loginToast'), 'برای پرداخت ابتدا وارد شوید.', 'error'); return; }
+
+    // اگر اردر موجود نیست یا ناقص است، بازیابی از sessionStorage
+    if (!order || !order.id) {
+      const saved = sessionStorage.getItem('nexora_active_order');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.id) order = parsed;
+        } catch (_) {}
+      }
+    }
+
+    // اگر باز هم توتال یا آیدی موجود نیست، آخرین سفارش در انتظار کاربر را می‌آوریم
+    if (!order || !order.id || !order.total) {
+      try {
+        const res = await api('/api/orders', 'GET');
+        if (res.ok && res.data && res.data.orders && res.data.orders.length) {
+          const found = res.data.orders.find(o => o.status === 'pending' || o.status === 'rejected') || res.data.orders[0];
+          if (found) order = found;
+        }
+      } catch (_) {}
+    }
+
+    if (!order) order = { id: 'ORD-' + Math.floor(100000 + Math.random() * 900000), total: 0, items: [] };
+
     payOrder = order;
+    sessionStorage.setItem('nexora_active_order', JSON.stringify(order));
     payReceiptBase64 = '';
     showAppPage('paymentPage');
 
     $('payFlowActive').style.display = 'block';
     $('payFlowSuccess').style.display = 'none';
 
-    $('payOrderId').textContent = 'شماره سفارش: #' + order.id;
-    $('payAmount').textContent = fmt(order.total);
-    $('paySummary').innerHTML = (order.items || []).map(it =>
+    $('payOrderId').textContent = '#' + (order.id || '—');
+    if ($('payOrderIdSub')) $('payOrderIdSub').textContent = '#' + (order.id || '—');
+
+    // محاسبه و نمایش دقیق مبلغ نهایی هم زیر کارت و هم روی خود کارت
+    const finalTotal = Number(order.total || (order.items || []).reduce((s, i) => s + (i.price * i.qty), 0) || 0);
+    const totalFormatted = fmt(finalTotal);
+    $('payAmount').textContent = totalFormatted;
+    $('cardVisualAmount').textContent = totalFormatted;
+    $('btnCopyAmount').dataset.amount = String(finalTotal);
+
+    let itemsArr = order.items || [];
+    if (typeof itemsArr === 'string') {
+      try { itemsArr = JSON.parse(itemsArr); } catch (_) { itemsArr = []; }
+    }
+    $('paySummary').innerHTML = itemsArr.map(it =>
       `<div class="pay-summary-item"><span class="psi-name">${esc(it.name)} × ${it.qty}</span><span class="psi-val">${fmt(it.price * it.qty)}</span></div>`
     ).join('');
 
     $('payTracking').value = '';
+    $('payCustomerPhone').value = '';
+    $('payCustomerTelegram').value = '';
     $('paySenderCard').value = '';
-    $('payCustomerContact').value = (currentUser && currentUser.email) ? currentUser.email : '';
     $('payReceiptText').value = '';
+    setTxTimeToNow(0);
     resetReceiptUpload();
 
-    // بارگذاری مشخصات حساب بانکی فعال
+    // بارگذاری مشخصات حساب بانکی از سرور
     try {
       const { ok, data } = await api('/api/payment-settings', 'GET');
       if (ok && data && data.settings) {
         const s = data.settings;
-        if (s.card_number) $('destCardNum').textContent = s.card_number;
-        if (s.card_bank) $('destBankName').textContent = s.card_bank;
-        if (s.card_holder) $('destCardHolder').textContent = s.card_holder;
-        if (s.card_help) $('destCardHelp').textContent = s.card_help;
+        const num = s.cardNumber || s.card_number;
+        const bank = s.cardBank || s.card_bank;
+        const holder = s.cardHolder || s.card_holder;
+        const help = s.cardHelp || s.card_help;
+        if (num) {
+          activeCardNumberRaw = num.replace(/\D/g, '');
+          $('destCardNum').dataset.card = activeCardNumberRaw;
+          $('destCardNum').textContent = num.replace(/(\d{4})(?=\d)/g, '$1 - ');
+        }
+        if (bank) $('destBankName').textContent = bank;
+        if (holder) $('destCardHolder').textContent = holder;
+        if (help) $('destCardHelp').textContent = help;
       }
     } catch (err) {
       console.error('Error loading payment settings:', err);
@@ -3354,24 +3578,34 @@
   $('payBackBtn').addEventListener('click', () => { closeAppPages(); openProfile(); });
 
   // کپی شماره کارت
-  $('btnCopyCard').addEventListener('click', () => {
-    const raw = $('destCardNum').textContent.replace(/\D/g, '');
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(raw).then(() => gToast('شماره کارت کپی شد 📋', 'success'));
-    } else {
-      gToast('شماره کارت کپی شد 📋', 'success');
-    }
-  });
+  async function handleCopyCard() {
+    const card = activeCardNumberRaw || $('destCardNum').dataset.card || '6219861912652186';
+    await copyToClipboard(card);
+    const btn = $('btnCopyCard');
+    const oldHtml = btn.innerHTML;
+    btn.innerHTML = 'کپی شد! ✓';
+    btn.style.background = 'var(--success)';
+    setTimeout(() => {
+      btn.innerHTML = oldHtml;
+      btn.style.background = '';
+    }, 1800);
+    gToast('شماره کارت ' + card + ' کپی شد 📋', 'success');
+  }
+  $('btnCopyCard').addEventListener('click', handleCopyCard);
+  $('destCardVisual').addEventListener('click', handleCopyCard);
 
   // کپی مبلغ
-  $('btnCopyAmount').addEventListener('click', () => {
-    if (!payOrder) return;
-    const raw = String(payOrder.total);
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(raw).then(() => gToast('مبلغ ' + fmt(payOrder.total) + ' کپی شد 📋', 'success'));
-    } else {
-      gToast('مبلغ کپی شد 📋', 'success');
-    }
+  $('btnCopyAmount').addEventListener('click', async function() {
+    const amt = this.dataset.amount || (payOrder ? String(payOrder.total) : '0');
+    await copyToClipboard(amt);
+    const oldHtml = this.innerHTML;
+    this.innerHTML = 'کپی شد! ✓';
+    this.style.color = 'var(--success)';
+    setTimeout(() => {
+      this.innerHTML = oldHtml;
+      this.style.color = '';
+    }, 1800);
+    gToast('مبلغ ' + fmt(Number(amt)) + ' کپی شد 📋', 'success');
   });
 
   // کنترل فیلد آپلود فیش
@@ -3420,13 +3654,16 @@
     if (!payOrder) { gToast('اطلاعات سفارش در دسترس نیست.', 'error'); return; }
 
     const trackingCode = $('payTracking').value.trim();
-    const customerContact = $('payCustomerContact').value.trim();
+    const customerPhone = $('payCustomerPhone').value.trim();
+    const customerTelegram = $('payCustomerTelegram').value.trim();
+    const transactionTime = $('payTxTime').value.trim();
     const senderCard = $('paySenderCard').value.trim();
     const receiptText = $('payReceiptText').value.trim();
 
-    if (!trackingCode) { gToast('لطفاً کد یا شماره پیگیری بانکی را وارد کنید.', 'error'); return; }
-    if (!customerContact) { gToast('شماره تماس یا آیدی تلگرام الزامی است.', 'error'); return; }
-    if (!payReceiptBase64) { gToast('بارگذاری تصویر یا عکس رسید واریزی اجباری است.', 'error'); return; }
+    if (!trackingCode) { gToast('کد یا شماره پیگیری بانکی الزامی است.', 'error'); return; }
+    if (!customerPhone) { gToast('شماره تماس / موبایل الزامی است.', 'error'); $('payCustomerPhone').focus(); return; }
+    if (!transactionTime) { gToast('ساعت ثبت تراکنش الزامی است.', 'error'); return; }
+    if (!payReceiptBase64) { gToast('بارگذاری عکس فیش واریزی اجباری است.', 'error'); return; }
 
     const btn = $('payReceiptSubmitBtn');
     btn.disabled = true;
@@ -3435,8 +3672,10 @@
     const { ok, data } = await api('/api/pay-receipt', 'POST', {
       orderId: payOrder.id,
       trackingCode,
+      customerPhone,
+      customerTelegram,
+      transactionTime,
       senderCard,
-      customerContact,
       receiptImage: payReceiptBase64,
       receiptText
     });
@@ -3449,6 +3688,7 @@
       $('payFlowSuccess').style.display = 'block';
       $('successPayOrderId').textContent = '#' + payOrder.id;
       $('successPayTracking').textContent = trackingCode;
+      sessionStorage.removeItem('nexora_active_order');
       gToast('فیش واریزی شما با موفقیت ثبت شد 🎉', 'success');
     } else {
       gToast(data.error || 'خطا در ثبت فیش واریزی.', 'error');

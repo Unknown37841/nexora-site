@@ -14,7 +14,7 @@ export async function onRequestGet(context) {
   const products = (results || []).map((p) => ({
     ...p,
     price: Number(p.price),
-    active: !!p.active,
+    active: true,
   }));
 
   return jsonResponse({ ok: true, products });

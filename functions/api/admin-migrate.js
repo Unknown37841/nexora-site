@@ -43,6 +43,7 @@ export async function ensureDatabaseSchema(env) {
       "ALTER TABLE orders ADD COLUMN customer_contact TEXT",
       "ALTER TABLE orders ADD COLUMN receipt_text TEXT",
       "ALTER TABLE orders ADD COLUMN receipt_image TEXT",
+      "ALTER TABLE orders ADD COLUMN transaction_time TEXT",
       "ALTER TABLE orders ADD COLUMN admin_note TEXT",
       "ALTER TABLE orders ADD COLUMN delivery_text TEXT",
       "ALTER TABLE orders ADD COLUMN delivered_at INTEGER",

@@ -38,14 +38,23 @@ export async function onRequestPost(context) {
     return jsonError("فرمت تصویر رسید معتبر نیست (فقط JPG، PNG و WebP مجاز است).", 400);
   }
 
-  // اطلاعات تماس مشتری (شماره موبایل یا آیدی تلگرام برای هماهنگی و ارسال)
-  const customerContact = (body.customerContact || "").toString().trim().slice(0, 100);
-  if (!customerContact) {
-    return jsonError("شماره تماس یا آیدی تلگرام جهت ارتباط و هماهنگی الزامی است.", 400);
+  // اطلاعات تماس مشتری (شماره موبایل اجباری، آیدی تلگرام اختیاری)
+  const customerPhone = (body.customerPhone || body.customerContact || "").toString().trim().slice(0, 30);
+  if (!customerPhone) {
+    return jsonError("شماره تماس / موبایل جهت هماهنگی الزامی است.", 400);
+  }
+  const customerTelegram = (body.customerTelegram || "").toString().trim().slice(0, 50);
+  const customerContact = customerPhone + (customerTelegram ? " | تلگرام: " + customerTelegram : "");
+
+  // ساعت ثبت تراکنش (اجباری)
+  const transactionTime = (body.transactionTime || "").toString().trim().slice(0, 15);
+  if (!transactionTime) {
+    return jsonError("ساعت ثبت واریز وجه الزامی است.", 400);
   }
 
   const senderCard = (body.senderCard || "").toString().trim().slice(0, 30);
-  const receiptText = (body.receiptText || "").toString().trim().slice(0, 600);
+  const rawReceiptText = (body.receiptText || "").toString().trim().slice(0, 500);
+  const receiptText = `ساعت واریز: ${transactionTime}${rawReceiptText ? " | " + rawReceiptText : ""}`;
 
   // بررسی سفارش در دیتابیس
   const order = await env.DB.prepare(
@@ -75,6 +84,7 @@ export async function onRequestPost(context) {
         customer_contact = ?,
         receipt_text = ?,
         receipt_image = ?,
+        transaction_time = ?,
         submitted_at = ?,
         admin_note = NULL
       WHERE id = ?
@@ -84,6 +94,7 @@ export async function onRequestPost(context) {
       customerContact,
       receiptText,
       receiptImage,
+      transactionTime,
       now,
       orderId
     ).run();
