@@ -1103,6 +1103,24 @@
       }
     }
 
+    function normalizeDigits(str) {
+      return (str || '')
+        .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+        .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+    }
+
+    function showOtpScreen(email, msg) {
+      pendingOtpEmail = email;
+      $('loginForm').style.display = 'none';
+      $('otpForm').style.display = 'block';
+      $('authSub').textContent = msg || `کد ۶ رقمی به ${email} ارسال شد.`;
+      otpBoxes.forEach(b => { b.value = ''; });
+      setTimeout(() => {
+        const first = document.querySelector('.otp-box[data-idx="0"]');
+        if (first) first.focus();
+      }, 100);
+    }
+
     // Login Form Submit
     $('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
@@ -1116,17 +1134,15 @@
       btn.disabled = false;
       btn.textContent = 'ورود به مدیریت';
 
-      if (ok && data.pendingVerification) {
-        pendingOtpEmail = email;
-        $('loginForm').style.display = 'none';
-        $('otpForm').style.display = 'block';
-        $('authSub').textContent = `کد ۶ رقمی به ${email} ارسال شد.`;
-        document.querySelector('.otp-box[data-idx="0"]').focus();
-      } else if (ok && data.ok) {
-        // Direct session
-        initAuth();
+      if (ok && (data.loginCodeSent || data.pendingVerification || data.ok)) {
+        showOtpScreen(email, `کد ۶ رقمی به ${email} ارسال شد.`);
+        toast('کد تأیید ورود به ایمیل شما ارسال شد 📩', 'info');
+      } else if (!ok && data && data.code === 'COOLDOWN') {
+        // کد قبلی هنوز در بازه زمانی معتبر است
+        showOtpScreen(email, `کد قبلی ارسال‌شده هنوز معتبر است (${email})`);
+        toast('کد ورود اخیراً برای شما ایمیل شده است؛ آن را وارد کنید.', 'warning');
       } else {
-        toast(data.error || 'ورود ناموفق بود.', 'error');
+        toast((data && data.error) || 'ایمیل یا رمز عبور نامعتبر است.', 'error');
       }
     });
 
@@ -1134,9 +1150,9 @@
     const otpBoxes = document.querySelectorAll('.otp-box');
     otpBoxes.forEach(box => {
       box.addEventListener('input', e => {
-        const val = e.target.value.replace(/[^0-9]/g, '');
-        e.target.value = val;
-        if (val) {
+        const val = normalizeDigits(e.target.value).replace(/[^0-9]/g, '');
+        e.target.value = val ? val[0] : '';
+        if (e.target.value) {
           const idx = parseInt(e.target.dataset.idx, 10);
           if (idx < 5) otpBoxes[idx + 1].focus();
         }
@@ -1149,7 +1165,8 @@
       });
       box.addEventListener('paste', e => {
         e.preventDefault();
-        const text = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+        const raw = (e.clipboardData || window.clipboardData).getData('text') || '';
+        const text = normalizeDigits(raw).replace(/[^0-9]/g, '');
         if (text.length >= 6) {
           for (let i = 0; i < 6; i++) otpBoxes[i].value = text[i];
           otpBoxes[5].focus();
@@ -1165,7 +1182,7 @@
 
     $('otpForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const code = Array.from(otpBoxes).map(b => b.value).join('');
+      const code = Array.from(otpBoxes).map(b => normalizeDigits(b.value)).join('');
       if (code.length < 6) {
         toast('لطفاً کد ۶ رقمی را کامل وارد کنید.', 'error');
         return;
@@ -1179,10 +1196,10 @@
       btn.textContent = 'تأیید و ورود';
 
       if (ok && data.ok) {
-        toast('خوش آمدید!', 'success');
+        toast('خوش آمدید! ورود موفقیت‌آمیز بود 🎉', 'success');
         initAuth();
       } else {
-        toast(data.error || 'کد وارد شده صحیح نیست.', 'error');
+        toast((data && data.error) || 'کد وارد شده صحیح نیست.', 'error');
       }
     });
 
