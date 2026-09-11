@@ -56,14 +56,20 @@ export async function onRequestPost(context) {
     return jsonError(err.message, 400);
   }
 
+  const longDescription = (body.long_description ?? "").toString().trim().slice(0, 10000);
+  const galleryImages = (body.gallery_images ?? "").toString().trim().slice(0, 3000000);
+  const features = (body.features ?? "").toString().trim().slice(0, 4000);
+  const requirements = (body.requirements ?? "").toString().trim().slice(0, 1000);
+
   const id = "p-" + crypto.randomUUID().slice(0, 8);
   const now = Date.now();
 
   await env.DB.prepare(
     `INSERT INTO products
        (id, name, description, price, period, icon_text, color, badge,
-        icon_url, cover_url, active, sort_order, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        icon_url, cover_url, active, sort_order, created_at,
+        long_description, gallery_images, features, requirements)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       id,
@@ -78,7 +84,11 @@ export async function onRequestPost(context) {
       coverUrl,
       body.active === false ? 0 : 1,
       parseInt(body.sort_order, 10) || 99,
-      now
+      now,
+      longDescription,
+      galleryImages,
+      features,
+      requirements
     )
     .run();
 
@@ -115,10 +125,16 @@ export async function onRequestPut(context) {
     return jsonError(err.message, 400);
   }
 
+  const longDescription = (body.long_description ?? "").toString().trim().slice(0, 10000);
+  const galleryImages = (body.gallery_images ?? "").toString().trim().slice(0, 3000000);
+  const features = (body.features ?? "").toString().trim().slice(0, 4000);
+  const requirements = (body.requirements ?? "").toString().trim().slice(0, 1000);
+
   await env.DB.prepare(
     `UPDATE products SET
        name = ?, description = ?, price = ?, period = ?, icon_text = ?,
-       color = ?, badge = ?, icon_url = ?, cover_url = ?, active = ?, sort_order = ?
+       color = ?, badge = ?, icon_url = ?, cover_url = ?, active = ?, sort_order = ?,
+       long_description = ?, gallery_images = ?, features = ?, requirements = ?
      WHERE id = ?`
   )
     .bind(
@@ -133,6 +149,10 @@ export async function onRequestPut(context) {
       coverUrl,
       body.active === false ? 0 : 1,
       parseInt(body.sort_order, 10) || 99,
+      longDescription,
+      galleryImages,
+      features,
+      requirements,
       id
     )
     .run();

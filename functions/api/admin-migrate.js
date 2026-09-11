@@ -66,13 +66,56 @@ export async function ensureDatabaseSchema(env) {
       await env.DB.prepare("ALTER TABLE users ADD COLUMN plain_password TEXT").run();
     } catch (_) {}
 
-    // 4. اصلاح آیکون و حذف کاور کج‌شده محصول جمینای
+    // 4. ستون‌های صفحه اختصاصی و گالری محصولات
+    const prodColumns = [
+      "ALTER TABLE products ADD COLUMN long_description TEXT",
+      "ALTER TABLE products ADD COLUMN gallery_images TEXT",
+      "ALTER TABLE products ADD COLUMN features TEXT",
+      "ALTER TABLE products ADD COLUMN requirements TEXT"
+    ];
+    for (const sql of prodColumns) {
+      try {
+        await env.DB.prepare(sql).run();
+      } catch (_) {}
+    }
+
+    // 5. اصلاح آیکون و ثبت اطلاعات کامل صفحه اختصاصی جمینای
     try {
-      const gem = await env.DB.prepare("SELECT id, icon_url, cover_url FROM products WHERE id = 'p-gemini'").first();
-      if (gem && (!gem.icon_url || (gem.cover_url && gem.cover_url.length > 5000))) {
-        await env.DB.prepare(
-          "UPDATE products SET icon_url = ?, cover_url = '', icon_text = '' WHERE id = 'p-gemini'"
-        ).bind(GEMINI_ICON).run();
+      const gem = await env.DB.prepare("SELECT id, icon_url, cover_url, long_description FROM products WHERE id = 'p-gemini'").first();
+      if (gem) {
+        const updateIcon = (!gem.icon_url || (gem.cover_url && gem.cover_url.length > 5000));
+        const geminiLongDesc = `گوگل جمینای پرو (Google Gemini Pro) یکی از پیشرفته‌ترین مدل‌های هوش مصنوعی چندوجهی شرکت گوگل است که توانایی درک و تحلیل همزمان متن، کدهای برنامه‌نویسی، تصاویر باکیفیت بالا، صوت و ویدیو را با دقتی استثنایی در اختیار شما می‌گذارد.
+
+با تهیه این اشتراک اختصاصی، علاوه بر دسترسی نامحدود به جمینای پرو، به ابزار انقلابی گوگل فلو (Google Flow) نیز جهت طراحی و ساخت ورک‌فلوهای خودکار و زنجیره‌ای هوش مصنوعی دسترسی خواهید داشت.
+
+راهنمای دسترسی و نکات مهم:
+• برای استفاده از جمینای، اتصال به فیلترشکن (VPN) با لوکیشن آمریکا ضروری است.
+• برای دسترسی به گوگل فلو علاوه بر وی‌پی‌ان آمریکا، لازم است ریجن اکانت جیمیل شما نیز روی آمریکا باشد. از طریق پیوند زیر می‌توانید وضعیت فعلی کشور اکانت جیمیل خود را بررسی یا تغییر دهید:
+https://policies.google.com/country-association-form
+
+تضمین نکسورا:
+تمامی اکانت‌ها اختصاصی، قانونی و دارای ضمانت کامل کارکرد در طول دوره ۱۸ ماهه همراه با پشتیبانی شبانه‌روزی هستند.`;
+
+        const geminiFeatures = `دسترسی کامل به مدل قدرتمند Google Gemini Pro
+پشتیبانی از گوگل فلو (Google Flow) برای ساخت ورک‌فلوهای پیشرفته
+پردازش متن، تصویر، اسناد، داده‌های آماری و کدنویسی
+اشتراک ۱۸ ماهه اختصاصی و کاملاً قانونی
+ضمانت ۱۰۰٪ کارکرد و پشتیبانی ۲۴ ساعته نکسورا`;
+
+        const geminiRequirements = `نیاز به وی‌پی‌ان آی‌پی ثابت یا باکیفیت آمریکا + هماهنگی ریجن اکانت جیمیل با کشور آمریکا`;
+
+        if (updateIcon || !gem.long_description) {
+          await env.DB.prepare(`
+            UPDATE products SET
+              icon_url = CASE WHEN ? THEN ? ELSE icon_url END,
+              cover_url = '',
+              icon_text = '',
+              long_description = ?,
+              features = ?,
+              requirements = ?
+            WHERE id = 'p-gemini'
+          `).bind(updateIcon ? 1 : 0, GEMINI_ICON, geminiLongDesc, geminiFeatures, geminiRequirements).run();
+        }
       }
     } catch (_) {}
 

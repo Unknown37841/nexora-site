@@ -8,7 +8,8 @@ export async function onRequestGet(context) {
   await ensureDatabaseSchema(env);
 
   const { results } = await env.DB.prepare(
-    `SELECT id, name, description, price, period, icon_text, color, badge, icon_url, cover_url
+    `SELECT id, name, description, price, period, icon_text, color, badge, icon_url, cover_url,
+            long_description, gallery_images, features, requirements
      FROM products
      WHERE active = 1
      ORDER BY sort_order ASC, created_at ASC`

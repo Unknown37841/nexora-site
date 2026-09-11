@@ -1742,6 +1742,177 @@
     .admin-page { padding-top: 90px; }
     .admin-prod-row { flex-wrap: wrap; }
   }
+  /* ---------- Dedicated Product Page ---------- */
+  .pd-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+  .pd-top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+  }
+  .pd-breadcrumb {
+    display: flex; align-items: center; gap: 8px; font-size: 0.86rem; color: var(--text-mute);
+  }
+  .pd-breadcrumb a { color: var(--text-soft); text-decoration: none; transition: color 0.2s; }
+  .pd-breadcrumb a:hover { color: var(--primary); }
+  .pd-breadcrumb .current { color: var(--text); font-weight: 600; }
+  
+  .pd-main-grid {
+    display: grid; grid-template-columns: 420px 1fr; gap: 32px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 900px) {
+    .pd-main-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* Gallery Left Column */
+  .pd-gallery-box {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .pd-main-view {
+    width: 100%; aspect-ratio: 1 / 1; border-radius: 18px;
+    background: var(--surface-2); border: 1px solid var(--surface-border);
+    display: grid; place-items: center; overflow: hidden; position: relative;
+  }
+  .pd-main-view img {
+    width: 100%; height: 100%; object-fit: contain; padding: 24px;
+    transition: transform 0.3s ease;
+  }
+  .pd-main-view img:hover { transform: scale(1.05); }
+  .pd-main-fallback {
+    width: 120px; height: 120px; border-radius: 28px;
+    display: grid; place-items: center; color: #fff; font-size: 3rem; font-weight: 800;
+  }
+  .pd-thumbs-strip {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px;
+  }
+  .pd-thumb-item {
+    width: 68px; height: 68px; border-radius: 12px;
+    border: 2px solid var(--surface-border); background: var(--surface-2);
+    cursor: pointer; overflow: hidden; flex-shrink: 0; transition: all 0.2s;
+    display: grid; place-items: center;
+  }
+  .pd-thumb-item img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+  .pd-thumb-item.active {
+    border-color: var(--primary); box-shadow: 0 0 14px rgba(99,102,241,0.4); transform: translateY(-2px);
+  }
+
+  /* Info Right Column */
+  .pd-info-box { display: flex; flex-direction: column; gap: 18px; }
+  .pd-pills-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pd-period-pill {
+    font-size: 0.8rem; font-weight: 700; color: var(--primary);
+    background: rgba(99,102,241,0.12); padding: 4px 12px; border-radius: 99px;
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+  .pd-badge-pill {
+    font-size: 0.8rem; font-weight: 700; color: #f59e0b;
+    background: rgba(245,158,11,0.12); padding: 4px 12px; border-radius: 99px;
+    border: 1px solid rgba(245,158,11,0.3);
+  }
+  .pd-instant-pill {
+    font-size: 0.78rem; font-weight: 600; color: #10b981;
+    background: rgba(16,185,129,0.12); padding: 4px 10px; border-radius: 99px;
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+  .pd-title { font-size: 1.85rem; font-weight: 800; color: var(--text); line-height: 1.3; margin: 0; }
+  .pd-short-desc { font-size: 0.94rem; color: var(--text-soft); line-height: 1.75; margin: 0; }
+
+  .pd-buy-card {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow);
+  }
+  .pd-price-line {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+  }
+  .pd-price-label { font-size: 0.8rem; color: var(--text-mute); margin-bottom: 2px; }
+  .pd-price-val { font-size: 1.8rem; font-weight: 800; color: var(--text); }
+  
+  .pd-qty-group {
+    display: flex; align-items: center; border: 1px solid var(--surface-border);
+    border-radius: 12px; background: var(--surface-2); padding: 3px;
+  }
+  .pd-qbtn {
+    width: 34px; height: 34px; border: none; background: transparent;
+    color: var(--text); font-size: 1.25rem; font-weight: 700; cursor: pointer;
+    border-radius: 8px; display: grid; place-items: center; transition: background 0.2s;
+  }
+  .pd-qbtn:hover { background: var(--surface); }
+  .pd-qnum { width: 40px; text-align: center; font-weight: 700; font-size: 1.05rem; }
+
+  .pd-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  @media (max-width: 500px) { .pd-actions { grid-template-columns: 1fr; } }
+  .pd-btn-cart {
+    padding: 13px 18px; font-weight: 700; font-size: 0.95rem; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  }
+  .pd-btn-fast {
+    padding: 13px 18px; font-weight: 700; font-size: 0.95rem; border-radius: 12px;
+    background: #10b981; color: #fff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 8px 24px rgba(16,185,129,0.3); transition: all 0.2s;
+  }
+  .pd-btn-fast:hover { background: #059669; transform: translateY(-1px); }
+
+  .pd-guarantees {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    padding-top: 16px; border-top: 1px dashed var(--surface-border);
+  }
+  .pd-guar-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-soft); }
+  .pd-guar-item span { font-size: 1.1rem; flex-shrink: 0; }
+  .pd-guar-item strong { display: block; color: var(--text); font-size: 0.82rem; }
+
+  /* Warning / Requirements Banner */
+  .pd-alert-box {
+    background: rgba(245,158,11,0.08); border: 1.5px solid rgba(245,158,11,0.35);
+    border-radius: 14px; padding: 14px 18px; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .pd-alert-box .pda-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 1px; }
+  .pd-alert-box strong { font-size: 0.9rem; color: #f59e0b; display: block; margin-bottom: 2px; }
+  .pd-alert-box p { font-size: 0.85rem; color: var(--text); margin: 0; line-height: 1.7; }
+
+  /* Content Tabs Card */
+  .pd-tabs-card {
+    background: var(--surface); border: 1px solid var(--surface-border);
+    border-radius: var(--radius); padding: 26px; box-shadow: var(--shadow);
+  }
+  .pd-nav-tabs {
+    display: flex; gap: 8px; border-bottom: 1px solid var(--surface-border);
+    padding-bottom: 14px; margin-bottom: 22px; flex-wrap: wrap;
+  }
+  .pd-tab-trigger {
+    padding: 9px 18px; border-radius: 10px; border: 1px solid transparent;
+    background: var(--surface-2); color: var(--text-soft); font-weight: 600;
+    font-size: 0.88rem; cursor: pointer; transition: all 0.2s;
+  }
+  .pd-tab-trigger.active {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+  }
+  .pd-tab-content { display: none; }
+  .pd-tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  .pd-prose { font-size: 0.95rem; line-height: 1.85; color: var(--text-soft); white-space: pre-line; }
+  .pd-prose a { color: var(--primary); text-decoration: underline; word-break: break-all; }
+  
+  .pd-checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .pd-checklist li {
+    display: flex; align-items: center; gap: 10px; font-size: 0.92rem; color: var(--text);
+    padding: 10px 14px; background: var(--surface-2); border-radius: 10px;
+    border: 1px solid var(--surface-border);
+  }
+  .pd-checklist li .chk-icon {
+    width: 22px; height: 22px; border-radius: 50%; background: #10b981;
+    color: #fff; display: grid; place-items: center; font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+  }
+
+  /* Quick view button on card */
+  .service-card .card-click-hint {
+    font-size: 0.78rem; color: var(--primary); font-weight: 600;
+    margin-top: 10px; display: flex; align-items: center; gap: 4px;
+    opacity: 0.85; transition: opacity 0.2s;
+  }
+  .service-card:hover .card-click-hint { opacity: 1; transform: translateX(-2px); }
 </style>
 </head>
 <body>
@@ -2709,6 +2880,151 @@
   </div>
 </div>
 
+<!-- Dedicated Single Product Detail Page -->
+<div class="app-page" id="productDetailPage">
+  <div class="pd-wrap">
+    <!-- Top Navigation & Breadcrumb -->
+    <div class="pd-top-bar">
+      <button type="button" class="btn btn-ghost btn-sm" id="pdBackBtn" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <span>بازگشت به همه سرویس‌ها</span>
+      </button>
+      <div class="pd-breadcrumb">
+        <a href="#services" id="pdBcHome">خانه</a>
+        <span>/</span>
+        <a href="#services" id="pdBcServices">سرویس‌ها</a>
+        <span>/</span>
+        <span id="pdBcCurrent" class="current">جزئیات محصول</span>
+      </div>
+    </div>
+
+    <!-- Main Showcase Grid -->
+    <div class="pd-main-grid">
+      <!-- Media Gallery Column -->
+      <div class="pd-gallery-box">
+        <div class="pd-main-view" id="pdMainView">
+          <img id="pdMainImage" src="" alt="تصویر محصول" style="display:none;">
+          <div id="pdMainFallback" class="pd-main-fallback" style="display:none;"></div>
+        </div>
+        <!-- Thumbnails Strip -->
+        <div class="pd-thumbs-strip" id="pdThumbsStrip"></div>
+      </div>
+
+      <!-- Information & Actions Column -->
+      <div class="pd-info-box">
+        <div class="pd-pills-row">
+          <span class="pd-period-pill" id="pdPeriodPill">دوره: ماهانه</span>
+          <span class="pd-badge-pill" id="pdBadgePill" style="display:none;">ویژه</span>
+          <span class="pd-instant-pill">تحویل آنلاین و پشتیبانی کامل ⚡</span>
+        </div>
+
+        <h1 class="pd-title" id="pdTitle">نام محصول</h1>
+        <p class="pd-short-desc" id="pdShortDesc">توضیحات مختصر</p>
+
+        <!-- Requirements Box -->
+        <div class="pd-alert-box" id="pdReqBox" style="display:none;">
+          <span class="pda-icon">⚠️</span>
+          <div>
+            <strong>شرایط و پیشنیازهای مهم استفاده:</strong>
+            <p id="pdReqText"></p>
+          </div>
+        </div>
+
+        <!-- Buy & Pricing Card -->
+        <div class="pd-buy-card">
+          <div class="pd-price-line">
+            <div>
+              <div class="pd-price-label">مبلغ اشتراک:</div>
+              <div class="pd-price-val" id="pdPriceVal">0 تومان</div>
+            </div>
+            <div class="pd-qty-group">
+              <button type="button" class="pd-qbtn" id="pdQtyMinus">−</button>
+              <span class="pd-qnum" id="pdQtyNum">1</span>
+              <button type="button" class="pd-qbtn" id="pdQtyPlus">+</button>
+            </div>
+          </div>
+
+          <div class="pd-actions">
+            <button type="button" class="auth-submit pd-btn-cart" id="pdAddToCartBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              <span>افزودن به سبد خرید</span>
+            </button>
+            <button type="button" class="pd-btn-fast" id="pdFastBuyBtn">
+              خرید فوری و پرداخت ⚡
+            </button>
+          </div>
+
+          <!-- Guarantees Strip -->
+          <div class="pd-guarantees">
+            <div class="pd-guar-item">
+              <span>🛡️</span>
+              <div><strong>اشتراک قانونی</strong><span>فعال‌سازی اختصاصی و مجاز</span></div>
+            </div>
+            <div class="pd-guar-item">
+              <span>⚡</span>
+              <div><strong>تحویل سریع</strong><span>ارسال پس از تایید فیش</span></div>
+            </div>
+            <div class="pd-guar-item">
+              <span>💬</span>
+              <div><strong>پشتیبانی ۲۴/۷</strong><span>پاسخگویی سریع در تلگرام</span></div>
+            </div>
+            <div class="pd-guar-item">
+              <span>🔄</span>
+              <div><strong>گارانتی تعویض</strong><span>پوشش تا آخرین روز دوره</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Details Section -->
+    <div class="pd-tabs-card">
+      <div class="pd-nav-tabs">
+        <button type="button" class="pd-tab-trigger active" data-pdtab="desc">توضیحات و راهنمای کامل 📖</button>
+        <button type="button" class="pd-tab-trigger" data-pdtab="features">ویژگی‌ها و قابلیت‌ها ✨</button>
+        <button type="button" class="pd-tab-trigger" data-pdtab="delivery">نحوه تحویل و فعال‌سازی 🚀</button>
+      </div>
+
+      <div class="pd-tab-content active" id="pdTabPanelDesc">
+        <div class="pd-prose" id="pdLongDescText"></div>
+      </div>
+
+      <div class="pd-tab-content" id="pdTabPanelFeatures">
+        <ul class="pd-checklist" id="pdFeaturesList"></ul>
+      </div>
+
+      <div class="pd-tab-content" id="pdTabPanelDelivery">
+        <div class="pd-prose">
+          <p>فرآیند دریافت اشتراک در نکسورا کاملاً شفاف و گام‌به‌گام است:</p>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">1</span>
+              <div>
+                <strong style="color:var(--text);display:block;margin-bottom:2px;">ثبت سفارش و پرداخت کارت به کارت</strong>
+                <span>سفارش خود را نهایی کرده و مبلغ را به شماره کارت سامان بنام محمد اورک واریز فرمایید.</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">2</span>
+              <div>
+                <strong style="color:var(--text);display:block;margin-bottom:2px;">بارگذاری فیش و کد رهگیری</strong>
+                <span>تصویر فیش واریزی و کد پیگیری را در فرم مربوطه وارد کنید تا به صف بررسی فوری ارسال شود.</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <span style="width:28px;height:28px;border-radius:50%;background:#10b981;color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">3</span>
+              <div>
+                <strong style="color:var(--text);display:block;margin-bottom:2px;">تحویل مستقیم مشخصات اکانت یا لایسنس</strong>
+                <span>به محض تأیید مدیر، مشخصات اکانت در صفحه پروفایل و با بنر و اعلان بازشو با امکان کپی آسان به شما تحویل داده می‌شود.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Delivered Account Info Modal -->
 <div class="modal-overlay" id="delivModalOverlay">
   <div class="auth-modal" style="max-width:500px;border:1.5px solid rgba(16,185,129,0.5);box-shadow:0 20px 50px rgba(0,0,0,0.6),0 0 35px rgba(16,185,129,0.25);">
@@ -3186,6 +3502,7 @@
             </svg>
           </button>
         </div>
+        <div class="card-click-hint">مشاهده جزئیات کامل و خرید اختصاصی ←</div>
       </div>`).join('');
   }
   async function loadProducts() {
@@ -3204,6 +3521,7 @@
       renderFooterProducts();
       updateCartBadge();
       renderCart(); // همگام‌سازی لحظه‌ای سبد خرید با جدیدترین قیمت‌های تعیین‌شده توسط ادمین
+      handleHashRoute();
     }
     else grid.innerHTML = '<div class="prod-loading">خطا در بارگذاری سرویس‌ها. صفحه را رفرش کنید.</div>';
   }
@@ -3228,6 +3546,13 @@
       }, 900);
       const p = products.find(x => x.id === id);
       gToast((p ? p.name : 'محصول') + ' به سبد اضافه شد 🛒', 'success');
+      return;
+    }
+
+    const prodCard = e.target.closest('.service-card');
+    if (prodCard) {
+      const id = prodCard.dataset.id;
+      if (id) openProductDetail(id);
     }
   });
 
@@ -3369,8 +3694,8 @@
   $('cfNo').addEventListener('click', () => closeConfirm(false));
   $('confirmModal').addEventListener('click', (e) => { if (e.target === $('confirmModal')) closeConfirm(false); });
 
-  // ================= Page router (profile / payment / contact / legal) =================
-  const appPages = ['profilePage', 'paymentPage', 'contactPage', 'legalPage'];
+  // ================= Page router (profile / payment / contact / legal / productDetail) =================
+  const appPages = ['profilePage', 'paymentPage', 'contactPage', 'legalPage', 'productDetailPage'];
   let siteHidden = false;
   function hideSite() {
     const hdr = document.querySelector('header');
@@ -3399,6 +3724,9 @@
     });
     showSite();
     setBnActive('home');
+    if (window.location.hash.startsWith('#product/')) {
+      history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
     window.scrollTo(0, 0);
   }
   function currentPage() { return appPages.find(p => { const el = $(p); return el && el.classList.contains('active'); }) || null; }
@@ -3998,6 +4326,202 @@
     else if (p === 'profile') openProfile();
     else openLegal(p);
   }));
+
+  // ================= Dedicated Product Detail Page =================
+  let currentDetailProduct = null;
+  let detailQty = 1;
+
+  function openProductDetail(id) {
+    if (!products || !products.length) return;
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+
+    currentDetailProduct = p;
+    detailQty = 1;
+    $('pdQtyNum').textContent = '1';
+
+    // Breadcrumbs & Titles
+    $('pdBcCurrent').textContent = p.name;
+    $('pdTitle').textContent = p.name;
+    $('pdShortDesc').textContent = p.description || '';
+
+    // Pills
+    $('pdPeriodPill').textContent = 'دوره: ' + (p.period || 'ماهانه');
+    if (p.badge) {
+      $('pdBadgePill').textContent = p.badge;
+      $('pdBadgePill').style.display = 'inline-block';
+    } else {
+      $('pdBadgePill').style.display = 'none';
+    }
+
+    // Requirements
+    if (p.requirements && p.requirements.trim()) {
+      $('pdReqText').textContent = p.requirements;
+      $('pdReqBox').style.display = 'flex';
+    } else {
+      $('pdReqBox').style.display = 'none';
+    }
+
+    // Pricing
+    $('pdPriceVal').textContent = fmt(p.price);
+
+    // Media Gallery
+    const gallery = [];
+    if (p.icon_url) gallery.push({ src: p.icon_url, label: 'لوگو' });
+    if (p.cover_url) gallery.push({ src: p.cover_url, label: 'کاور' });
+    try {
+      const extra = JSON.parse(p.gallery_images || '[]');
+      if (Array.isArray(extra)) {
+        extra.forEach((img, i) => gallery.push({ src: img, label: 'تصویر ' + (i + 1) }));
+      }
+    } catch (_) {}
+
+    const mainViewImg = $('pdMainImage');
+    const mainFallback = $('pdMainFallback');
+    const thumbsStrip = $('pdThumbsStrip');
+
+    if (gallery.length > 0) {
+      mainViewImg.src = gallery[0].src;
+      mainViewImg.style.display = 'block';
+      mainFallback.style.display = 'none';
+
+      thumbsStrip.innerHTML = gallery.map((item, idx) => `
+        <div class="pd-thumb-item ${idx === 0 ? 'active' : ''}" data-gidx="${idx}">
+          <img src="${esc(item.src)}" alt="${esc(item.label)}">
+        </div>
+      `).join('');
+      thumbsStrip.style.display = gallery.length > 1 ? 'flex' : 'none';
+    } else {
+      mainViewImg.style.display = 'none';
+      mainFallback.style.display = 'grid';
+      mainFallback.style.background = iconStyle(p);
+      mainFallback.textContent = p.icon_text || p.name.charAt(0);
+      thumbsStrip.innerHTML = '';
+      thumbsStrip.style.display = 'none';
+    }
+
+    // Tabs content
+    // 1. Long Description
+    const longDesc = p.long_description || p.description || 'توضیحات تکمیلی برای این محصول به زودی اضافه می‌شود.';
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const formattedDesc = esc(longDesc).replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+    $('pdLongDescText').innerHTML = formattedDesc;
+
+    // 2. Features
+    const featList = $('pdFeaturesList');
+    const rawFeat = (p.features || '').trim();
+    if (rawFeat) {
+      const items = rawFeat.split('\n').map(x => x.trim()).filter(Boolean);
+      featList.innerHTML = items.map(f => `
+        <li>
+          <span class="chk-icon">✓</span>
+          <span>${esc(f)}</span>
+        </li>
+      `).join('');
+    } else {
+      featList.innerHTML = `
+        <li><span class="chk-icon">✓</span><span>دسترسی اختصاصی و رسمی به سرویس</span></li>
+        <li><span class="chk-icon">✓</span><span>پشتیبانی شبانه‌روزی و گارانتی تمام مدت</span></li>
+        <li><span class="chk-icon">✓</span><span>تحویل آنلاین و فعال‌سازی سریع</span></li>
+      `;
+    }
+
+    // Reset active tab to Description
+    document.querySelectorAll('[data-pdtab]').forEach(btn => btn.classList.toggle('active', btn.dataset.pdtab === 'desc'));
+    document.querySelectorAll('.pd-tab-content').forEach(pnl => pnl.classList.toggle('active', pnl.id === 'pdTabPanelDesc'));
+
+    // Set URL hash
+    if (window.location.hash !== '#product/' + p.id) {
+      window.location.hash = 'product/' + p.id;
+    }
+
+    showAppPage('productDetailPage');
+  }
+
+  // Thumbnails click delegation
+  $('pdThumbsStrip').addEventListener('click', (e) => {
+    const thumb = e.target.closest('.pd-thumb-item');
+    if (!thumb) return;
+    const img = thumb.querySelector('img');
+    if (!img) return;
+    $('pdMainImage').src = img.src;
+    document.querySelectorAll('.pd-thumb-item').forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+  });
+
+  // Quantity changes
+  $('pdQtyMinus').addEventListener('click', () => {
+    if (detailQty > 1) {
+      detailQty--;
+      $('pdQtyNum').textContent = detailQty;
+    }
+  });
+  $('pdQtyPlus').addEventListener('click', () => {
+    detailQty++;
+    $('pdQtyNum').textContent = detailQty;
+  });
+
+  // Add to cart from detail page
+  $('pdAddToCartBtn').addEventListener('click', () => {
+    if (!currentDetailProduct) return;
+    const id = currentDetailProduct.id;
+    cart[id] = (Number(cart[id]) || 0) + detailQty;
+    cartSave();
+    updateCartBadge();
+    gToast(`${detailQty} عدد ${currentDetailProduct.name} به سبد خرید اضافه شد 🛒`, 'success');
+    openCart();
+  });
+
+  // Fast buy from detail page (add and jump directly to checkout)
+  $('pdFastBuyBtn').addEventListener('click', () => {
+    if (!currentDetailProduct) return;
+    const id = currentDetailProduct.id;
+    cart[id] = (Number(cart[id]) || 0) + detailQty;
+    cartSave();
+    updateCartBadge();
+    closeAppPages();
+    openCart();
+    setTimeout(() => {
+      const checkoutBtn = $('checkoutBtn');
+      if (checkoutBtn) checkoutBtn.click();
+    }, 150);
+  });
+
+  // Back button & breadcrumbs
+  $('pdBackBtn').addEventListener('click', closeAppPages);
+  $('pdBcHome').addEventListener('click', (e) => { e.preventDefault(); closeAppPages(); });
+  $('pdBcServices').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeAppPages();
+    const s = $('services');
+    if (s) s.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Detail tabs switching
+  document.querySelectorAll('[data-pdtab]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const target = this.dataset.pdtab;
+      document.querySelectorAll('[data-pdtab]').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.pd-tab-content').forEach(pnl => {
+        pnl.classList.toggle('active', pnl.id === ('pdTabPanel' + target.charAt(0).toUpperCase() + target.slice(1)));
+      });
+    });
+  });
+
+  // Hash Routing support for product details
+  function handleHashRoute() {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#product/')) {
+      const id = hash.replace('#product/', '').trim();
+      if (products && products.length) {
+        openProductDetail(id);
+      } else {
+        setTimeout(() => { if (products && products.length) openProductDetail(id); }, 400);
+      }
+    }
+  }
+  window.addEventListener('hashchange', handleHashRoute);
 
   // ================= Admin Panel Redirect =================
   $('adminBtn').addEventListener('click', () => { window.location.href = '/admin.html'; });

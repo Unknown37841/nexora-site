@@ -886,6 +886,42 @@
             <button type="button" class="btn btn-ghost btn-sm" id="btnRemoveCover" style="margin-top:4px;display:none;font-size:0.75rem;">حذف کاور</button>
           </div>
         </div>
+
+        <!-- فیلدهای تکمیلی برای صفحه اختصاصی محصول -->
+        <div style="border-top:1px dashed var(--border);margin-top:12px;padding-top:12px;">
+          <div style="font-size:0.92rem;font-weight:700;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <span>📄</span>
+            <span>اطلاعات صفحه اختصاصی محصول (نمایش با کلیک روی محصول)</span>
+          </div>
+
+          <div class="form-group">
+            <label>توضیحات و راهنمای کامل سرویس</label>
+            <textarea id="pmLongDesc" class="form-input" rows="4" placeholder="توضیحات مفصل، مزایا، شرایط و راهنمای راه‌اندازی این سرویس…"></textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>ویژگی‌ها و مزایای اشتراک (هر خط یک مورد)</label>
+              <textarea id="pmFeatures" class="form-input" rows="3" placeholder="اکانت اختصاصی&#10;بدون قطعی&#10;پشتیبانی ۲۴ ساعته"></textarea>
+            </div>
+            <div class="form-group">
+              <label>شرایط و پیشنیازهای مهم استفاده</label>
+              <textarea id="pmRequirements" class="form-input" rows="3" placeholder="مثلاً: نیاز به VPN با آی‌پی آمریکا یا تغییر ریجن جیمیل"></textarea>
+            </div>
+          </div>
+
+          <!-- گالری تصاویر بیشتر برای صفحه اختصاصی -->
+          <div class="form-group">
+            <label>گالری تصاویر بیشتر برای صفحه محصول (حداکثر ۴ تصویر)</label>
+            <div id="pmGalleryContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0;"></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddGalleryImg">+ افزودن عکس به گالری 📷</button>
+              <span id="galleryCountLabel" style="font-size:0.78rem;color:var(--text-dim);"></span>
+            </div>
+            <input type="file" id="galleryFileInput" accept="image/*" style="display:none;">
+          </div>
+        </div>
+
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
           <span style="font-size:0.9rem;font-weight:600;">وضعیت فعال در فروشگاه</span>
           <label class="toggle">
@@ -1745,6 +1781,45 @@
       }
     };
 
+    // Gallery management for product dedicated page
+    let currentGallery = [];
+    function renderAdminGallery() {
+      const cont = $('pmGalleryContainer');
+      if (!cont) return;
+      cont.innerHTML = currentGallery.map((img, idx) => `
+        <div style="position:relative;width:68px;height:68px;border-radius:8px;overflow:hidden;border:1.5px solid var(--border);background:var(--surface);">
+          <img src="${img}" style="width:100%;height:100%;object-fit:cover;">
+          <button type="button" onclick="removeGalleryImg(${idx})" style="position:absolute;top:2px;right:2px;background:rgba(239,68,68,0.9);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:12px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="حذف">×</button>
+        </div>
+      `).join('');
+      $('galleryCountLabel').textContent = `${currentGallery.length} از ۴ عکس`;
+      $('btnAddGalleryImg').style.display = currentGallery.length >= 4 ? 'none' : 'inline-block';
+    }
+    window.removeGalleryImg = function(idx) {
+      currentGallery.splice(idx, 1);
+      renderAdminGallery();
+    };
+
+    $('btnAddGalleryImg').addEventListener('click', () => {
+      if (currentGallery.length >= 4) { toast('حداکثر ۴ تصویر در گالری مجاز است.', 'error'); return; }
+      $('galleryFileInput').click();
+    });
+
+    $('galleryFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (currentGallery.length >= 4) { toast('حداکثر ۴ تصویر مجاز است.', 'error'); return; }
+      try {
+        const compressed = await compressImage(file, 640, 0.85);
+        currentGallery.push(compressed);
+        renderAdminGallery();
+        toast('تصویر به گالری اضافه شد ✓', 'success');
+      } catch (err) {
+        toast('خطا در فشرده‌سازی تصویر گالری', 'error');
+      }
+      $('galleryFileInput').value = '';
+    });
+
     // Product Modal (Add / Edit)
     $('openAddProdBtn').addEventListener('click', () => {
       $('prodModalTitle').textContent = 'افزودن محصول جدید';
@@ -1753,6 +1828,11 @@
       $('pmActive').checked = true;
       $('pmIconData').value = '';
       $('pmCoverData').value = '';
+      $('pmLongDesc').value = '';
+      $('pmFeatures').value = '';
+      $('pmRequirements').value = '';
+      currentGallery = [];
+      renderAdminGallery();
       $('iconImg').style.display = 'none';
       $('iconEmpty').style.display = 'flex';
       $('btnRemoveIcon').style.display = 'none';
@@ -1780,6 +1860,15 @@
       $('pmDesc').value = p.description || '';
       $('pmIconText').value = p.icon_text || '';
       $('pmActive').checked = p.active !== 0;
+      $('pmLongDesc').value = p.long_description || '';
+      $('pmFeatures').value = p.features || '';
+      $('pmRequirements').value = p.requirements || '';
+
+      try {
+        currentGallery = JSON.parse(p.gallery_images || '[]');
+      } catch (_) { currentGallery = []; }
+      if (!Array.isArray(currentGallery)) currentGallery = [];
+      renderAdminGallery();
 
       const colors = (p.color || '#6366f1|#8b5cf6').split('|');
       $('pmColor1').value = colors[0] || '#6366f1';
@@ -1882,7 +1971,11 @@
         color: `${$('pmColor1').value}|${$('pmColor2').value}`,
         icon_url: $('pmIconData').value || '',
         cover_url: $('pmCoverData').value || '',
-        active: $('pmActive').checked
+        active: $('pmActive').checked,
+        long_description: $('pmLongDesc').value.trim(),
+        features: $('pmFeatures').value.trim(),
+        requirements: $('pmRequirements').value.trim(),
+        gallery_images: JSON.stringify(currentGallery)
       };
 
       const btn = $('saveProdBtn');
