@@ -1118,11 +1118,11 @@
   </div>
 
   <!-- Course Modal (Add / Edit) -->
-  <div class="modal-overlay" id="courseModal">
-    <div class="modal-card" style="max-width:640px;max-height:92vh;overflow-y:auto;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <h3 id="courseModalTitle" style="font-size:1.05rem;font-weight:800;margin:0;">افزودن دوره جدید</h3>
-        <button type="button" class="btn btn-ghost btn-sm" id="closeCourseModalBtn">✕</button>
+  <div class="modal-backdrop" id="courseModal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-head">
+        <h3 id="courseModalTitle">افزودن دوره جدید</h3>
+        <button type="button" class="modal-close" id="closeCourseModalBtn">&times;</button>
       </div>
       <form id="courseModalForm">
         <input type="hidden" id="cmId" value="">
@@ -1583,6 +1583,7 @@
     function closeCourseModal() { $('courseModal').classList.remove('active'); }
     $('closeCourseModalBtn').addEventListener('click', closeCourseModal);
     $('cancelCourseBtn').addEventListener('click', closeCourseModal);
+    $('courseModal').addEventListener('click', e => { if (e.target === $('courseModal')) closeCourseModal(); });
 
     window.editCourse = function(id) {
       const c = allCourses.find(x => x.id === id);
