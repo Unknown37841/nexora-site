@@ -2710,43 +2710,41 @@
               <span style="font-size:0.75rem;color:var(--primary);font-weight:600;">بدون نیاز به کیبورد 👇</span>
             </label>
 
-            <div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 14px;">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+            <div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:14px;">
+              <!-- Steppers: LTR block so hour sits LEFT and minutes RIGHT like any digital clock -->
+              <div style="direction:ltr;display:flex;align-items:flex-start;justify-content:center;gap:14px;margin-bottom:14px;">
                 <!-- Hour Control -->
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <button type="button" class="btn-time-step" id="btnHourMinus" aria-label="کاهش ساعت">−</button>
-                  <div style="text-align:center;min-width:54px;">
-                    <div style="font-size:0.68rem;color:var(--text-mute);">ساعت</div>
-                    <div id="dispTxHour" style="font-size:1.3rem;font-weight:800;font-family:monospace;color:var(--text);">19</div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <button type="button" class="btn-time-step" id="btnHourMinus" aria-label="کاهش ساعت">−</button>
+                    <div id="dispTxHour" style="font-size:1.6rem;font-weight:800;font-family:monospace;color:var(--text);min-width:46px;text-align:center;line-height:1.2;">19</div>
+                    <button type="button" class="btn-time-step" id="btnHourPlus" aria-label="افزایش ساعت">+</button>
                   </div>
-                  <button type="button" class="btn-time-step" id="btnHourPlus" aria-label="افزایش ساعت">+</button>
+                  <div style="font-size:0.7rem;color:var(--text-mute);font-weight:600;">ساعت</div>
                 </div>
 
-                <div style="font-size:1.4rem;font-weight:800;color:var(--primary);padding:0 2px;">:</div>
+                <div style="font-size:1.6rem;font-weight:800;color:var(--primary);padding-top:4px;">:</div>
 
                 <!-- Minute Control -->
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <button type="button" class="btn-time-step" id="btnMinMinus" aria-label="کاهش دقیقه">−۵</button>
-                  <div style="text-align:center;min-width:54px;">
-                    <div style="font-size:0.68rem;color:var(--text-mute);">دقیقه</div>
-                    <div id="dispTxMin" style="font-size:1.3rem;font-weight:800;font-family:monospace;color:var(--text);">45</div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <button type="button" class="btn-time-step" id="btnMinMinus" aria-label="کاهش دقیقه">−5</button>
+                    <div id="dispTxMin" style="font-size:1.6rem;font-weight:800;font-family:monospace;color:var(--text);min-width:46px;text-align:center;line-height:1.2;">45</div>
+                    <button type="button" class="btn-time-step" id="btnMinPlus" aria-label="افزایش دقیقه">+5</button>
                   </div>
-                  <button type="button" class="btn-time-step" id="btnMinPlus" aria-label="افزایش دقیقه">+۵</button>
+                  <div style="font-size:0.7rem;color:var(--text-mute);font-weight:600;">دقیقه</div>
                 </div>
-
-                <!-- Current Time Button -->
-                <button type="button" class="btn btn-ghost btn-sm" id="btnTimeNow" style="background:rgba(99,102,241,0.18);color:var(--primary);border:1px solid rgba(99,102,241,0.35);padding:7px 10px;font-size:0.78rem;font-weight:700;white-space:nowrap;border-radius:8px;">
-                  ⚡ الان
-                </button>
               </div>
 
-              <!-- Quick Time Chips -->
-              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
-                <button type="button" class="chip-time" data-offset="0">هم‌اکنون</button>
-                <button type="button" class="chip-time" data-offset="5">۵ دقیقه پیش</button>
-                <button type="button" class="chip-time" data-offset="15">۱۵ دقیقه پیش</button>
-                <button type="button" class="chip-time" data-offset="30">۳۰ دقیقه پیش</button>
-                <button type="button" class="chip-time" data-offset="60">۱ ساعت پیش</button>
+              <!-- Quick Time Chips (RTL) + Now button -->
+              <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center;border-top:1px dashed rgba(99,102,241,0.25);padding-top:10px;">
+                <button type="button" class="btn btn-ghost btn-sm" id="btnTimeNow" style="background:rgba(99,102,241,0.18);color:var(--primary);border:1px solid rgba(99,102,241,0.35);padding:6px 10px;font-size:0.78rem;font-weight:700;white-space:nowrap;border-radius:999px;">
+                  ⚡ الان
+                </button>
+                <button type="button" class="chip-time" data-offset="5">5 دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="15">15 دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="30">30 دقیقه پیش</button>
+                <button type="button" class="chip-time" data-offset="60">1 ساعت پیش</button>
               </div>
             </div>
             <input type="hidden" id="payTxTime" name="payTxTime" value="">

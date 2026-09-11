@@ -1539,7 +1539,7 @@
               <div style="font-size:0.82rem;">
                 پیگیری: <strong style="color:var(--warning);font-family:monospace;">${o.tracking_code || '—'}</strong>
               </div>
-              ${o.transaction_time ? `<div style="font-size:0.75rem;color:var(--primary);font-weight:700;">⏱️ ساعت واریز: ${o.transaction_time}</div>` : ''}
+              ${o.transaction_time ? `<div style="font-size:0.75rem;color:var(--primary);font-weight:700;">⏱️ ساعت واریز: <span dir="ltr" style="display:inline-block;font-family:monospace;">${o.transaction_time}</span></div>` : ''}
               ${o.sender_card ? `<div style="font-size:0.75rem;color:var(--text-mute);">کارت: ${o.sender_card}</div>` : ''}
               ${o.receipt_text ? `<div style="font-size:0.74rem;color:var(--text-dim);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${o.receipt_text}">${o.receipt_text}</div>` : ''}
               ${o.delivery_text ? `
@@ -1571,7 +1571,7 @@
       $('rmMeta').innerHTML = `
         <div>خریدار: <strong>${ord.user_name || '—'}</strong> (${ord.user_email || '—'})</div>
         ${ord.customer_contact ? `<div>شماره تماس / تلگرام: <strong style="color:var(--primary);direction:ltr;display:inline-block;">${ord.customer_contact}</strong></div>` : ''}
-        ${ord.transaction_time ? `<div>ساعت واریز وجه: <strong style="color:var(--warning);font-family:monospace;">${ord.transaction_time}</strong></div>` : ''}
+        ${ord.transaction_time ? `<div>ساعت واریز وجه: <strong style="color:var(--warning);font-family:monospace;direction:ltr;display:inline-block;">${ord.transaction_time}</strong></div>` : ''}
         <div>مبلغ سفارش: <strong style="color:var(--success);">${fmt(ord.total)} تومان</strong></div>
         <div>شماره پیگیری: <strong style="color:var(--warning);font-family:monospace;">${ord.tracking_code || '—'}</strong></div>
         ${ord.sender_card ? `<div>کارت واریزکننده: <strong>${ord.sender_card}</strong></div>` : ''}
