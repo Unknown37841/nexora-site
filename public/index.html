@@ -416,10 +416,15 @@
   }
   .service-card .desc {
     color: var(--text-soft);
-    font-size: 0.92rem;
-    margin-bottom: 20px;
-    min-height: 48px;
-    flex: 1;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 68px;
   }
   .service-meta {
     display: flex;
