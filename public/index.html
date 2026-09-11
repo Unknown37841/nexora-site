@@ -4116,6 +4116,8 @@
           if (parsed && parsed.id === orderId) sessionStorage.removeItem('nexora_active_order');
         }
       } catch (_) {}
+      if (payOrder && payOrder.id === orderId) payOrder = null;
+      closeAppPages();
       openProfile();
     } else {
       gToast((data && data.error) || 'خطا در لغو سفارش.', 'error');
@@ -4457,6 +4459,22 @@
 
   $('btnGoProfileOrders').addEventListener('click', () => { closeAppPages(); openProfile(); });
   $('btnGoShopHome').addEventListener('click', () => { closeAppPages(); });
+
+  // دکمه لغو سفارش در صفحه پرداخت کارت به کارت
+  $('payCancelOrderBtn').addEventListener('click', async () => {
+    const orderId = (payOrder && payOrder.id) || $('payOrderId').textContent.replace('#', '').trim();
+    if (!orderId || orderId === '—') {
+      closeAppPages();
+      openProfile();
+      return;
+    }
+    const btn = $('payCancelOrderBtn');
+    btn.disabled = true;
+    btn.textContent = 'در حال لغو سفارش…';
+    await window.cancelOrder(orderId);
+    btn.disabled = false;
+    btn.textContent = 'انصراف و لغو این سفارش ✖';
+  });
 
   // ---- Contact ----
   $('ctBackBtn').addEventListener('click', closeAppPages);
