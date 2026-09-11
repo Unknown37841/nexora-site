@@ -3534,7 +3534,8 @@
                   ❌ علت رد فیش توسط مدیر: <strong>${esc(o.admin_note)}</strong> — لطفاً در صورت تمایل فیش صحیح را مجدداً ارسال نمایید.
                 </div>
               ` : ''}
-            </div>`).join('')
+            </div>`;
+          }).join('')
         : '<div class="no-orders">هنوز سفارشی ثبت نکرده‌اید.</div>';
     } else {
       $('pfOrdersList').innerHTML = '<div class="no-orders">خطا در دریافت سفارش‌ها.</div>';

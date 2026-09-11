@@ -1,4 +1,5 @@
 import { jsonResponse, jsonError, requireAdmin, logError } from "../_utils.js";
+import { GEMINI_ICON } from "./gemini_icon.js";
 
 // تابع تضمینی برای اجرای مهاجرت در D1 به صورت خودکار و بدون نیاز به دسترسی دستی
 export async function ensureDatabaseSchema(env) {
