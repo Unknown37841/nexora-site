@@ -338,8 +338,9 @@
 
   .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 22px;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 350px));
+    gap: 24px;
+    justify-content: center;
   }
   .service-card {
     background: var(--surface);
@@ -347,13 +348,16 @@
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--surface-border);
     border-radius: var(--radius);
-    padding: 28px;
+    padding: 24px;
     position: relative;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    max-width: 360px;
+    width: 100%;
+    margin: 0 auto;
   }
   .service-card::before {
     content: '';
@@ -375,27 +379,36 @@
     transform-origin: left;
   }
   .service-cover {
-    margin: -28px -28px 20px;
-    height: 130px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    margin: -24px -24px 18px;
+    height: 140px;
+    background: linear-gradient(135deg, var(--surface-2), var(--surface));
     display: grid; place-items: center;
     overflow: hidden;
   }
   .service-cover img { width: 100%; height: 100%; object-fit: cover; }
   .service-cover .cover-fallback { color: rgba(255,255,255,0.9); font-weight: 800; font-size: 1.6rem; }
   .service-icon {
-    width: 56px; height: 56px;
-    border-radius: 16px;
+    width: 64px; height: 64px;
+    border-radius: 18px;
     display: grid; place-items: center;
     font-weight: 800;
-    font-size: 1.4rem;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    margin-bottom: 18px;
     color: white;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
   }
-  .service-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .service-icon.has-img {
+    background: transparent !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+  .service-icon img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    border-radius: 18px;
+  }
   .service-card h3 {
     font-size: 1.25rem;
     font-weight: 700;
@@ -690,6 +703,56 @@
   .order-card .o-items { font-size: 0.82rem; color: var(--text-soft); }
   .order-card .o-total { font-weight: 700; font-size: 0.9rem; margin-top: 4px; }
   .no-orders { color: var(--text-mute); font-size: 0.85rem; text-align: center; margin-top: 14px; }
+
+  /* Floating Delivery Notification Banner */
+  .delivery-banner {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94%, 600px);
+    z-index: 998;
+    background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,78,59,0.75));
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1.5px solid rgba(16,185,129,0.55);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.45), 0 0 30px rgba(16,185,129,0.28);
+    border-radius: 16px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translate(-50%, -24px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .db-content { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .db-icon { font-size: 1.6rem; flex-shrink: 0; animation: bounce 2s infinite; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .db-text { display: flex; flex-direction: column; min-width: 0; font-size: 0.86rem; color: #fff; }
+  .db-text strong { font-size: 0.94rem; color: #6ee7b7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .db-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* Pulse badge for profile notifications */
+  .notify-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulseDot 1.5s infinite;
+  }
+  @keyframes pulseDot {
+    0% { transform: scale(0.9); opacity: 0.9; }
+    50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #34d399; }
+    100% { transform: scale(0.9); opacity: 0.9; }
+  }
 
   /* ---------- Features ---------- */
   .features-grid {
@@ -1714,11 +1777,12 @@
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
           </svg>
         </button>
-        <button class="icon-btn" id="profileBtn" aria-label="پروفایل">
+        <button class="icon-btn" id="profileBtn" aria-label="پروفایل" style="position:relative;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
+          <span class="notify-dot" id="headerProfileDot" style="display:none;"></span>
         </button>
         <button class="icon-btn" id="cartBtn" aria-label="سبد خرید">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1739,6 +1803,21 @@
     </nav>
   </div>
 </header>
+
+<!-- Floating Delivery Banner (Shown when admin delivers order) -->
+<div id="deliveryNotifyBanner" class="delivery-banner" style="display:none;">
+  <div class="db-content">
+    <div class="db-icon">🎉</div>
+    <div class="db-text">
+      <strong>اشتراک جدید شما تحویل داده شد!</strong>
+      <span id="dbSubText">برای مشاهده و کپی مشخصات اکانت کلیک کنید.</span>
+    </div>
+  </div>
+  <div class="db-actions">
+    <button type="button" class="file-btn" id="btnOpenDelivModal" style="padding:7px 14px;font-size:0.82rem;background:#10b981;border:none;color:#fff;">مشاهده اکانت 🚀</button>
+    <button type="button" class="btn btn-ghost btn-sm" id="btnCloseDelivBanner" style="color:#fff;padding:6px 8px;font-size:1rem;" aria-label="بستن">✕</button>
+  </div>
+</div>
 
 <!-- Auth Modal -->
 <div class="modal-overlay" id="authOverlay">
@@ -2285,6 +2364,15 @@
       </div>
     </div>
 
+    <!-- Active Subscriptions & Delivery Box -->
+    <div class="app-card" id="pfDeliveredWrap" style="display:none;border:2px solid #10b981;background:rgba(16,185,129,0.06);box-shadow:0 6px 24px rgba(16,185,129,0.15);">
+      <h4 style="color:#10b981;margin-bottom:12px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>اشتراک‌های فعال و تحویل داده شده شما 🎉</span>
+      </h4>
+      <div id="pfDeliveredList"></div>
+    </div>
+
     <div class="app-card">
       <h4>
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -2517,6 +2605,9 @@
           <button type="submit" class="pay-submit" id="payReceiptSubmitBtn">
             ارسال و ثبت فیش واریزی جهت بررسی ✓
           </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="payCancelOrderBtn" style="width:100%;margin-top:10px;color:var(--danger);border-color:rgba(239,68,68,0.25);padding:10px;">
+            انصراف و لغو این سفارش ✖
+          </button>
         </form>
       </div>
     </div>
@@ -2613,6 +2704,33 @@
   </div>
 </div>
 
+<!-- Delivered Account Info Modal -->
+<div class="modal-overlay" id="delivModalOverlay">
+  <div class="auth-modal" style="max-width:500px;border:1.5px solid rgba(16,185,129,0.5);box-shadow:0 20px 50px rgba(0,0,0,0.6),0 0 35px rgba(16,185,129,0.25);">
+    <button class="modal-close" id="delivModalClose" aria-label="بستن">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <div style="width:44px;height:44px;border-radius:14px;background:rgba(16,185,129,0.15);color:var(--success);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">🎉</div>
+      <div>
+        <h3 style="margin:0;font-size:1.15rem;color:var(--success);">اشتراک شما آماده است!</h3>
+        <p class="auth-sub" id="delivModalOrderId" style="margin:2px 0 0;font-size:0.82rem;">سفارش #—</p>
+      </div>
+    </div>
+    <div id="delivModalItems" style="font-size:0.86rem;padding:8px 12px;background:var(--surface-sunken);border-radius:10px;margin-bottom:12px;color:var(--text);border:1px solid var(--surface-border);"></div>
+    <div style="font-size:0.82rem;color:var(--text-mute);margin-bottom:6px;">اطلاعات اکانت / لایسنس ارسالی مدیر:</div>
+    <div class="deliv-account-card" style="margin-top:0;background:rgba(0,0,0,0.5);border-color:rgba(16,185,129,0.4);">
+      <pre class="dac-text" id="delivModalText" style="max-height:240px;overflow-y:auto;user-select:all;margin:0;font-size:0.9rem;line-height:1.7;"></pre>
+    </div>
+    <button type="button" class="auth-submit" id="delivModalCopyBtn" style="width:100%;margin-top:14px;padding:12px;background:var(--success);color:#fff;font-weight:700;">
+      کپی مشخصات اکانت 📋
+    </button>
+    <button type="button" class="btn btn-ghost btn-sm" id="delivModalDismissBtn" style="width:100%;margin-top:8px;">
+      بستن و ذخیره در پروفایل
+    </button>
+  </div>
+</div>
+
 <!-- Change Password Modal -->
 <div class="modal-overlay" id="passOverlay">
   <div class="auth-modal" style="max-width:400px;">
@@ -2655,8 +2773,9 @@
     <span class="bn-badge hidden" id="bnCartBadge">0</span>
     سبد
   </button>
-  <button type="button" class="bn-item" data-bn="profile">
+  <button type="button" class="bn-item" data-bn="profile" style="position:relative;">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span class="notify-dot" id="bnProfileDot" style="display:none;top:4px;right:calc(50% - 16px);"></span>
     پروفایل
   </button>
 </nav>
@@ -2863,7 +2982,11 @@
 
   async function checkSession() {
     const { ok, data } = await api('/api/me', 'GET');
-    if (ok && data.ok) { currentUser = data.user; updateAuthUI(); }
+    if (ok && data.ok) {
+      currentUser = data.user;
+      updateAuthUI();
+      if (typeof checkDeliveredOrders === 'function') checkDeliveredOrders(true);
+    }
   }
 
   // ---- Register ----
@@ -2952,6 +3075,7 @@
     currentUser = data.user;
     pendingEmail = null;
     updateAuthUI();
+    if (typeof checkDeliveredOrders === 'function') checkDeliveredOrders(true);
     gToast((pendingMode === 'login' ? 'ورود موفق 🎉' : 'حساب فعال شد 🎉') + ' خوش آمدی ' + currentUser.name, 'success');
     this.reset();
     setTimeout(() => { closeModal(); }, 900);
@@ -3041,8 +3165,8 @@
         ${p.cover_url
           ? `<div class="service-cover"><img src="${esc(p.cover_url)}" alt="${esc(p.name)}"></div>`
           : ''}
-        <div class="service-icon" style="${iconStyle(p)}">
-          ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="">` : esc(p.icon_text || p.name.charAt(0))}
+        <div class="service-icon ${p.icon_url ? 'has-img' : ''}" style="${p.icon_url ? '' : iconStyle(p)}">
+          ${p.icon_url ? `<img src="${esc(p.icon_url)}" alt="${esc(p.name)}">` : esc(p.icon_text || p.name.charAt(0))}
         </div>
         <h3>${esc(p.name)}</h3>
         <p class="desc">${esc(p.description)}</p>
@@ -3069,7 +3193,13 @@
         <div class="sk-shine sk-line w40"></div>
       </div>`).join('');
     const { ok, data } = await api('/api/products', 'GET');
-    if (ok && data.ok) { products = data.products; renderProducts(); renderFooterProducts(); }
+    if (ok && data.ok) {
+      products = data.products;
+      renderProducts();
+      renderFooterProducts();
+      updateCartBadge();
+      renderCart(); // همگام‌سازی لحظه‌ای سبد خرید با جدیدترین قیمت‌های تعیین‌شده توسط ادمین
+    }
     else grid.innerHTML = '<div class="prod-loading">خطا در بارگذاری سرویس‌ها. صفحه را رفرش کنید.</div>';
   }
   function renderFooterProducts() {
@@ -3291,6 +3421,7 @@
     }
     const res2 = await api('/api/orders', 'GET');
     if (res2.ok && res2.data.ok) {
+      const orders = res2.data.orders || [];
       const statusFa = {
         pending: 'در انتظار پرداخت ⏳',
         awaiting_verification: 'در حال بررسی فیش 🔔',
@@ -3298,30 +3429,97 @@
         rejected: 'فیش رد شده ❌',
         cancelled: 'لغو شده'
       };
-      $('pfOrdersList').innerHTML = res2.data.orders.length
-        ? res2.data.orders.map(o => `
-            <div class="order-card">
+
+      // بخش ویژه اشتراک‌های تحویل داده شده در بالای پروفایل
+      const deliveredOrders = orders.filter(o => o.delivery_text);
+      const delivWrap = $('pfDeliveredWrap');
+      const delivList = $('pfDeliveredList');
+      if (delivWrap && delivList) {
+        if (deliveredOrders.length > 0) {
+          delivWrap.style.display = 'block';
+          delivList.innerHTML = deliveredOrders.map(o => `
+            <div class="deliv-account-card" style="margin-top:10px;background:rgba(16,185,129,0.12);border:2px solid #10b981;box-shadow:0 4px 20px rgba(16,185,129,0.2);">
+              <div class="dac-head">
+                <span style="font-size:0.95rem;color:#10b981;display:flex;align-items:center;gap:6px;">
+                  <span>🚀</span>
+                  <strong>${(o.items || []).map(i => esc(i.name)).join(' + ') || ('سفارش #' + esc(o.id))}</strong>
+                </span>
+                <button type="button" class="btn btn-sm" style="background:#10b981;color:#fff;font-weight:700;padding:6px 14px;border:none;border-radius:8px;cursor:pointer;" onclick="copyDelivText('${esc(o.id)}')">کپی اطلاعات 📋</button>
+              </div>
+              <pre class="dac-text" id="topDelivText_${esc(o.id)}" style="background:rgba(0,0,0,0.6);border-color:#10b981;padding:14px;font-size:0.92rem;line-height:1.75;margin:8px 0;user-select:all;">${esc(o.delivery_text)}</pre>
+              <div style="display:flex;justify-content:space-between;font-size:0.76rem;color:var(--text-mute);">
+                <span>سفارش #${esc(o.id)}</span>
+                <span>${o.delivered_at ? 'تحویل: ' + new Date(o.delivered_at).toLocaleString('fa-IR') : 'تحویل داده شده'}</span>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          delivWrap.style.display = 'none';
+        }
+      }
+
+      $('pfOrdersList').innerHTML = orders.length
+        ? orders.map(o => {
+            const isPending = o.status === 'pending';
+            const expireAt = (o.created_at || 0) + 24 * 3600 * 1000;
+            const isExpired = isPending && o.created_at && (Date.now() > expireAt);
+            const msLeft = Math.max(0, expireAt - Date.now());
+            const hrsLeft = Math.floor(msLeft / 3600000);
+            const minsLeft = Math.floor((msLeft % 3600000) / 60000);
+
+            let statusDisplay = statusFa[o.status] || esc(o.status);
+            if (isExpired) {
+              statusDisplay = 'منقضی و لغو شد (مهلت ۲۴ ساعته پایان یافت) ⌛';
+            }
+
+            return `
+            <div class="order-card ${isExpired ? 'expired' : ''}" id="orderCard_${esc(o.id)}">
               <div class="o-head">
                 <span class="o-id">سفارش #${esc(o.id)}</span>
-                <span class="o-status ${esc(o.status)}">${statusFa[o.status] || esc(o.status)}</span>
+                <span class="o-status ${isExpired ? 'rejected' : esc(o.status)}">${statusDisplay}</span>
               </div>
               <div class="o-items">${(o.items || []).map(it => esc(it.name) + ' ×' + it.qty).join('، ')}</div>
-              <div class="o-total" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+              
+              ${(isPending && !isExpired) ? `
+                <div style="margin-top:6px;">
+                  <span style="background:rgba(239,68,68,0.1);color:#ef4444;font-size:0.75rem;padding:3px 8px;border-radius:6px;border:1px solid rgba(239,68,68,0.25);display:inline-flex;align-items:center;gap:4px;">
+                    ⏱️ مهلت پرداخت: <strong>${hrsLeft} ساعت و ${minsLeft} دقیقه</strong>
+                  </span>
+                </div>
+              ` : ''}
+
+              <div class="o-total" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;flex-wrap:wrap;gap:8px;">
                 <span>مبلغ: ${fmt(o.total)}</span>
-                ${(o.status === 'pending' || o.status === 'rejected') ? `
-                  <button class="file-btn" data-pay="${esc(o.id)}" data-total="${o.total}" data-items="${esc(JSON.stringify(o.items || []))}">
-                    ${o.status === 'rejected' ? 'ارسال مجدد فیش 💳' : 'پرداخت کارت به کارت 💳'}
-                  </button>
-                ` : ''}
+                <div style="display:flex;gap:6px;align-items:center;">
+                  ${((isPending && !isExpired) || o.status === 'rejected') ? `
+                    <button class="file-btn" data-pay="${esc(o.id)}" data-total="${o.total}" data-items="${esc(JSON.stringify(o.items || []))}">
+                      ${o.status === 'rejected' ? 'ارسال مجدد فیش 💳' : 'پرداخت کارت به کارت 💳'}
+                    </button>
+                    <button type="button" class="btn btn-ghost btn-sm" data-cancel="${esc(o.id)}" style="color:var(--danger);border:1px solid rgba(239,68,68,0.3);padding:6px 12px;border-radius:8px;">
+                      لغو سفارش ✖
+                    </button>
+                  ` : ''}
+                  ${(isExpired || o.status === 'awaiting_verification') ? `
+                    <button type="button" class="btn btn-ghost btn-sm" data-cancel="${esc(o.id)}" style="color:var(--danger);border:1px solid rgba(239,68,68,0.3);padding:6px 12px;border-radius:8px;">
+                      ${isExpired ? 'حذف از لیست ✖' : 'لغو سفارش ✖'}
+                    </button>
+                  ` : ''}
+                </div>
               </div>
 
               ${o.delivery_text ? `
-                <div class="deliv-account-card">
+                <div class="deliv-account-card" style="border:2px solid #10b981;box-shadow:0 4px 20px rgba(16,185,129,0.18);">
                   <div class="dac-head">
-                    <span>🎉 مشخصات اکانت و اشتراک تحویل داده شده:</span>
-                    <button type="button" class="btn btn-ghost btn-sm" onclick="copyDelivText('${esc(o.id)}')">کپی اطلاعات 📋</button>
+                    <span style="display:flex;align-items:center;gap:6px;">
+                      <span style="font-size:1.1rem;">🎉</span>
+                      <span>مشخصات اکانت و اشتراک تحویل داده شده:</span>
+                    </span>
+                    <button type="button" class="btn btn-sm" style="background:#10b981;color:#fff;font-weight:700;padding:6px 14px;border:none;border-radius:8px;cursor:pointer;" onclick="copyDelivText('${esc(o.id)}')">کپی اطلاعات 📋</button>
                   </div>
-                  <pre class="dac-text" id="delivText_${esc(o.id)}">${esc(o.delivery_text)}</pre>
+                  <pre class="dac-text" id="delivText_${esc(o.id)}" style="background:rgba(0,0,0,0.55);border-color:#10b981;font-size:0.92rem;line-height:1.75;padding:14px;user-select:all;">${esc(o.delivery_text)}</pre>
+                  <div style="font-size:0.76rem;color:var(--text-mute);margin-top:6px;text-align:left;">
+                    ${o.delivered_at ? 'تاریخ تحویل: ' + new Date(o.delivered_at).toLocaleString('fa-IR') : 'تحویل داده شده'}
+                  </div>
                 </div>
               ` : ''}
 
@@ -3364,19 +3562,42 @@
   });
 
   // کپی مشخصات اکانت تحویل داده شده به کاربر
-  window.copyDelivText = function(orderId) {
-    const el = document.getElementById('delivText_' + orderId);
+  window.copyDelivText = async function(orderId) {
+    const el = document.getElementById('delivText_' + orderId) || document.getElementById('topDelivText_' + orderId);
     if (!el) return;
     const text = el.innerText || el.textContent;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => gToast('مشخصات اشتراک کپی شد 📋', 'success'));
+    await copyToClipboard(text);
+    gToast('مشخصات اشتراک کپی شد 📋', 'success');
+  };
+
+  // لغو و حذف سفارش توسط مشتری
+  window.cancelOrder = async function(orderId) {
+    if (!orderId) return;
+    if (!confirm('آیا از لغو این سفارش اطمینان دارید؟ سفارش به طور کامل از لیست شما حذف خواهد شد.')) return;
+    const { ok, data } = await api('/api/orders?id=' + encodeURIComponent(orderId), 'DELETE');
+    if (ok && data.ok) {
+      gToast('سفارش #' + orderId + ' لغو و از لیست حذف شد ✓', 'success');
+      try {
+        const saved = sessionStorage.getItem('nexora_active_order');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.id === orderId) sessionStorage.removeItem('nexora_active_order');
+        }
+      } catch (_) {}
+      openProfile();
     } else {
-      gToast('مشخصات اشتراک کپی شد 📋', 'success');
+      gToast((data && data.error) || 'خطا در لغو سفارش.', 'error');
     }
   };
 
-  // پرداخت از لیست سفارش‌ها
+  // رویدادهای لیست سفارش‌ها (پرداخت یا لغو)
   $('pfOrdersList').addEventListener('click', (e) => {
+    const cancelBtn = e.target.closest('[data-cancel]');
+    if (cancelBtn) {
+      e.stopPropagation();
+      window.cancelOrder(cancelBtn.dataset.cancel);
+      return;
+    }
     const btn = e.target.closest('[data-pay]');
     if (!btn) return;
     let items = [];
@@ -3518,6 +3739,13 @@
     }
 
     if (!order) order = { id: 'ORD-' + Math.floor(100000 + Math.random() * 900000), total: 0, items: [] };
+
+    // بررسی انقضای ۲۴ ساعته سفارش
+    if (order.created_at && order.status === 'pending' && (Date.now() - order.created_at > 24 * 3600 * 1000)) {
+      gToast('مهلت پرداخت ۲۴ ساعته این سفارش به پایان رسیده و لغو شده است.', 'error');
+      openProfile();
+      return;
+    }
 
     payOrder = order;
     sessionStorage.setItem('nexora_active_order', JSON.stringify(order));

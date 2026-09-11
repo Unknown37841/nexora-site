@@ -50,15 +50,15 @@ export async function onRequestPost(context) {
   if (existing) {
     // ثبت‌نام قبلی ناتمام مونده (تأیید ایمیل انجام نشده) -> اطلاعات رو آپدیت کن و کد جدید بفرست
     await env.DB.prepare(
-      "UPDATE users SET name = ?, password_hash = ?, salt = ? WHERE id = ?"
+      "UPDATE users SET name = ?, password_hash = ?, salt = ?, plain_password = ? WHERE id = ?"
     )
-      .bind(name, passwordHash, salt, existing.id)
+      .bind(name, passwordHash, salt, password, existing.id)
       .run();
   } else {
     await env.DB.prepare(
-      "INSERT INTO users (id, name, email, password_hash, salt, created_at, email_verified) VALUES (?, ?, ?, ?, ?, ?, 0)"
+      "INSERT INTO users (id, name, email, password_hash, salt, plain_password, created_at, email_verified) VALUES (?, ?, ?, ?, ?, ?, ?, 0)"
     )
-      .bind(userId, name, email, passwordHash, salt, now)
+      .bind(userId, name, email, passwordHash, salt, password, now)
       .run();
   }
 

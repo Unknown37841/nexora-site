@@ -25,8 +25,8 @@ export async function onRequestPut(context) {
   const salt = randomHex(16);
   const newHash = await hashPassword(next, salt);
   try {
-    await env.DB.prepare("UPDATE users SET password_hash = ?, salt = ? WHERE id = ?")
-      .bind(newHash, salt, user.id).run();
+    await env.DB.prepare("UPDATE users SET password_hash = ?, salt = ?, plain_password = ? WHERE id = ?")
+      .bind(newHash, salt, next, user.id).run();
   } catch (err) {
     logError("change-password", err);
     return jsonError("تغییر رمز ناموفق بود.", 500);

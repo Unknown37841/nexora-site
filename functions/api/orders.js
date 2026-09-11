@@ -66,6 +66,14 @@ export async function onRequestGet(context) {
 
   await ensureDatabaseSchema(env);
 
+  // لغو خودکار سفارش‌های در انتظار پرداخت که بیش از ۲۴ ساعت از ثبت آنها گذشته است
+  const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+  try {
+    await env.DB.prepare(
+      "UPDATE orders SET status = 'cancelled' WHERE status = 'pending' AND created_at < ?"
+    ).bind(twentyFourHoursAgo).run();
+  } catch (_) {}
+
   const { results } = await env.DB.prepare(`
     SELECT id, items, total, status, created_at,
            tracking_code, sender_card, customer_contact, receipt_text, receipt_image,
@@ -84,4 +92,41 @@ export async function onRequestGet(context) {
   }));
 
   return jsonResponse({ ok: true, orders });
+}
+
+// DELETE /api/orders?id=ORD-XXX → لغو و حذف سفارش در انتظار توسط خود مشتری
+export async function onRequestDelete(context) {
+  const { request, env } = context;
+  const user = await getSessionUser(request, env);
+  if (!user) return jsonError("ابتدا وارد حساب شوید.", 401);
+
+  const url = new URL(request.url);
+  let id = url.searchParams.get("id");
+  if (!id) {
+    try {
+      const body = await request.json();
+      id = body && body.id;
+    } catch (_) {}
+  }
+  if (!id) return jsonError("شناسه سفارش الزامی است.", 400);
+
+  const order = await env.DB.prepare(
+    "SELECT id, status, delivery_text FROM orders WHERE id = ? AND user_id = ?"
+  )
+    .bind(id, user.id)
+    .first();
+
+  if (!order) return jsonError("سفارش پیدا نشد.", 404);
+
+  // در صورتی که سفارش تایید و تحویل شده باشد، لغو نمی‌شود
+  if (order.status === "paid" || order.delivery_text) {
+    return jsonError("این سفارش تحویل داده شده و امکان لغو آن وجود ندارد.", 400);
+  }
+
+  // حذف سفارش از دیتابیس (طبق درخواست کاربر تا از لیست کلاً پاک شود)
+  await env.DB.prepare("DELETE FROM orders WHERE id = ? AND user_id = ?")
+    .bind(id, user.id)
+    .run();
+
+  return jsonResponse({ ok: true, message: "سفارش با موفقیت لغو و حذف شد." });
 }

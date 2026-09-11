@@ -1,4 +1,4 @@
-import { jsonResponse, jsonError, requireAdmin, logError } from "../_utils.js";
+import { jsonResponse, jsonError, requireAdmin, logError, hashPassword, randomHex } from "../_utils.js";
 import { ensureDatabaseSchema } from "./admin-migrate.js";
 
 // GET /api/admin-users → مشاهده لیست کاربران و آمار آنها
@@ -13,7 +13,7 @@ export async function onRequestGet(context) {
   const q = (url.searchParams.get("q") || "").trim().toLowerCase();
 
   let query = `
-    SELECT u.id, u.name, u.email, u.email_verified, u.is_admin, u.created_at,
+    SELECT u.id, u.name, u.email, u.email_verified, u.is_admin, u.created_at, u.plain_password,
            COUNT(o.id) as order_count,
            COALESCE(SUM(CASE WHEN o.status = 'paid' THEN o.total ELSE 0 END), 0) as total_spent
     FROM users u
@@ -83,6 +83,19 @@ export async function onRequestPut(context) {
   if (body.email_verified !== undefined) {
     updates.push("email_verified = ?");
     params.push(body.email_verified ? 1 : 0);
+  }
+
+  if (body.password !== undefined && body.password !== "") {
+    const pwd = String(body.password).trim();
+    if (pwd.length < 6) return jsonError("رمز عبور جدید باید حداقل ۶ کاراکتر باشد.", 400);
+    const newSalt = randomHex(16);
+    const newHash = await hashPassword(pwd, newSalt);
+    updates.push("password_hash = ?");
+    params.push(newHash);
+    updates.push("salt = ?");
+    params.push(newSalt);
+    updates.push("plain_password = ?");
+    params.push(pwd);
   }
 
   if (!updates.length) return jsonError("تغییری مشخص نشده است.", 400);

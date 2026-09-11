@@ -857,18 +857,34 @@
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <label>تصویر کاور یا لوگوی محصول (انتخاب فایل یا عکس)</label>
-          <div class="img-preview-box" id="coverBox">
-            <div class="img-preview-empty" id="coverEmpty">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-              <span>برای انتخاب یا عکس گرفتن کلیک کنید</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>لوگو / آیکون محصول (مربعی)</label>
+            <div class="img-preview-box" id="iconBox" style="height:110px;">
+              <div class="img-preview-empty" id="iconEmpty">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                <span style="font-size:0.75rem;">آپلود لوگوی سرویس</span>
+              </div>
+              <img id="iconImg" style="display:none;width:100%;height:100%;object-fit:contain;padding:8px;" alt="لوگو">
             </div>
-            <img id="coverImg" style="display:none;" alt="کاور">
+            <input type="file" id="iconFileInput" accept="image/*" style="display:none;">
+            <input type="hidden" id="pmIconData">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnRemoveIcon" style="margin-top:4px;display:none;font-size:0.75rem;">حذف لوگو</button>
           </div>
-          <input type="file" id="coverFileInput" accept="image/*" style="display:none;">
-          <input type="hidden" id="pmCoverData">
-          <button type="button" class="btn btn-ghost btn-sm" id="btnRemoveCover" style="margin-top:6px;display:none;">حذف عکس</button>
+
+          <div class="form-group">
+            <label>کاور بالای کارت (اختیاری)</label>
+            <div class="img-preview-box" id="coverBox" style="height:110px;">
+              <div class="img-preview-empty" id="coverEmpty">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span style="font-size:0.75rem;">آپلود بنر کاور</span>
+              </div>
+              <img id="coverImg" style="display:none;" alt="کاور">
+            </div>
+            <input type="file" id="coverFileInput" accept="image/*" style="display:none;">
+            <input type="hidden" id="pmCoverData">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnRemoveCover" style="margin-top:4px;display:none;font-size:0.75rem;">حذف کاور</button>
+          </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
           <span style="font-size:0.9rem;font-weight:600;">وضعیت فعال در فروشگاه</span>
@@ -987,6 +1003,29 @@
           <label>ایمیل</label>
           <input type="text" id="umEmail" class="form-input" disabled dir="ltr">
         </div>
+
+        <!-- بخش مشاهده و تغییر رمز عبور کاربر -->
+        <div class="form-group" style="background:var(--surface-2);padding:12px;border-radius:10px;border:1px solid var(--border);margin-top:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label style="font-size:0.85rem;font-weight:600;margin:0;">رمز عبور کاربر</label>
+            <span id="umPassBadge" style="font-size:0.72rem;color:var(--text-dim);"></span>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input type="password" id="umViewPass" class="form-input" readonly style="font-family:monospace;letter-spacing:1px;background:var(--surface);font-size:0.9rem;" placeholder="رمز ثبت نشده">
+            <button type="button" class="btn btn-ghost btn-sm" id="btnToggleUserPass" title="نمایش/مخفی کردن">👁️</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="btnCopyUserPass" title="کپی رمز">📋</button>
+          </div>
+          
+          <div style="margin-top:10px;border-top:1px dashed var(--border);padding-top:10px;">
+            <label style="font-size:0.8rem;font-weight:600;margin-bottom:4px;display:block;">تغییر رمز عبور توسط مدیر (اختیاری):</label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" id="umNewPass" class="form-input" placeholder="رمز جدید (حداقل ۶ کاراکتر)" style="font-size:0.85rem;">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnGenPass" style="white-space:nowrap;font-size:0.78rem;">تصادفی 🎲</button>
+            </div>
+            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:4px;">در صورت وارد کردن رمز جدید، هنگام فشردن «ذخیره تغییرات»، رمز کاربر فوراً تغییر خواهد کرد.</div>
+          </div>
+        </div>
+
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
           <span style="font-size:0.9rem;font-weight:600;">دسترسی مدیر سیستم (Admin)</span>
           <label class="toggle">
@@ -1039,8 +1078,8 @@
       return d.toLocaleDateString('fa-IR') + ' ' + d.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Image compression helper (keeps max dimension 1200px, jpeg 0.8)
-    function compressImage(file, maxDimension = 1200, quality = 0.8) {
+    // Image compression helper (keeps max dimension, preserves webp/png transparency, white fallback)
+    function compressImage(file, maxDimension = 800, quality = 0.85) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = e => {
@@ -1061,7 +1100,32 @@
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            resolve(canvas.toDataURL('image/jpeg', quality));
+
+            // اولویت با WebP برای حفظ شفافیت (Alpha Channel) و حجم بهینه
+            try {
+              const webp = canvas.toDataURL('image/webp', quality);
+              if (webp && webp.startsWith('data:image/webp') && webp.length < 650000) {
+                return resolve(webp);
+              }
+            } catch (_) {}
+
+            // در صورتی که تصویر شفاف باشد و وب‌پی در دسترس نباشد
+            if (file.type === 'image/png') {
+              try {
+                const png = canvas.toDataURL('image/png');
+                if (png && png.length < 650000) return resolve(png);
+              } catch (_) {}
+            }
+
+            // فال‌بک امن: پس‌زمینه سفید خالص (جلوگیری قطعی از سیاه شدن پس‌زمینه در فرمت jpeg)
+            const canvas2 = document.createElement('canvas');
+            canvas2.width = width;
+            canvas2.height = height;
+            const ctx2 = canvas2.getContext('2d');
+            ctx2.fillStyle = '#ffffff';
+            ctx2.fillRect(0, 0, width, height);
+            ctx2.drawImage(img, 0, 0, width, height);
+            resolve(canvas2.toDataURL('image/jpeg', quality));
           };
           img.onerror = reject;
           img.src = e.target.result;
@@ -1687,7 +1751,11 @@
       $('prodModalForm').reset();
       $('pmId').value = '';
       $('pmActive').checked = true;
+      $('pmIconData').value = '';
       $('pmCoverData').value = '';
+      $('iconImg').style.display = 'none';
+      $('iconEmpty').style.display = 'flex';
+      $('btnRemoveIcon').style.display = 'none';
       $('coverImg').style.display = 'none';
       $('coverEmpty').style.display = 'flex';
       $('btnRemoveCover').style.display = 'none';
@@ -1717,7 +1785,22 @@
       $('pmColor1').value = colors[0] || '#6366f1';
       $('pmColor2').value = colors[1] || '#8b5cf6';
 
-      const cover = p.cover_url || p.icon_url || '';
+      // بارگذاری آیکون محصول
+      const icon = p.icon_url || '';
+      $('pmIconData').value = icon;
+      if (icon) {
+        $('iconImg').src = icon;
+        $('iconImg').style.display = 'block';
+        $('iconEmpty').style.display = 'none';
+        $('btnRemoveIcon').style.display = 'inline-block';
+      } else {
+        $('iconImg').style.display = 'none';
+        $('iconEmpty').style.display = 'flex';
+        $('btnRemoveIcon').style.display = 'none';
+      }
+
+      // بارگذاری کاور بالای محصول
+      const cover = p.cover_url || '';
       $('pmCoverData').value = cover;
       if (cover) {
         $('coverImg').src = cover;
@@ -1733,20 +1816,45 @@
       $('prodModal').classList.add('active');
     };
 
-    // Image Upload & Compression in Modal
+    // Icon Upload in Modal
+    $('iconBox').addEventListener('click', () => $('iconFileInput').click());
+    $('iconFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const compressed = await compressImage(file, 256, 0.9);
+        $('pmIconData').value = compressed;
+        $('iconImg').src = compressed;
+        $('iconImg').style.display = 'block';
+        $('iconEmpty').style.display = 'none';
+        $('btnRemoveIcon').style.display = 'inline-block';
+      } catch (err) {
+        toast('خطا در پردازش تصویر لوگو', 'error');
+      }
+    });
+
+    $('btnRemoveIcon').addEventListener('click', () => {
+      $('pmIconData').value = '';
+      $('iconFileInput').value = '';
+      $('iconImg').style.display = 'none';
+      $('iconEmpty').style.display = 'flex';
+      $('btnRemoveIcon').style.display = 'none';
+    });
+
+    // Cover Upload & Compression in Modal
     $('coverBox').addEventListener('click', () => $('coverFileInput').click());
     $('coverFileInput').addEventListener('change', async e => {
       const file = e.target.files[0];
       if (!file) return;
       try {
-        const compressed = await compressImage(file, 800, 0.82);
+        const compressed = await compressImage(file, 800, 0.85);
         $('pmCoverData').value = compressed;
         $('coverImg').src = compressed;
         $('coverImg').style.display = 'block';
         $('coverEmpty').style.display = 'none';
         $('btnRemoveCover').style.display = 'inline-block';
       } catch (err) {
-        toast('خطا در پردازش تصویر', 'error');
+        toast('خطا در پردازش تصویر کاور', 'error');
       }
     });
 
@@ -1772,6 +1880,7 @@
         description: $('pmDesc').value.trim(),
         icon_text: $('pmIconText').value.trim(),
         color: `${$('pmColor1').value}|${$('pmColor2').value}`,
+        icon_url: $('pmIconData').value || '',
         cover_url: $('pmCoverData').value || '',
         active: $('pmActive').checked
       };
@@ -1869,21 +1978,67 @@
       $('umName').value = u.name || '';
       $('umEmail').value = u.email;
       $('umIsAdmin').checked = !!u.is_admin;
+      $('umNewPass').value = '';
+
+      const pass = u.plain_password || '';
+      $('umViewPass').value = pass;
+      $('umViewPass').type = 'password';
+      if (pass) {
+        $('umPassBadge').textContent = 'رمز ذخیره شده در سیستم ✓';
+        $('umPassBadge').style.color = 'var(--success)';
+      } else {
+        $('umPassBadge').textContent = 'رمز از قبل هش شده (جهت نمایش، رمز جدید ثبت کنید)';
+        $('umPassBadge').style.color = 'var(--warning)';
+      }
+
       $('userModal').classList.add('active');
     };
     function closeUserModal() { $('userModal').classList.remove('active'); }
     $('closeUserModalBtn').addEventListener('click', closeUserModal);
 
+    // نمایش یا مخفی کردن رمز
+    $('btnToggleUserPass').addEventListener('click', () => {
+      const el = $('umViewPass');
+      el.type = el.type === 'password' ? 'text' : 'password';
+    });
+
+    // کپی رمز
+    $('btnCopyUserPass').addEventListener('click', async () => {
+      const val = $('umViewPass').value;
+      if (!val) { toast('رمزی برای کپی وجود ندارد.', 'error'); return; }
+      await copyToClipboard(val);
+      toast('رمز عبور کاربر کپی شد 📋', 'success');
+    });
+
+    // تولید رمز تصادفی
+    $('btnGenPass').addEventListener('click', () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#';
+      let res = '';
+      for (let i = 0; i < 10; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+      $('umNewPass').value = res;
+      toast('رمز تصادفی ایجاد شد 🎲', 'success');
+    });
+
     $('userForm').addEventListener('submit', async e => {
       e.preventDefault();
       const id = $('umUserId').value;
+      const newPass = $('umNewPass').value.trim();
+      if (newPass && newPass.length < 6) {
+        toast('رمز عبور جدید باید حداقل ۶ کاراکتر باشد.', 'error');
+        return;
+      }
+
       const payload = {
         name: $('umName').value.trim(),
         is_admin: $('umIsAdmin').checked ? 1 : 0
       };
+      if (newPass) {
+        payload.password = newPass;
+      }
+
       const { ok, data } = await api(`/api/admin-users?id=${id}`, 'PUT', payload);
       if (ok && data.ok) {
-        toast('اطلاعات کاربر به‌روزرسانی شد.', 'success');
+        toast(newPass ? 'اطلاعات و رمز عبور کاربر با موفقیت تغییر کرد ✓' : 'اطلاعات کاربر به‌روزرسانی شد.', 'success');
         closeUserModal();
         loadUsers();
       } else {

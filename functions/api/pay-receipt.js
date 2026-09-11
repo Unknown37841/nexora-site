@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
 
   // بررسی سفارش در دیتابیس
   const order = await env.DB.prepare(
-    "SELECT id, user_id, total, status FROM orders WHERE id = ?"
+    "SELECT id, user_id, total, status, created_at FROM orders WHERE id = ?"
   ).bind(orderId).first();
 
   if (!order) {
@@ -71,6 +71,12 @@ export async function onRequestPost(context) {
 
   if (order.status === "paid") {
     return jsonError("این سفارش قبلاً تأیید و پرداخت شده است.", 400);
+  }
+
+  const twentyFourHoursAgo = Date.now() - 24 * 60 * 60 * 1000;
+  if (order.status === "pending" && order.created_at < twentyFourHoursAgo) {
+    await env.DB.prepare("UPDATE orders SET status = 'cancelled' WHERE id = ?").bind(orderId).run();
+    return jsonError("مهلت ۲۴ ساعته پرداخت این سفارش به پایان رسیده و لغو شده است. لطفاً سفارش جدید ثبت کنید.", 400);
   }
 
   const now = Date.now();
