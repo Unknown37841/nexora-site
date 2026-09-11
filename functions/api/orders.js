@@ -24,7 +24,11 @@ export async function onRequestPost(context) {
   const cleanItems = [];
   for (const it of items) {
     const qty = Math.min(20, Math.max(1, parseInt(it.qty, 10) || 1));
-    cleanItems.push({ id: (it.id || "").toString().slice(0, 40), qty });
+    cleanItems.push({
+      id: (it.id || "").toString().slice(0, 40),
+      kind: it.kind === "course" ? "course" : "product",
+      qty,
+    });
   }
 
   const priceRows = await env.DB.prepare(
@@ -32,13 +36,29 @@ export async function onRequestPost(context) {
   ).all();
   const priceMap = new Map((priceRows.results || []).map((r) => [r.id, r]));
 
+  const courseRows = await env.DB.prepare(
+    `SELECT id, title, price, telegram_link FROM courses WHERE active = 1`
+  ).all();
+  const courseMap = new Map((courseRows.results || []).map((r) => [r.id, r]));
+
   let total = 0;
   const finalItems = [];
   for (const it of cleanItems) {
-    const p = priceMap.get(it.id);
-    if (!p) return jsonError("یکی از محصولات سبد دیگر موجود نیست.", 400);
-    total += p.price * it.qty;
-    finalItems.push({ id: p.id, name: p.name, price: p.price, qty: it.qty });
+    if (it.kind === "course") {
+      const c = courseMap.get(it.id);
+      if (!c) return jsonError("یکی از دوره‌های سبد دیگر موجود نیست.", 400);
+      total += c.price * it.qty;
+      finalItems.push({
+        id: c.id, kind: "course", name: c.title,
+        price: c.price, qty: it.qty,
+        telegram_link: c.telegram_link || "",
+      });
+    } else {
+      const p = priceMap.get(it.id);
+      if (!p) return jsonError("یکی از محصولات سبد دیگر موجود نیست.", 400);
+      total += p.price * it.qty;
+      finalItems.push({ id: p.id, kind: "product", name: p.name, price: p.price, qty: it.qty });
+    }
   }
 
   const id = "ord-" + crypto.randomUUID().replace(/-/g, "").slice(0, 14);

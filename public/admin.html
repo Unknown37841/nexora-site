@@ -549,6 +549,11 @@
           <span class="sb-badge" id="sbPendingBadge" style="display:none;">0</span>
         </button>
 
+        <button class="sb-item" data-tab="courses">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 10v6"/></svg>
+          <span>مدیریت دوره‌ها</span>
+        </button>
+
         <button class="sb-item" data-tab="products">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
           <span>مدیریت محصولات</span>
@@ -704,6 +709,25 @@
 
             <div class="prods-grid" id="prodsGrid">
               <p style="color:var(--text-mute);padding:30px;text-align:center;">در حال بارگذاری محصولات…</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAB: COURSES ==================== -->
+        <section class="tab-view" id="view-courses">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg>
+                <span>لیست دوره‌های آموزشی</span>
+              </div>
+              <button class="btn btn-primary" id="openAddCourseBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                افزودن دوره جدید
+              </button>
+            </div>
+            <div class="prods-grid" id="coursesGrid">
+              <p style="color:var(--text-mute);padding:30px;text-align:center;">در حال بارگذاری دوره‌ها…</p>
             </div>
           </div>
         </section>
@@ -1017,6 +1041,7 @@
             <span style="font-size:0.75rem;color:var(--success);">مستقیماً در پنل کاربری خریدار قرار می‌گیرد</span>
           </label>
           <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('course')" style="color:#229ED9;font-weight:700;">قالب کانال تلگرام دوره 🎓</button>
             <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('account')">قالب اکانت (یوزر/پسورد)</button>
             <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('invite')">قالب لینک دعوت فمیلی</button>
             <button type="button" class="btn btn-ghost btn-sm" onclick="insertDelivTemplate('license')">قالب کد لایسنس</button>
@@ -1087,6 +1112,118 @@
         <div style="display:flex;gap:10px;margin-top:16px;">
           <button type="submit" class="btn btn-primary" style="flex:1;">ذخیره تغییرات</button>
           <button type="button" class="btn btn-danger" id="btnDeleteUser">حذف کاربر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Course Modal (Add / Edit) -->
+  <div class="modal-overlay" id="courseModal">
+    <div class="modal-card" style="max-width:640px;max-height:92vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 id="courseModalTitle" style="font-size:1.05rem;font-weight:800;margin:0;">افزودن دوره جدید</h3>
+        <button type="button" class="btn btn-ghost btn-sm" id="closeCourseModalBtn">✕</button>
+      </div>
+      <form id="courseModalForm">
+        <input type="hidden" id="cmId" value="">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>عنوان دوره *</label>
+            <input type="text" id="cmTitle" class="form-input" required placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>زیرعنوان (توضیح کوتاه کارت)</label>
+            <input type="text" id="cmSubtitle" class="form-input" placeholder="مثلاً: راه‌اندازی کامل ChatGPT و ابزارها بدون محدودیت روی سیستم شخصی">
+          </div>
+          <div class="form-group">
+            <label>قیمت (تومان) *</label>
+            <input type="number" id="cmPrice" class="form-input" required min="0" placeholder="890000">
+          </div>
+          <div class="form-group">
+            <label>قیمت قبل از تخفیف (اختیاری)</label>
+            <input type="number" id="cmOldPrice" class="form-input" min="0" placeholder="1200000">
+          </div>
+          <div class="form-group">
+            <label>سطح دوره</label>
+            <select id="cmLevel" class="form-input">
+              <option value="">— انتخاب کنید —</option>
+              <option value="مقدماتی">مقدماتی</option>
+              <option value="متوسط">متوسط</option>
+              <option value="پیشرفته">پیشرفته</option>
+              <option value="مقدماتی تا پیشرفته">مقدماتی تا پیشرفته</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>مدت دوره</label>
+            <input type="text" id="cmDuration" class="form-input" placeholder="مثلاً: 6 ساعت ویدیو">
+          </div>
+          <div class="form-group">
+            <label>تعداد درس / ویدیو</label>
+            <input type="number" id="cmLessons" class="form-input" min="0" placeholder="32">
+          </div>
+          <div class="form-group">
+            <label>ترتیب نمایش</label>
+            <input type="number" id="cmSort" class="form-input" min="1" value="1">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>پیش‌نیاز دوره (اختیاری)</label>
+            <input type="text" id="cmPrerequisites" class="form-input" placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>لینک کانال خصوصی تلگرام این دوره *</label>
+            <input type="text" id="cmTelegramLink" class="form-input" dir="ltr" required placeholder="https://t.me/YourPrivateChannel">
+            <div style="font-size:0.72rem;color:var(--text-mute);margin-top:4px;">این لینک پس از تأیید پرداخت، فقط به خریدار همان دوره تحویل داده می‌شود.</div>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>توضیح نحوه دسترسی (اختیاری)</label>
+            <input type="text" id="cmTelegramNote" class="form-input" placeholder="مثلاً: پس از تأیید پرداخت، روی دکمه عضویت در کانال دوره کلیک کنید.">
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>توضیح کوتاه (نمایش در لیست)</label>
+            <textarea id="cmDesc" class="form-input" rows="2" placeholder="چند خط درباره محتوای دوره…"></textarea>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>توضیحات کامل دوره (تب «درباره این دوره»)</label>
+            <textarea id="cmLongDesc" class="form-input" rows="4" placeholder="سرفصل‌ها، نکات، مزایا و هر توضیح مفصل…"></textarea>
+          </div>
+          <div class="form-group">
+            <label>ویژگی‌ها (هر خط یک مورد)</label>
+            <textarea id="cmFeatures" class="form-input" rows="3" placeholder="۳۲ درس ویدیویی&#10;پشتیبانی اختصاصی&#10;دسترسی مادام‌العمر"></textarea>
+          </div>
+          <div class="form-group">
+            <label>لوگو / آیکون دوره</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <img id="cmIconImg" src="" alt="" style="display:none;width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--surface-2);">
+              <span id="cmIconEmpty" style="width:44px;height:44px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);">🎓</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="cmIconBtn">انتخاب آیکون</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveIcon" style="display:none;color:var(--danger);">حذف</button>
+            </div>
+            <input type="file" id="cmIconFileInput" accept="image/*" style="display:none;">
+          </div>
+          <div class="form-group">
+            <label>کاور دوره (اختیاری)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <img id="cmCoverImg" src="" alt="" style="display:none;width:64px;height:40px;border-radius:8px;object-fit:cover;background:var(--surface-2);">
+              <span id="cmCoverEmpty" style="width:64px;height:40px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);font-size:0.7rem;">۱۶:۱۰</span>
+              <button type="button" class="btn btn-ghost btn-sm" id="cmCoverBtn">انتخاب کاور</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveCover" style="display:none;color:var(--danger);">حذف</button>
+            </div>
+            <input type="file" id="cmCoverFileInput" accept="image/*" style="display:none;">
+          </div>
+        </div>
+        <input type="hidden" id="cmIconData" value="">
+        <input type="hidden" id="cmCoverData" value="">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+          <span style="font-size:0.9rem;font-weight:600;">وضعیت انتشار</span>
+          <label class="toggle">
+            <input type="checkbox" id="cmActive" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button type="submit" class="btn btn-primary" id="saveCourseBtn" style="flex:1;">ذخیره دوره</button>
+          <button type="button" class="btn btn-ghost" id="cancelCourseBtn">انصراف</button>
         </div>
       </form>
     </div>
@@ -1341,9 +1478,231 @@
       loadStats();
       loadOrders();
       loadProducts();
+      loadCourses();
       loadUsers();
       loadSettings();
     }
+
+    // ================= Courses Management =================
+    let allCourses = [];
+
+    async function loadCourses() {
+      const { ok, data } = await api('/api/admin-courses');
+      if (ok && data.ok) {
+        allCourses = data.courses || [];
+        renderCoursesAdmin();
+      } else {
+        $('coursesGrid').innerHTML = '<p style="color:var(--danger);padding:20px;text-align:center;">خطا در بارگذاری دوره‌ها.</p>';
+      }
+    }
+
+    function renderCoursesAdmin() {
+      const grid = $('coursesGrid');
+      if (!allCourses.length) {
+        grid.innerHTML = '<p style="color:var(--text-mute);padding:30px;text-align:center;">هنوز دوره‌ای ثبت نشده است. با دکمه «افزودن دوره جدید» اولین دوره را بسازید.</p>';
+        return;
+      }
+      grid.innerHTML = allCourses.map(c => {
+        let iconHtml;
+        if (c.cover_url) {
+          iconHtml = `<img src="${c.cover_url}" alt="${esc(c.title)}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else if (c.icon_url) {
+          iconHtml = `<img src="${c.icon_url}" alt="${esc(c.title)}" style="width:100%;height:100%;object-fit:contain;background:var(--surface);">`;
+        } else {
+          iconHtml = `<div style="width:100%;height:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">🎓</div>`;
+        }
+        return `
+          <div class="p-card" style="opacity:${c.active ? 1 : 0.6};">
+            <div class="p-top">
+              <div class="p-icon-box" style="width:56px;height:56px;border-radius:14px;overflow:hidden;">${iconHtml}</div>
+              <div style="flex:1;min-width:0;">
+                <div class="p-title" title="${esc(c.title)}">${esc(c.title)}</div>
+                <div class="p-period">${c.level ? esc(c.level) + ' • ' : ''}${esc(c.duration || '')}</div>
+              </div>
+            </div>
+            <div class="p-price">${fmt(c.price)} تومان</div>
+            <div class="p-desc" style="color:#229ED9;">📨 ${esc(c.telegram_link || 'بدون لینک تلگرام')}</div>
+            <div class="p-actions">
+              <div style="display:flex;align-items:center;gap:6px;flex:1;">
+                <label class="toggle" style="transform:scale(0.85);margin-right:-4px;">
+                  <input type="checkbox" ${c.active ? 'checked' : ''} onchange="toggleCourseActive('${c.id}', this.checked)">
+                  <span class="slider"></span>
+                </label>
+                <span style="font-size:0.75rem;color:var(--text-mute);">${c.active ? 'منتشر شده' : 'پیش‌نویس'}</span>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="editCourse('${c.id}')">ویرایش ✏️</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteCourse('${c.id}')">حذف 🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.toggleCourseActive = async function(id, active) {
+      const c = allCourses.find(x => x.id === id);
+      if (!c) return;
+      const { ok, data } = await api(`/api/admin-courses?id=${id}`, 'PUT', { ...c, active });
+      if (ok && data.ok) {
+        c.active = active ? 1 : 0;
+        toast(active ? 'دوره منتشر شد ✓' : 'دوره به پیش‌نویس تغییر یافت.', 'success');
+        renderCoursesAdmin();
+      } else {
+        toast(data.error || 'خطا در تغییر وضعیت دوره', 'error');
+        renderCoursesAdmin();
+      }
+    };
+
+    window.deleteCourse = async function(id) {
+      const c = allCourses.find(x => x.id === id);
+      if (!confirm(`حذف دوره «${c ? c.title : id}»؟ این عمل قابل بازگشت نیست.`)) return;
+      const { ok, data } = await api(`/api/admin-courses?id=${id}`, 'DELETE');
+      if (ok && data.ok) {
+        toast('دوره حذف شد ✓', 'success');
+        loadCourses();
+      } else {
+        toast(data.error || 'خطا در حذف دوره', 'error');
+      }
+    };
+
+    function openCourseModal() {
+      $('courseModalTitle').textContent = 'افزودن دوره جدید';
+      $('courseModalForm').reset();
+      $('cmId').value = '';
+      $('cmActive').checked = true;
+      $('cmIconData').value = '';
+      $('cmCoverData').value = '';
+      $('cmIconImg').style.display = 'none';
+      $('cmIconEmpty').style.display = 'grid';
+      $('cmRemoveIcon').style.display = 'none';
+      $('cmCoverImg').style.display = 'none';
+      $('cmCoverEmpty').style.display = 'grid';
+      $('cmRemoveCover').style.display = 'none';
+      $('courseModal').classList.add('active');
+    }
+    $('openAddCourseBtn').addEventListener('click', openCourseModal);
+    function closeCourseModal() { $('courseModal').classList.remove('active'); }
+    $('closeCourseModalBtn').addEventListener('click', closeCourseModal);
+    $('cancelCourseBtn').addEventListener('click', closeCourseModal);
+
+    window.editCourse = function(id) {
+      const c = allCourses.find(x => x.id === id);
+      if (!c) return;
+      $('courseModalTitle').textContent = 'ویرایش دوره';
+      $('cmId').value = c.id;
+      $('cmTitle').value = c.title || '';
+      $('cmSubtitle').value = c.subtitle || '';
+      $('cmPrice').value = c.price || 0;
+      $('cmOldPrice').value = c.old_price || '';
+      $('cmLevel').value = c.level || '';
+      $('cmDuration').value = c.duration || '';
+      $('cmLessons').value = c.lessons_count || '';
+      $('cmSort').value = c.sort_order || 1;
+      $('cmPrerequisites').value = c.prerequisites || '';
+      $('cmTelegramLink').value = c.telegram_link || '';
+      $('cmTelegramNote').value = c.telegram_note || '';
+      $('cmDesc').value = c.description || '';
+      $('cmLongDesc').value = c.long_description || '';
+      $('cmFeatures').value = c.features || '';
+      $('cmActive').checked = c.active !== 0;
+
+      const icon = c.icon_url || '';
+      $('cmIconData').value = icon;
+      if (icon) { $('cmIconImg').src = icon; $('cmIconImg').style.display = 'block'; $('cmIconEmpty').style.display = 'none'; $('cmRemoveIcon').style.display = 'inline-block'; }
+      else { $('cmIconImg').style.display = 'none'; $('cmIconEmpty').style.display = 'grid'; $('cmRemoveIcon').style.display = 'none'; }
+
+      const cover = c.cover_url || '';
+      $('cmCoverData').value = cover;
+      if (cover) { $('cmCoverImg').src = cover; $('cmCoverImg').style.display = 'block'; $('cmCoverEmpty').style.display = 'none'; $('cmRemoveCover').style.display = 'inline-block'; }
+      else { $('cmCoverImg').style.display = 'none'; $('cmCoverEmpty').style.display = 'grid'; $('cmRemoveCover').style.display = 'none'; }
+
+      $('courseModal').classList.add('active');
+    };
+
+    // Course icon/cover upload
+    $('cmIconBtn').addEventListener('click', () => $('cmIconFileInput').click());
+    $('cmIconFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const compressed = await compressImage(file, 256, 0.9);
+        $('cmIconData').value = compressed;
+        $('cmIconImg').src = compressed;
+        $('cmIconImg').style.display = 'block';
+        $('cmIconEmpty').style.display = 'none';
+        $('cmRemoveIcon').style.display = 'inline-block';
+      } catch (err) { toast('خطا در پردازش آیکون دوره', 'error'); }
+      $('cmIconFileInput').value = '';
+    });
+    $('cmRemoveIcon').addEventListener('click', () => {
+      $('cmIconData').value = '';
+      $('cmIconImg').style.display = 'none';
+      $('cmIconEmpty').style.display = 'grid';
+      $('cmRemoveIcon').style.display = 'none';
+    });
+
+    $('cmCoverBtn').addEventListener('click', () => $('cmCoverFileInput').click());
+    $('cmCoverFileInput').addEventListener('change', async e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const compressed = await compressImage(file, 800, 0.85);
+        $('cmCoverData').value = compressed;
+        $('cmCoverImg').src = compressed;
+        $('cmCoverImg').style.display = 'block';
+        $('cmCoverEmpty').style.display = 'none';
+        $('cmRemoveCover').style.display = 'inline-block';
+      } catch (err) { toast('خطا در پردازش کاور دوره', 'error'); }
+      $('cmCoverFileInput').value = '';
+    });
+    $('cmRemoveCover').addEventListener('click', () => {
+      $('cmCoverData').value = '';
+      $('cmCoverImg').style.display = 'none';
+      $('cmCoverEmpty').style.display = 'grid';
+      $('cmRemoveCover').style.display = 'none';
+    });
+
+    // Save course
+    $('courseModalForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = $('cmId').value;
+      const isEdit = !!id;
+      const payload = {
+        title: $('cmTitle').value.trim(),
+        subtitle: $('cmSubtitle').value.trim(),
+        price: parseInt($('cmPrice').value, 10) || 0,
+        old_price: parseInt($('cmOldPrice').value, 10) || 0,
+        level: $('cmLevel').value,
+        duration: $('cmDuration').value.trim(),
+        lessons_count: parseInt($('cmLessons').value, 10) || 0,
+        sort_order: parseInt($('cmSort').value, 10) || 1,
+        prerequisites: $('cmPrerequisites').value.trim(),
+        telegram_link: $('cmTelegramLink').value.trim(),
+        telegram_note: $('cmTelegramNote').value.trim(),
+        description: $('cmDesc').value.trim(),
+        long_description: $('cmLongDesc').value.trim(),
+        features: $('cmFeatures').value.trim(),
+        icon_url: $('cmIconData').value || '',
+        cover_url: $('cmCoverData').value || '',
+        active: $('cmActive').checked
+      };
+
+      const btn = $('saveCourseBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال ذخیره…';
+      const url = isEdit ? `/api/admin-courses?id=${id}` : '/api/admin-courses';
+      const method = isEdit ? 'PUT' : 'POST';
+      const { ok, data } = await api(url, method, payload);
+      btn.disabled = false;
+      btn.textContent = 'ذخیره دوره';
+
+      if (ok && (data.ok || data.id)) {
+        toast(isEdit ? 'دوره با موفقیت ویرایش شد ✓' : 'دوره جدید اضافه شد ✓', 'success');
+        closeCourseModal();
+        loadCourses();
+      } else {
+        toast(data.error || 'خطا در ذخیره دوره', 'error');
+      }
+    });
 
     // Tabs switching
     const tabBtns = document.querySelectorAll('.sb-item[data-tab]');
@@ -1358,6 +1717,7 @@
         const titles = {
           dashboard: 'داشبورد و وضعیت کل',
           orders: 'سفارشات و رسیدهای واریزی',
+          courses: 'مدیریت دوره‌های آموزشی',
           products: 'مدیریت محصولات فروشگاه',
           users: 'مدیریت کاربران و مشتریان',
           settings: 'تنظیمات حساب بانکی'
@@ -1616,7 +1976,12 @@
 
     window.insertDelivTemplate = function(type) {
       const t = $('delivText');
-      if (type === 'account') {
+      if (type === 'course') {
+        t.value = `🎓 دسترسی به دوره آموزشی تخصصی هوش مصنوعی نکسورا:\n` +
+                  `🔗 لینک کانال خصوصی تلگرام: https://t.me/+\n` +
+                  `📌 راهنما: روی لینک بالا کلیک کنید و درخواست عضویت دهید یا مستقیماً وارد کانال شوید. ویدیوها و فایل‌های دوره داخل کانال پین شده‌اند.\n` +
+                  `موفق باشید! تیم آکادمی نکسورا 💜`;
+      } else if (type === 'account') {
         t.value = `مشخصات اشتراک شما فعال شد:\n` +
                   `👤 ایمیل / نام کاربری: \n` +
                   `🔑 رمز عبور: \n` +

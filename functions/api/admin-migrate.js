@@ -80,6 +80,41 @@ export async function ensureDatabaseSchema(env) {
       } catch (_) {}
     }
 
+    // 4b. جدول دوره‌های آموزشی (محصول اصلی سایت)
+    await env.DB.prepare(`
+      CREATE TABLE IF NOT EXISTS courses (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        subtitle TEXT,
+        description TEXT,
+        long_description TEXT,
+        price INTEGER NOT NULL DEFAULT 0,
+        old_price INTEGER,
+        level TEXT,
+        duration TEXT,
+        lessons_count INTEGER,
+        icon_url TEXT,
+        cover_url TEXT,
+        gallery_images TEXT,
+        features TEXT,
+        prerequisites TEXT,
+        telegram_link TEXT,
+        telegram_note TEXT,
+        custom_tabs TEXT,
+        active INTEGER NOT NULL DEFAULT 1,
+        sort_order INTEGER NOT NULL DEFAULT 99,
+        created_at INTEGER NOT NULL
+      )
+    `).run();
+    const courseColumns = [
+      "ALTER TABLE courses ADD COLUMN old_price INTEGER",
+      "ALTER TABLE courses ADD COLUMN telegram_note TEXT",
+      "ALTER TABLE courses ADD COLUMN custom_tabs TEXT"
+    ];
+    for (const sql of courseColumns) {
+      try { await env.DB.prepare(sql).run(); } catch (_) {}
+    }
+
     // 5b. ارتقای آیکون جمینای به نسخه باکیفیت ۵۱۲ پیکسلی (اگر نسخه قدیمی کم‌حجم ذخیره شده باشد)
     try {
       const gemRow = await env.DB.prepare("SELECT id, icon_url FROM products WHERE id = 'p-gemini'").first();
