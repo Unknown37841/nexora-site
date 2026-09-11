@@ -71,7 +71,8 @@ export async function ensureDatabaseSchema(env) {
       "ALTER TABLE products ADD COLUMN long_description TEXT",
       "ALTER TABLE products ADD COLUMN gallery_images TEXT",
       "ALTER TABLE products ADD COLUMN features TEXT",
-      "ALTER TABLE products ADD COLUMN requirements TEXT"
+      "ALTER TABLE products ADD COLUMN requirements TEXT",
+      "ALTER TABLE products ADD COLUMN custom_tabs TEXT"
     ];
     for (const sql of prodColumns) {
       try {

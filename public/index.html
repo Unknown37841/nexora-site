@@ -2977,50 +2977,10 @@
       </div>
     </div>
 
-    <!-- Tabs Details Section -->
-    <div class="pd-tabs-card">
-      <div class="pd-nav-tabs">
-        <button type="button" class="pd-tab-trigger active" data-pdtab="desc">توضیحات و راهنمای کامل 📖</button>
-        <button type="button" class="pd-tab-trigger" data-pdtab="features">ویژگی‌ها و قابلیت‌ها ✨</button>
-        <button type="button" class="pd-tab-trigger" data-pdtab="delivery">نحوه تحویل و فعال‌سازی 🚀</button>
-      </div>
-
-      <div class="pd-tab-content active" id="pdTabPanelDesc">
-        <div class="pd-prose" id="pdLongDescText"></div>
-      </div>
-
-      <div class="pd-tab-content" id="pdTabPanelFeatures">
-        <ul class="pd-checklist" id="pdFeaturesList"></ul>
-      </div>
-
-      <div class="pd-tab-content" id="pdTabPanelDelivery">
-        <div class="pd-prose">
-          <p>فرآیند دریافت اشتراک در نکسورا کاملاً شفاف و گام‌به‌گام است:</p>
-          <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px;">
-            <div style="display:flex;gap:12px;align-items:flex-start;">
-              <span style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">1</span>
-              <div>
-                <strong style="color:var(--text);display:block;margin-bottom:2px;">ثبت سفارش و پرداخت کارت به کارت</strong>
-                <span>سفارش خود را نهایی کرده و مبلغ را به شماره کارت سامان بنام محمد اورک واریز فرمایید.</span>
-              </div>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start;">
-              <span style="width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">2</span>
-              <div>
-                <strong style="color:var(--text);display:block;margin-bottom:2px;">بارگذاری فیش و کد رهگیری</strong>
-                <span>تصویر فیش واریزی و کد پیگیری را در فرم مربوطه وارد کنید تا به صف بررسی فوری ارسال شود.</span>
-              </div>
-            </div>
-            <div style="display:flex;gap:12px;align-items:flex-start;">
-              <span style="width:28px;height:28px;border-radius:50%;background:#10b981;color:#fff;display:grid;place-items:center;font-weight:800;font-size:0.85rem;flex-shrink:0;">3</span>
-              <div>
-                <strong style="color:var(--text);display:block;margin-bottom:2px;">تحویل مستقیم مشخصات اکانت یا لایسنس</strong>
-                <span>به محض تأیید مدیر، مشخصات اکانت در صفحه پروفایل و با بنر و اعلان بازشو با امکان کپی آسان به شما تحویل داده می‌شود.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Tabs Details Section (Dynamic Custom Tabs) -->
+    <div class="pd-tabs-card" id="pdTabsCard">
+      <div class="pd-nav-tabs" id="pdNavTabs"></div>
+      <div id="pdTabsBody"></div>
     </div>
   </div>
 </div>
@@ -4400,35 +4360,63 @@
       thumbsStrip.style.display = 'none';
     }
 
-    // Tabs content
-    // 1. Long Description
-    const longDesc = p.long_description || p.description || 'توضیحات تکمیلی برای این محصول به زودی اضافه می‌شود.';
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const formattedDesc = esc(longDesc).replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
-    $('pdLongDescText').innerHTML = formattedDesc;
+    // Dynamic Tabs Rendering
+    let tabs = [];
+    try {
+      tabs = JSON.parse(p.custom_tabs || '[]');
+    } catch (_) { tabs = []; }
 
-    // 2. Features
-    const featList = $('pdFeaturesList');
-    const rawFeat = (p.features || '').trim();
-    if (rawFeat) {
-      const items = rawFeat.split('\n').map(x => x.trim()).filter(Boolean);
-      featList.innerHTML = items.map(f => `
-        <li>
-          <span class="chk-icon">✓</span>
-          <span>${esc(f)}</span>
-        </li>
-      `).join('');
-    } else {
-      featList.innerHTML = `
-        <li><span class="chk-icon">✓</span><span>دسترسی اختصاصی و رسمی به سرویس</span></li>
-        <li><span class="chk-icon">✓</span><span>پشتیبانی شبانه‌روزی و گارانتی تمام مدت</span></li>
-        <li><span class="chk-icon">✓</span><span>تحویل آنلاین و فعال‌سازی سریع</span></li>
-      `;
+    if (!Array.isArray(tabs) || tabs.length === 0) {
+      tabs = [];
+      if (p.long_description) {
+        tabs.push({ title: 'توضیحات و راهنمای کامل 📖', content: p.long_description });
+      }
+      if (p.features) {
+        tabs.push({ title: 'ویژگی‌ها و قابلیت‌ها ✨', content: p.features });
+      }
+      tabs.push({
+        title: 'نحوه تحویل و فعال‌سازی 🚀',
+        content: '• ثبت سفارش و پرداخت کارت به کارت به شماره کارت اعلام شده\n• بارگذاری فیش واریزی و کد پیگیری در سیستم\n• تحویل مستقیم و آنی مشخصات اکانت یا لایسنس در پنل کاربری شما با گارانتی کامل'
+      });
     }
 
-    // Reset active tab to Description
-    document.querySelectorAll('[data-pdtab]').forEach(btn => btn.classList.toggle('active', btn.dataset.pdtab === 'desc'));
-    document.querySelectorAll('.pd-tab-content').forEach(pnl => pnl.classList.toggle('active', pnl.id === 'pdTabPanelDesc'));
+    const nav = $('pdNavTabs');
+    const body = $('pdTabsBody');
+    if (tabs.length === 0) {
+      $('pdTabsCard').style.display = 'none';
+    } else {
+      $('pdTabsCard').style.display = 'block';
+      nav.innerHTML = tabs.map((tab, idx) => `
+        <button type="button" class="pd-tab-trigger ${idx === 0 ? 'active' : ''}" data-pdtab-idx="${idx}">
+          ${esc(tab.title || ('تب ' + (idx + 1)))}
+        </button>
+      `).join('');
+
+      body.innerHTML = tabs.map((tab, idx) => {
+        const raw = (tab.content || '').trim();
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+        let innerHtml = '';
+        const isList = lines.length > 1 && lines.every(l => l.startsWith('•') || l.startsWith('-') || l.startsWith('*') || /^\d+[\.\-]/.test(l));
+
+        if (isList) {
+          innerHtml = `<ul class="pd-checklist">` + lines.map(l => {
+            const clean = l.replace(/^[•\-\*]|\d+[\.\-]/, '').trim();
+            const linked = esc(clean).replace(urlRegex, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+            return `<li><span class="chk-icon">✓</span><span>${linked}</span></li>`;
+          }).join('') + `</ul>`;
+        } else {
+          const linked = esc(raw).replace(urlRegex, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+          innerHtml = `<div class="pd-prose">${linked}</div>`;
+        }
+
+        return `
+          <div class="pd-tab-content ${idx === 0 ? 'active' : ''}" id="pdTabPanel_${idx}">
+            ${innerHtml}
+          </div>
+        `;
+      }).join('');
+    }
 
     // Set URL hash
     if (window.location.hash !== '#product/' + p.id) {
@@ -4497,16 +4485,16 @@
     if (s) s.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Detail tabs switching
-  document.querySelectorAll('[data-pdtab]').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const target = this.dataset.pdtab;
-      document.querySelectorAll('[data-pdtab]').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      document.querySelectorAll('.pd-tab-content').forEach(pnl => {
-        pnl.classList.toggle('active', pnl.id === ('pdTabPanel' + target.charAt(0).toUpperCase() + target.slice(1)));
-      });
-    });
+  // Detail dynamic tabs switching
+  $('pdNavTabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-pdtab-idx]');
+    if (!btn) return;
+    const idx = btn.dataset.pdtabIdx;
+    document.querySelectorAll('#pdNavTabs .pd-tab-trigger').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#pdTabsBody .pd-tab-content').forEach(pnl => pnl.classList.remove('active'));
+    const target = $(`pdTabPanel_${idx}`);
+    if (target) target.classList.add('active');
   });
 
   // Hash Routing support for product details

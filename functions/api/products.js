@@ -9,7 +9,7 @@ export async function onRequestGet(context) {
 
   const { results } = await env.DB.prepare(
     `SELECT id, name, description, price, period, icon_text, color, badge, icon_url, cover_url,
-            long_description, gallery_images, features, requirements
+            long_description, gallery_images, features, requirements, custom_tabs
      FROM products
      WHERE active = 1
      ORDER BY sort_order ASC, created_at ASC`

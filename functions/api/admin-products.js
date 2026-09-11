@@ -60,6 +60,7 @@ export async function onRequestPost(context) {
   const galleryImages = (body.gallery_images ?? "").toString().trim().slice(0, 3000000);
   const features = (body.features ?? "").toString().trim().slice(0, 4000);
   const requirements = (body.requirements ?? "").toString().trim().slice(0, 1000);
+  const customTabs = (body.custom_tabs ?? "").toString().trim().slice(0, 30000);
 
   const id = "p-" + crypto.randomUUID().slice(0, 8);
   const now = Date.now();
@@ -68,8 +69,8 @@ export async function onRequestPost(context) {
     `INSERT INTO products
        (id, name, description, price, period, icon_text, color, badge,
         icon_url, cover_url, active, sort_order, created_at,
-        long_description, gallery_images, features, requirements)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        long_description, gallery_images, features, requirements, custom_tabs)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   )
     .bind(
       id,
@@ -88,7 +89,8 @@ export async function onRequestPost(context) {
       longDescription,
       galleryImages,
       features,
-      requirements
+      requirements,
+      customTabs
     )
     .run();
 
@@ -129,12 +131,13 @@ export async function onRequestPut(context) {
   const galleryImages = (body.gallery_images ?? "").toString().trim().slice(0, 3000000);
   const features = (body.features ?? "").toString().trim().slice(0, 4000);
   const requirements = (body.requirements ?? "").toString().trim().slice(0, 1000);
+  const customTabs = (body.custom_tabs ?? "").toString().trim().slice(0, 30000);
 
   await env.DB.prepare(
     `UPDATE products SET
        name = ?, description = ?, price = ?, period = ?, icon_text = ?,
        color = ?, badge = ?, icon_url = ?, cover_url = ?, active = ?, sort_order = ?,
-       long_description = ?, gallery_images = ?, features = ?, requirements = ?
+       long_description = ?, gallery_images = ?, features = ?, requirements = ?, custom_tabs = ?
      WHERE id = ?`
   )
     .bind(
@@ -153,6 +156,7 @@ export async function onRequestPut(context) {
       galleryImages,
       features,
       requirements,
+      customTabs,
       id
     )
     .run();

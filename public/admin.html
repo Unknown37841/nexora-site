@@ -920,6 +920,21 @@
             </div>
             <input type="file" id="galleryFileInput" accept="image/*" style="display:none;">
           </div>
+
+          <!-- تب‌های پویا و سفارشی صفحه محصول -->
+          <div style="border-top:1px dashed var(--border);margin-top:14px;padding-top:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+              <div style="font-size:0.92rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px;">
+                <span>📑</span>
+                <span>تب‌های صفحه اختصاصی محصول (افزودن / حذف / ویرایش آزاد)</span>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnAddCustomTab" style="border-color:var(--primary);color:var(--primary);">+ افزودن تب جدید</button>
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-dim);margin-bottom:12px;">
+              می‌توانید هر تعداد تب دلخواه (مانند توضیحات، راهنمای نصب، سوالات متداول، مشخصات فنی، و نحوه تحویل) ایجاد کنید یا تب‌های پیش‌فرض را کم و زیاد نمایید.
+            </div>
+            <div id="pmTabsContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
@@ -1820,6 +1835,59 @@
       $('galleryFileInput').value = '';
     });
 
+    // Custom Tabs Management
+    let currentCustomTabs = [];
+    function renderAdminCustomTabs() {
+      const cont = $('pmTabsContainer');
+      if (!cont) return;
+      if (!currentCustomTabs || currentCustomTabs.length === 0) {
+        cont.innerHTML = `
+          <div style="padding:16px;background:var(--bg-card);border:1px dashed var(--border);border-radius:10px;text-align:center;color:var(--text-dim);font-size:0.85rem;">
+            هیچ تب سفارشی برای این محصول وجود ندارد. برای افزودن تب، روی دکمه «+ افزودن تب جدید» کلیک کنید.
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = currentCustomTabs.map((tab, idx) => `
+        <div class="custom-tab-item" style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;flex:1;">
+              <span style="font-weight:800;font-size:0.82rem;color:var(--primary);width:24px;height:24px;border-radius:50%;background:rgba(99,102,241,0.15);display:grid;place-items:center;">${idx + 1}</span>
+              <input type="text" class="form-input custom-tab-title" data-idx="${idx}" value="${esc(tab.title || '')}" placeholder="عنوان تب (مثلاً: راهنمای نصب 🚀 یا سوالات متداول ❓)" style="font-weight:700;flex:1;font-size:0.88rem;">
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="removeAdminCustomTab(${idx})" style="color:#ef4444;border-color:rgba(239,68,68,0.3);padding:4px 10px;font-size:0.8rem;" title="حذف این تب">
+              حذف تب 🗑️
+            </button>
+          </div>
+          <textarea class="form-input custom-tab-content" data-idx="${idx}" rows="3" placeholder="محتوای این تب (پشتیبانی از متن کامل، چندخطی و لینک)..." style="font-size:0.86rem;line-height:1.6;">${esc(tab.content || '')}</textarea>
+        </div>
+      `).join('');
+
+      cont.querySelectorAll('.custom-tab-title').forEach(inp => {
+        inp.addEventListener('input', e => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          if (currentCustomTabs[i]) currentCustomTabs[i].title = e.target.value;
+        });
+      });
+      cont.querySelectorAll('.custom-tab-content').forEach(txt => {
+        txt.addEventListener('input', e => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          if (currentCustomTabs[i]) currentCustomTabs[i].content = e.target.value;
+        });
+      });
+    }
+
+    window.removeAdminCustomTab = function(idx) {
+      currentCustomTabs.splice(idx, 1);
+      renderAdminCustomTabs();
+    };
+
+    $('btnAddCustomTab').addEventListener('click', () => {
+      currentCustomTabs.push({ title: 'تب جدید ' + (currentCustomTabs.length + 1), content: '' });
+      renderAdminCustomTabs();
+    });
+
     // Product Modal (Add / Edit)
     $('openAddProdBtn').addEventListener('click', () => {
       $('prodModalTitle').textContent = 'افزودن محصول جدید';
@@ -1833,6 +1901,12 @@
       $('pmRequirements').value = '';
       currentGallery = [];
       renderAdminGallery();
+      currentCustomTabs = [
+        { title: 'توضیحات و راهنمای کامل 📖', content: '' },
+        { title: 'ویژگی‌ها و قابلیت‌ها ✨', content: '' },
+        { title: 'نحوه تحویل و فعال‌سازی 🚀', content: '۱. ثبت سفارش و پرداخت کارت به کارت به شماره کارت اعلام شده\n۲. بارگذاری فیش واریزی و کد رهگیری در سیستم\n۳. تحویل فوری اکانت یا لایسنس اختصاصی در بخش سفارش‌های پروفایل شما با گارانتی تعویض' }
+      ];
+      renderAdminCustomTabs();
       $('iconImg').style.display = 'none';
       $('iconEmpty').style.display = 'flex';
       $('btnRemoveIcon').style.display = 'none';
@@ -1869,6 +1943,24 @@
       } catch (_) { currentGallery = []; }
       if (!Array.isArray(currentGallery)) currentGallery = [];
       renderAdminGallery();
+
+      try {
+        currentCustomTabs = JSON.parse(p.custom_tabs || '[]');
+      } catch (_) { currentCustomTabs = []; }
+      if (!Array.isArray(currentCustomTabs) || currentCustomTabs.length === 0) {
+        currentCustomTabs = [];
+        if (p.long_description) {
+          currentCustomTabs.push({ title: 'توضیحات و راهنمای کامل 📖', content: p.long_description });
+        }
+        if (p.features) {
+          currentCustomTabs.push({ title: 'ویژگی‌ها و قابلیت‌ها ✨', content: p.features });
+        }
+        currentCustomTabs.push({
+          title: 'نحوه تحویل و فعال‌سازی 🚀',
+          content: '۱. ثبت سفارش و پرداخت کارت به کارت به شماره کارت اعلام شده\n۲. بارگذاری فیش واریزی و کد رهگیری در سیستم\n۳. تحویل فوری اکانت یا لایسنس اختصاصی در بخش سفارش‌های پروفایل شما با گارانتی تعویض'
+        });
+      }
+      renderAdminCustomTabs();
 
       const colors = (p.color || '#6366f1|#8b5cf6').split('|');
       $('pmColor1').value = colors[0] || '#6366f1';
@@ -1975,7 +2067,8 @@
         long_description: $('pmLongDesc').value.trim(),
         features: $('pmFeatures').value.trim(),
         requirements: $('pmRequirements').value.trim(),
-        gallery_images: JSON.stringify(currentGallery)
+        gallery_images: JSON.stringify(currentGallery),
+        custom_tabs: JSON.stringify(currentCustomTabs.filter(t => (t.title && t.title.trim()) || (t.content && t.content.trim())))
       };
 
       const btn = $('saveProdBtn');
