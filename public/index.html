@@ -2017,12 +2017,14 @@
   }
 
   /* Quick view button on card */
-  .service-card .card-click-hint {
+  .service-card .card-click-hint,
+  .course-card .card-click-hint {
     font-size: 0.78rem; color: var(--primary); font-weight: 600;
     margin-top: 10px; display: flex; align-items: center; gap: 4px;
     opacity: 0.85; transition: opacity 0.2s;
   }
-  .service-card:hover .card-click-hint { opacity: 1; transform: translateX(-2px); }
+  .service-card:hover .card-click-hint,
+  .course-card:hover .card-click-hint { opacity: 1; transform: translateX(-2px); }
 </style>
 </head>
 <body>
@@ -3337,13 +3339,47 @@
   // ================= State =================
   let currentUser = null;
   let products = [];
+  let courses = [];
   let cart = {};
   try { cart = JSON.parse(localStorage.getItem('nexora_cart') || '{}') || {}; } catch (e) { cart = {}; }
   function cartSave() { localStorage.setItem('nexora_cart', JSON.stringify(cart)); }
   function cartCount() { return Object.values(cart).reduce((a, b) => a + Number(b || 0), 0); }
-  function cartTotal() {
-    return products.reduce((sum, p) => cart[p.id] ? sum + p.price * cart[p.id] : sum, 0);
+
+  function courseIconStyle(c) {
+    const colors = ['#6366f1', '#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
+    const idx = ((c && c.id) || '').split('').reduce((a, ch) => a + ch.charCodeAt(0), 0) % colors.length;
+    const c1 = colors[idx];
+    const c2 = colors[(idx + 2) % colors.length];
+    return `background:linear-gradient(135deg,${c1},${c2})`;
   }
+
+  function iconStyle(p) {
+    const [c1, c2] = ((p && p.color) || '#6366f1|#8b5cf6').split('|');
+    return `background:linear-gradient(135deg,${esc(c1) || '#6366f1'},${esc(c2) || '#8b5cf6'})`;
+  }
+
+  function cartResolve(key) {
+    if (!key) return null;
+    if (key.startsWith('course:')) {
+      const cid = key.slice(7);
+      const c = courses.find(x => x.id === cid);
+      if (c) return { id: c.id, key, name: c.title, price: Number(c.price) || 0, iconUrl: c.icon_url || '', iconText: '', gradient: courseIconStyle(c), isCourse: true };
+      return null;
+    }
+    const p = products.find(x => x.id === key);
+    if (p) return { id: p.id, key, name: p.name, price: Number(p.price) || 0, iconUrl: p.icon_url || '', iconText: p.icon_text || '', gradient: iconStyle(p), isCourse: false };
+    return null;
+  }
+
+  function cartTotal() {
+    return Object.keys(cart).reduce((sum, key) => {
+      const qty = Number(cart[key]) || 0;
+      if (qty <= 0) return sum;
+      const it = cartResolve(key);
+      return sum + (it ? it.price * qty : 0);
+    }, 0);
+  }
+
   function updateCartBadge() {
     const n = cartCount();
     const b = $('cartBadge');
@@ -3628,10 +3664,6 @@
   }
 
   // ================= Products (public site) =================
-  function iconStyle(p) {
-    const [c1, c2] = (p.color || '#6366f1|#8b5cf6').split('|');
-    return `background:linear-gradient(135deg,${esc(c1) || '#6366f1'},${esc(c2) || '#8b5cf6'})`;
-  }
   function renderProducts() {
     const grid = $('servicesGrid');
     if (!products.length) {
@@ -3702,8 +3734,10 @@
         addBtn.classList.remove('added');
         addBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
       }, 900);
-      const p = products.find(x => x.id === id);
-      gToast((p ? p.name : 'محصول') + ' به سبد اضافه شد 🛒', 'success');
+      const itemInfo = cartResolve(id);
+      const label = itemInfo ? itemInfo.name : 'محصول';
+      gToast(label + ' به سبد خرید اضافه شد 🛒', 'success');
+      if (cartDrawer && cartDrawer.classList.contains('active')) renderCart();
       return;
     }
 
@@ -3721,19 +3755,6 @@
   $('cartBtn').addEventListener('click', openCart);
   $('cartClose').addEventListener('click', closeCart);
   cartOverlayEl.addEventListener('click', closeCart);
-
-  function cartResolve(key) {
-    // Returns { name, price, iconUrl, iconText, gradient, isCourse } for a cart key
-    if (key.startsWith('course:')) {
-      const cid = key.slice(7);
-      const c = courses.find(x => x.id === cid);
-      if (c) return { name: c.title, price: c.price, iconUrl: c.icon_url || '', iconText: '', gradient: courseIconStyle(c), isCourse: true };
-      return null;
-    }
-    const p = products.find(x => x.id === key);
-    if (p) return { name: p.name, price: p.price, iconUrl: p.icon_url || '', iconText: p.icon_text || '', gradient: iconStyle(p), isCourse: false };
-    return null;
-  }
 
   function renderCart() {
     const box = $('cartItems');
@@ -4741,16 +4762,6 @@
   window.addEventListener('hashchange', handleCourseHashRoute);
 
   // ================= Courses (main product of the site) =================
-  let courses = [];
-
-  function courseIconStyle(c) {
-    const colors = ['#6366f1', '#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
-    const idx = (c.id || '').split('').reduce((a, ch) => a + ch.charCodeAt(0), 0) % colors.length;
-    const c1 = colors[idx];
-    const c2 = colors[(idx + 2) % colors.length];
-    return `background:linear-gradient(135deg,${c1},${c2})`;
-  }
-
   function renderCourses() {
     const grid = $('coursesGrid');
     if (!grid) return;
@@ -4780,10 +4791,15 @@
           <div class="course-foot">
             <div class="course-price">
               <span class="cp-now">${Number(c.price).toLocaleString('en-US')} تومان</span>
-              ${c.old_price ? `<span class="cp-old">${Number(c.old_price).toLocaleString('en-US')}</span>` : ''}
+              ${c.old_price ? `<span class="cp-old">${Number(c.old_price).toLocaleString('en-US')} تومان</span>` : ''}
             </div>
-            <span class="course-go">مشاهده دوره ←</span>
+            <button class="add-btn" data-add="course:${esc(c.id)}" aria-label="افزودن دوره به سبد خرید" title="افزودن دوره به سبد خرید">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
           </div>
+          <div class="card-click-hint">مشاهده سرفصل‌ها و ثبت‌نام اختصاصی ←</div>
         </div>
       </div>`).join('');
   }
@@ -4897,6 +4913,7 @@
 
   // Course card clicks (open detail) — delegation on grid
   $('coursesGrid').addEventListener('click', (e) => {
+    if (e.target.closest('[data-add]')) return;
     const card = e.target.closest('.course-card');
     if (card) openCourseDetail(card.dataset.course);
   });
@@ -4927,6 +4944,7 @@
     if (ok && data.ok) {
       courses = data.courses;
       renderCourses();
+      renderCart();
     } else {
       const grid = $('coursesGrid');
       if (grid) grid.innerHTML = '<div class="prod-loading">خطا در بارگذاری دوره‌ها.</div>';
