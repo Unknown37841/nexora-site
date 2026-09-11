@@ -80,11 +80,21 @@ export async function ensureDatabaseSchema(env) {
       } catch (_) {}
     }
 
+    // 5b. ارتقای آیکون جمینای به نسخه باکیفیت ۵۱۲ پیکسلی (اگر نسخه قدیمی ۱۲۸ پیکسلی ذخیره شده باشد)
+    try {
+      const gemRow = await env.DB.prepare("SELECT id, icon_url FROM products WHERE id = 'p-gemini'").first();
+      if (gemRow && gemRow.icon_url && gemRow.icon_url.length < 3000) {
+        await env.DB.prepare("UPDATE products SET icon_url = ? WHERE id = 'p-gemini'")
+          .bind(GEMINI_ICON)
+          .run();
+      }
+    } catch (_) {}
+
     // 5. اصلاح آیکون و ثبت اطلاعات کامل صفحه اختصاصی جمینای
     try {
       const gem = await env.DB.prepare("SELECT id, icon_url, cover_url, long_description FROM products WHERE id = 'p-gemini'").first();
       if (gem) {
-        const updateIcon = (!gem.icon_url || (gem.cover_url && gem.cover_url.length > 5000));
+        const updateIcon = (!gem.icon_url || (gem.cover_url && gem.cover_url.length > 5000) || gem.icon_url.length < 3000);
         const geminiLongDesc = `گوگل جمینای پرو (Google Gemini Pro) یکی از پیشرفته‌ترین مدل‌های هوش مصنوعی چندوجهی شرکت گوگل است که توانایی درک و تحلیل همزمان متن، کدهای برنامه‌نویسی، تصاویر باکیفیت بالا، صوت و ویدیو را با دقتی استثنایی در اختیار شما می‌گذارد.
 
 با تهیه این اشتراک اختصاصی، علاوه بر دسترسی نامحدود به جمینای پرو، به ابزار انقلابی گوگل فلو (Google Flow) نیز جهت طراحی و ساخت ورک‌فلوهای خودکار و زنجیره‌ای هوش مصنوعی دسترسی خواهید داشت.
