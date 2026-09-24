@@ -10,7 +10,9 @@ export async function onRequestGet(context) {
   const { results } = await env.DB.prepare(
     `SELECT id, title, subtitle, description, long_description, price, old_price,
             level, duration, lessons_count, icon_url, cover_url, gallery_images,
-            features, prerequisites, custom_tabs
+            features, prerequisites, custom_tabs, syllabus, hardware_requirements,
+            what_you_will_learn, video_teaser_url, instructor_name, instructor_role,
+            instructor_bio, instructor_avatar, course_faq, roadmap_step, roadmap_title
      FROM courses
      WHERE active = 1
      ORDER BY sort_order ASC, created_at ASC`

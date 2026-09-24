@@ -109,11 +109,146 @@ export async function ensureDatabaseSchema(env) {
     const courseColumns = [
       "ALTER TABLE courses ADD COLUMN old_price INTEGER",
       "ALTER TABLE courses ADD COLUMN telegram_note TEXT",
-      "ALTER TABLE courses ADD COLUMN custom_tabs TEXT"
+      "ALTER TABLE courses ADD COLUMN custom_tabs TEXT",
+      "ALTER TABLE courses ADD COLUMN syllabus TEXT",
+      "ALTER TABLE courses ADD COLUMN hardware_requirements TEXT",
+      "ALTER TABLE courses ADD COLUMN what_you_will_learn TEXT",
+      "ALTER TABLE courses ADD COLUMN video_teaser_url TEXT",
+      "ALTER TABLE courses ADD COLUMN instructor_name TEXT",
+      "ALTER TABLE courses ADD COLUMN instructor_role TEXT",
+      "ALTER TABLE courses ADD COLUMN instructor_bio TEXT",
+      "ALTER TABLE courses ADD COLUMN instructor_avatar TEXT",
+      "ALTER TABLE courses ADD COLUMN course_faq TEXT",
+      "ALTER TABLE courses ADD COLUMN roadmap_step INTEGER",
+      "ALTER TABLE courses ADD COLUMN roadmap_title TEXT"
     ];
     for (const sql of courseColumns) {
       try { await env.DB.prepare(sql).run(); } catch (_) {}
     }
+
+    // ارتقای داده‌های دوره‌های پیش‌فرض با سرفصل‌ها، سخت‌افزار، دستاوردها و سوالات متداول در صورت خالی بودن
+    try {
+      const cWin = await env.DB.prepare("SELECT id, syllabus FROM courses WHERE id = 'c-win-ai'").first();
+      if (cWin && !cWin.syllabus) {
+        const winSyllabus = JSON.stringify([
+          {
+            title: "فصل ۱: مبانی و راه‌اندازی هسته هوش مصنوعی لوکال",
+            lessons: [
+              { title: "معرفی اکوسیستم هوش مصنوعی آفلاین و مدل‌های متن‌باز", duration: "18 دقیقه", free: true },
+              { title: "نصب موتور Ollama و پیکربندی درایورهای GPU و متغیرها", duration: "25 دقیقه", free: false },
+              { title: "دانلود و اجرای بهینه مدل‌های DeepSeek R1 و Llama 3.3", duration: "32 دقیقه", free: false }
+            ]
+          },
+          {
+            title: "فصل ۲: رابط‌های کاربری مدرن و چت‌بات‌های پیشرفته",
+            lessons: [
+              { title: "راه‌اندازی محیط وب Open WebUI با داکر و بدون داکر", duration: "24 دقیقه", free: false },
+              { title: "سیستم تحلیل فایل‌های PDF و ساخت پایگاه داده RAG محلی", duration: "35 دقیقه", free: false },
+              { title: "اتصال مدل‌های لوکال به عنوان دستیار کدنویسی در VS Code", duration: "28 دقیقه", free: false }
+            ]
+          },
+          {
+            title: "فصل ۳: هوش مصنوعی تولید تصویر، صوت و بهینه‌سازی نهایی",
+            lessons: [
+              { title: "راه‌اندازی موتور تولید تصویر سریع با مدل‌های Flux و SDXL", duration: "30 دقیقه", free: false },
+              { title: "تبدیل صوت به متن فوق‌سریع با Whisper آفلاین", duration: "20 دقیقه", free: false },
+              { title: "ترفندهای کوانتیزاسیون (GGUF) برای اجرای روان روی رم 8GB", duration: "22 دقیقه", free: false }
+            ]
+          }
+        ]);
+
+        const winHw = JSON.stringify({
+          os: "ویندوز 10 یا 11 (64 بیتی)",
+          ram_min: "8 گیگابایت",
+          ram_rec: "16 گیگابایت",
+          gpu: "Nvidia 4GB+ (یا اجرای CPU-Only)",
+          storage: "25 گیگابایت حافظه SSD"
+        });
+
+        const winLearn = "اجرای کامل و نامحدود DeepSeek و Llama 3 بدون اینترنت و فیلتر\nساخت دستیار هوشمند با دسترسی به اسناد و PDFهای شخصی\nجایگزینی رایگان ChatGPT Plus و GitHub Copilot با مدل‌های لوکال\nتولید نامحدود تصاویر هوش مصنوعی با کیفیت بالا روی ویندوز\nبهینه‌سازی و کوانتیزاسیون مدل‌ها برای انواع سیستم‌ها";
+
+        const winFaq = JSON.stringify([
+          { q: "آیا برای اجرای هوش مصنوعی حتماً به کارت گرافیک گران‌قیمت نیاز دارم؟", a: "خیر! در این دوره یاد می‌گیرید چگونه مدل‌های کوانتایز شده (GGUF) را حتی با پردازنده معمولی (CPU) و رم 8 گیگابایت به صورت روان اجرا کنید." },
+          { q: "آیا مدل‌ها کاملاً بدون نیاز به اینترنت کار می‌کنند؟", a: "بله، پس از یک‌بار دانلود وزن‌های مدل، کلیه پردازش‌ها، تولید متن، تحلیل کد و تولید تصویر به صورت کاملاً آفلاین و با حفظ ۱۰۰٪ حریم خصوصی روی سیستم خودتان انجام می‌شود." },
+          { q: "فایل‌ها و پشتیبانی دوره به چه صورت تحویل می‌شود؟", a: "پس از ثبت سفارش، بلافاصله لینک ورود به کانال خصوصی تلگرام این دوره در پنل کاربری شما قرار می‌گیرد و کلیه ویدیوها، کدهای پایتون، اسکریپت‌های نصب و فایل‌های کمکی در آنجا در دسترس دائمی هستند." },
+          { q: "در صورت انتشار مدل‌های جدید در آینده، دوره آپدیت می‌شود؟", a: "بله، تمام آپدیت‌های بعدی، مدل‌های جدید معرفی‌شده و ترفندهای تازه به صورت رایگان به کانال تلگرام دوره اضافه می‌شوند." }
+        ]);
+
+        await env.DB.prepare(`
+          UPDATE courses SET
+            syllabus = ?,
+            hardware_requirements = ?,
+            what_you_will_learn = ?,
+            course_faq = ?,
+            instructor_name = 'محمد اورک',
+            instructor_role = 'معمار سیستم‌های هوش مصنوعی و بنیان‌گذار نکسورا',
+            instructor_bio = 'بیش از ۶ سال سابقه در توسعه نرم‌افزار، معماری سیستم‌های سرورلس و اجرای مدل‌های عمیق هوش مصنوعی.',
+            roadmap_step = 1,
+            roadmap_title = 'گام ۱: اجرای محلی و تسلط بر مدل‌های هوش مصنوعی در ویندوز'
+          WHERE id = 'c-win-ai'
+        `).bind(winSyllabus, winHw, winLearn, winFaq).run();
+      }
+
+      const cWeb = await env.DB.prepare("SELECT id, syllabus FROM courses WHERE id = 'c-web-ai'").first();
+      if (cWeb && !cWeb.syllabus) {
+        const webSyllabus = JSON.stringify([
+          {
+            title: "فصل ۱: مهندسی پرامپت و ابزارهای توسعه با AI",
+            lessons: [
+              { title: "راه‌اندازی محیط توسعه مدرن و یکپارچه‌سازی مدل‌های هوش مصنوعی", duration: "20 دقیقه", free: true },
+              { title: "تکنیک‌های پرامپت‌نویسی ساخت‌یافته برای تولید کدهای تمیز", duration: "25 دقیقه", free: false },
+              { title: "ساخت پروتوتایپ سریع صفحات با راهنمایی مدل‌های زبانی", duration: "30 دقیقه", free: false }
+            ]
+          },
+          {
+            title: "فصل ۲: ساخت فرانت‌اند مدرن و واکنش‌گرا",
+            lessons: [
+              { title: "پیاده‌سازی رابط کاربری مدرن با CSS سفارشی و Glassmorphism", duration: "35 دقیقه", free: false },
+              { title: "مدیریت فرم‌ها، اعتبارسنجی‌ها و استیت‌های پویا با جاوااسکریپت", duration: "32 دقیقه", free: false },
+              { title: "بهینه‌سازی برای موبایل و تبلت با هوش مصنوعی", duration: "26 دقیقه", free: false }
+            ]
+          },
+          {
+            title: "فصل ۳: معماری بک‌اند سرورلس، دیتابیس و دیپلوی زنده",
+            lessons: [
+              { title: "طراحی APIهای سرورلس و احراز هویت امن با کمک AI", duration: "38 دقیقه", free: false },
+              { title: "اتصال به پایگاه داده ابری و نوشتن کوئری‌های بهینه", duration: "30 دقیقه", free: false },
+              { title: "دیپلوی نهایی و اتصال دامنه روی شبکه جهانی کلادفلر", duration: "25 دقیقه", free: false }
+            ]
+          }
+        ]);
+
+        const webHw = JSON.stringify({
+          os: "ویندوز 10 یا 11، مک یا لینوکس",
+          ram_min: "8 گیگابایت",
+          ram_rec: "16 گیگابایت",
+          gpu: "نیاز نیست (حتی با گرافیک آنبرد)",
+          storage: "10 گیگابایت فضای خالی"
+        });
+
+        const webLearn = "طراحی و توسعه وب‌سایت‌های مدرن از صفر تا صد با هدایت هوش مصنوعی\nنوشتن کدهای فرانت‌اند شیک و تمیز بدون نیاز به سال‌ها تجربه برنامه‌نویسی\nپیاده‌سازی بک‌اند سرورلس و اتصال پایگاه داده واقعی\nدیپلوی زنده سایت روی هاستینگ ابری جهانی بدون هزینه ماهانه\nعضویت دائمی در کانال خصوصی تلگرام و رفع اشکال";
+
+        const webFaq = JSON.stringify([
+          { q: "آیا برای این دوره باید برنامه‌نویسی حرفه‌ای بلد باشم؟", a: "خیر، این دوره طوری طراحی شده که یاد می‌گیرید چگونه از هوش مصنوعی به عنوان دستیار ارشد برنامه‌نویسی استفاده کنید و از صفر سایت بسازید." },
+          { q: "سایت‌های ساخته‌شده قابلیت پرداخت آنلاین دارند؟", a: "بله، در طول دوره فرآیند دریافت سفارش، سبد خرید و اتصال به درگاه‌های پرداخت یا کارت‌به‌کارت را آموزش می‌بینید." },
+          { q: "پشتیبانی دوره کجاست؟", a: "کلیه محتواها، سورس‌کدهای آماده هر فصل و سوالات دانشجویان در کانال تلگرام خصوصی دوره در دسترس شماست." }
+        ]);
+
+        await env.DB.prepare(`
+          UPDATE courses SET
+            syllabus = ?,
+            hardware_requirements = ?,
+            what_you_will_learn = ?,
+            course_faq = ?,
+            instructor_name = 'محمد اورک',
+            instructor_role = 'معمار سیستم‌های هوش مصنوعی و بنیان‌گذار نکسورا',
+            instructor_bio = 'بیش از ۶ سال سابقه در توسعه نرم‌افزار، معماری سیستم‌های سرورلس و اجرای مدل‌های عمیق هوش مصنوعی.',
+            roadmap_step = 2,
+            roadmap_title = 'گام ۲: ساخت وب‌سایت و ابزارهای هوشمند تجاری با AI'
+          WHERE id = 'c-web-ai'
+        `).bind(webSyllabus, webHw, webLearn, webFaq).run();
+      }
+    } catch (_) {}
 
     // 5b. ارتقای آیکون جمینای به نسخه باکیفیت ۵۱۲ پیکسلی (اگر نسخه قدیمی کم‌حجم ذخیره شده باشد)
     try {

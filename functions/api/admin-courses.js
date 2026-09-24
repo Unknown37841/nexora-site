@@ -52,10 +52,11 @@ export async function onRequestPost(context) {
   const title = cleanText(body.title, 160);
   if (!title) return jsonError("عنوان دوره الزامی است.", 400);
 
-  let iconUrl, coverUrl;
+  let iconUrl, coverUrl, instructorAvatar;
   try {
     iconUrl = validateImage(body.icon_url, "آیکون دوره");
     coverUrl = validateImage(body.cover_url, "کاور دوره");
+    instructorAvatar = validateImage(body.instructor_avatar, "تصویر مدرس");
   } catch (err) {
     return jsonError(err.message, 400);
   }
@@ -74,15 +75,18 @@ export async function onRequestPost(context) {
          (id, title, subtitle, description, long_description, price, old_price,
           level, duration, lessons_count, icon_url, cover_url, gallery_images,
           features, prerequisites, telegram_link, telegram_note, custom_tabs,
+          syllabus, hardware_requirements, what_you_will_learn, video_teaser_url,
+          instructor_name, instructor_role, instructor_bio, instructor_avatar,
+          course_faq, roadmap_step, roadmap_title,
           active, sort_order, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         id,
         title,
         cleanText(body.subtitle, 200),
         cleanText(body.description, 500),
-        (body.long_description ?? "").toString().trim().slice(0, 10000),
+        (body.long_description ?? "").toString().trim().slice(0, 15000),
         Math.max(0, parseInt(body.price, 10) || 0),
         Math.max(0, parseInt(body.old_price, 10) || 0) || null,
         cleanText(body.level, 40),
@@ -95,7 +99,18 @@ export async function onRequestPost(context) {
         (body.prerequisites ?? "").toString().trim().slice(0, 2000),
         telegramLink,
         (body.telegram_note ?? "").toString().trim().slice(0, 500),
-        (body.custom_tabs ?? "").toString().trim().slice(0, 30000),
+        (body.custom_tabs ?? "").toString().trim().slice(0, 40000),
+        (body.syllabus ?? "").toString().trim().slice(0, 40000),
+        (body.hardware_requirements ?? "").toString().trim().slice(0, 10000),
+        (body.what_you_will_learn ?? "").toString().trim().slice(0, 10000),
+        cleanText(body.video_teaser_url, 400),
+        cleanText(body.instructor_name, 100),
+        cleanText(body.instructor_role, 160),
+        cleanText(body.instructor_bio, 800),
+        instructorAvatar,
+        (body.course_faq ?? "").toString().trim().slice(0, 20000),
+        parseInt(body.roadmap_step, 10) || null,
+        cleanText(body.roadmap_title, 160),
         body.active === false ? 0 : 1,
         parseInt(body.sort_order, 10) || 99,
         now
@@ -136,10 +151,11 @@ export async function onRequestPut(context) {
   const title = cleanText(body.title, 160);
   if (!title) return jsonError("عنوان دوره الزامی است.", 400);
 
-  let iconUrl, coverUrl;
+  let iconUrl, coverUrl, instructorAvatar;
   try {
     iconUrl = validateImage(body.icon_url, "آیکون دوره");
     coverUrl = validateImage(body.cover_url, "کاور دوره");
+    instructorAvatar = validateImage(body.instructor_avatar, "تصویر مدرس");
   } catch (err) {
     return jsonError(err.message, 400);
   }
@@ -156,6 +172,9 @@ export async function onRequestPut(context) {
          price = ?, old_price = ?, level = ?, duration = ?, lessons_count = ?,
          icon_url = ?, cover_url = ?, gallery_images = ?, features = ?,
          prerequisites = ?, telegram_link = ?, telegram_note = ?, custom_tabs = ?,
+         syllabus = ?, hardware_requirements = ?, what_you_will_learn = ?, video_teaser_url = ?,
+         instructor_name = ?, instructor_role = ?, instructor_bio = ?, instructor_avatar = ?,
+         course_faq = ?, roadmap_step = ?, roadmap_title = ?,
          active = ?, sort_order = ?
        WHERE id = ?`
     )
@@ -163,7 +182,7 @@ export async function onRequestPut(context) {
         title,
         cleanText(body.subtitle, 200),
         cleanText(body.description, 500),
-        (body.long_description ?? "").toString().trim().slice(0, 10000),
+        (body.long_description ?? "").toString().trim().slice(0, 15000),
         Math.max(0, parseInt(body.price, 10) || 0),
         Math.max(0, parseInt(body.old_price, 10) || 0) || null,
         cleanText(body.level, 40),
@@ -176,7 +195,18 @@ export async function onRequestPut(context) {
         (body.prerequisites ?? "").toString().trim().slice(0, 2000),
         telegramLink,
         (body.telegram_note ?? "").toString().trim().slice(0, 500),
-        (body.custom_tabs ?? "").toString().trim().slice(0, 30000),
+        (body.custom_tabs ?? "").toString().trim().slice(0, 40000),
+        (body.syllabus ?? "").toString().trim().slice(0, 40000),
+        (body.hardware_requirements ?? "").toString().trim().slice(0, 10000),
+        (body.what_you_will_learn ?? "").toString().trim().slice(0, 10000),
+        cleanText(body.video_teaser_url, 400),
+        cleanText(body.instructor_name, 100),
+        cleanText(body.instructor_role, 160),
+        cleanText(body.instructor_bio, 800),
+        instructorAvatar,
+        (body.course_faq ?? "").toString().trim().slice(0, 20000),
+        parseInt(body.roadmap_step, 10) || null,
+        cleanText(body.roadmap_title, 160),
         body.active === false ? 0 : 1,
         parseInt(body.sort_order, 10) || 99,
         id

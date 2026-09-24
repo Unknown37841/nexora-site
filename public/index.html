@@ -1852,6 +1852,345 @@
   .cd-checklist li { display: flex; gap: 8px; align-items: flex-start; font-size: 0.86rem; color: var(--text-soft); line-height: 1.6; }
   .cd-checklist .chk { color: #10b981; font-weight: 800; flex-shrink: 0; }
 
+  /* AI Roadmap Section */
+  .roadmap-track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    position: relative;
+    margin-top: 24px;
+  }
+  .roadmap-card {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .roadmap-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--primary);
+    box-shadow: 0 12px 30px rgba(99,102,241,0.18);
+  }
+  .rm-step-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rm-step-num {
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    background: rgba(99,102,241,0.15);
+    color: var(--primary);
+    border: 1px solid rgba(99,102,241,0.3);
+  }
+  .rm-status-badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .rm-status-badge.active { background: rgba(16,185,129,0.15); color: #10b981; }
+  .rm-status-badge.upcoming { background: rgba(245,158,11,0.15); color: #f59e0b; }
+  .rm-title { font-size: 1.05rem; font-weight: 800; color: var(--text); margin: 0; }
+  .rm-desc { font-size: 0.84rem; color: var(--text-soft); line-height: 1.6; margin: 0; }
+  .rm-btn {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: gap 0.2s;
+  }
+  .rm-btn:hover { gap: 10px; }
+
+  /* Course Detail Enhanced Sections */
+  .cd-section-box {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .cd-sec-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+    margin: 0 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Outcomes Grid */
+  .cd-outcomes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .cd-outcome-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .cd-outcome-item .co-icon {
+    color: #10b981;
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Hardware Matrix */
+  .cd-hw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .cd-hw-card {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cd-hw-card .ch-label {
+    font-size: 0.78rem;
+    color: var(--text-mute);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .cd-hw-card .ch-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Interactive Syllabus Accordion */
+  .cd-syl-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .cd-syl-meta {
+    font-size: 0.8rem;
+    color: var(--text-mute);
+    margin-top: 4px;
+  }
+  .cd-syllabus-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cd-chapter {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .cd-chapter.open { border-color: rgba(99,102,241,0.5); }
+  .cd-ch-head {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .cd-ch-head:hover { background: rgba(255,255,255,0.02); }
+  .cd-ch-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: var(--text);
+  }
+  .cd-ch-badge {
+    font-size: 0.75rem;
+    color: var(--text-mute);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cd-ch-chevron {
+    transition: transform 0.3s;
+    color: var(--text-mute);
+  }
+  .cd-chapter.open .cd-ch-chevron { transform: rotate(180deg); }
+  .cd-ch-body {
+    display: none;
+    padding: 0 16px 12px;
+    border-top: 1px solid var(--surface-border);
+  }
+  .cd-chapter.open .cd-ch-body { display: block; }
+  .cd-lesson-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 8px;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+    font-size: 0.85rem;
+  }
+  .cd-lesson-row:last-child { border-bottom: none; }
+  .cd-lesson-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+  }
+  .cd-lesson-title svg { color: var(--text-mute); flex-shrink: 0; }
+  .cd-lesson-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.78rem;
+    color: var(--text-mute);
+  }
+  .cd-free-badge {
+    background: rgba(16,185,129,0.15);
+    color: #10b981;
+    border: 1px solid rgba(16,185,129,0.3);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  /* Video Teaser Player */
+  .cd-video-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    position: relative;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  }
+  .cd-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
+  .cd-video-wrap iframe { width: 100%; height: 100%; border: none; }
+
+  /* Instructor Profile Card */
+  .cd-instructor-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  @media (max-width: 600px) { .cd-instructor-card { flex-direction: column; text-align: center; } }
+  .cd-inst-avatar {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #06b6d4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(99,102,241,0.3);
+  }
+  .cd-inst-name { font-size: 1.1rem; font-weight: 800; color: var(--text); margin: 0; }
+  .cd-inst-role { font-size: 0.82rem; color: var(--primary); font-weight: 600; margin: 4px 0 8px; }
+  .cd-inst-bio { font-size: 0.84rem; color: var(--text-soft); line-height: 1.6; margin: 0; }
+
+  /* Course FAQ */
+  .cd-faq-list { display: flex; flex-direction: column; gap: 8px; }
+  .cd-faq-item {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .cd-faq-item.open { border-color: rgba(99,102,241,0.5); }
+  .cd-faq-q {
+    padding: 14px 18px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cd-faq-q:hover { background: rgba(255,255,255,0.02); }
+  .cd-faq-a {
+    display: none;
+    padding: 0 18px 14px;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    line-height: 1.7;
+    border-top: 1px solid var(--surface-border);
+  }
+  .cd-faq-item.open .cd-faq-a { display: block; }
+  .cd-faq-item.open .cd-faq-chevron { transform: rotate(180deg); }
+  .cd-faq-chevron { transition: transform 0.25s; color: var(--text-mute); }
+
+  /* Sticky Bottom Bar */
+  .cd-sticky-bar {
+    position: fixed;
+    bottom: -80px;
+    left: 0;
+    right: 0;
+    z-index: 95;
+    background: rgba(15,23,42,0.88);
+    backdrop-filter: blur(16px);
+    border-top: 1px solid var(--surface-border-strong);
+    padding: 12px 20px;
+    transition: bottom 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  }
+  .cd-sticky-bar.visible { bottom: 0; }
+  .cd-sticky-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .cd-sticky-info { display: flex; flex-direction: column; }
+  .cd-sticky-title { font-weight: 700; font-size: 0.95rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 500px; }
+  .cd-sticky-price { font-size: 0.85rem; font-weight: 800; color: #10b981; }
+  @media (max-width: 768px) {
+    .cd-sticky-bar { bottom: -120px; }
+    .cd-sticky-bar.visible { bottom: 65px; /* above mobile nav */ }
+  }
+
 
   .pd-wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
   .pd-top-bar {
@@ -2368,6 +2707,18 @@
         <span>پشتیبانی ۲۴/۷</span>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- AI Learning Roadmap -->
+<section class="section" id="roadmap" style="padding-top:40px;padding-bottom:10px;">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-tag">مسیر یادگیری هوش مصنوعی</span>
+      <h2>نقشه راه جامع تسلط بر AI</h2>
+      <p>از اجرای آفلاین و نامحدود در ویندوز تا توسعه وب‌سایت و ابزارهای هوشمند تجاری</p>
+    </div>
+    <div class="roadmap-track" id="roadmapTrack"></div>
   </div>
 </section>
 
@@ -3173,10 +3524,57 @@
       </div>
     </div>
 
-    <!-- Long Description + Tabs -->
+    <!-- What You'll Learn (Outcomes Box) -->
+    <div class="cd-section-box" id="cdOutcomesBox" style="display:none;margin-top:28px;">
+      <h3 class="cd-sec-title">🎯 در این دوره چه مهارت‌هایی کسب می‌کنید و چه می‌سازید؟</h3>
+      <div class="cd-outcomes-grid" id="cdOutcomesGrid"></div>
+    </div>
+
+    <!-- Hardware & System Requirements -->
+    <div class="cd-section-box" id="cdHwBox" style="display:none;margin-top:28px;">
+      <h3 class="cd-sec-title">💻 مشخصات و پیش‌نیازهای سخت‌افزاری سیستم (ویندوز)</h3>
+      <div class="cd-hw-grid" id="cdHwGrid"></div>
+    </div>
+
+    <!-- Interactive Syllabus (Syllabus Accordion) -->
+    <div class="cd-section-box" id="cdSyllabusBox" style="display:none;margin-top:28px;">
+      <div class="cd-syl-head">
+        <div>
+          <h3 class="cd-sec-title" style="margin:0;">📚 سرفصل‌ها و جلسات آموزشی دوره</h3>
+          <div class="cd-syl-meta" id="cdSyllabusMeta"></div>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="cdSyllabusToggleAll">باز کردن همه فصل‌ها</button>
+      </div>
+      <div class="cd-syllabus-list" id="cdSyllabusList"></div>
+    </div>
+
+    <!-- Instructor Card -->
+    <div class="cd-section-box" id="cdInstructorBox" style="display:none;margin-top:28px;">
+      <h3 class="cd-sec-title">👨‍🏫 مدرس و پشتیبان دوره</h3>
+      <div class="cd-instructor-card" id="cdInstructorCard"></div>
+    </div>
+
+    <!-- Course FAQ Accordion -->
+    <div class="cd-section-box" id="cdFaqBox" style="display:none;margin-top:28px;">
+      <h3 class="cd-sec-title">❓ سوالات متداول هنرجویان این دوره</h3>
+      <div class="cd-faq-list" id="cdFaqList"></div>
+    </div>
+
+    <!-- Long Description + Dynamic Tabs -->
     <div class="pd-tabs-card" id="cdTabsCard" style="margin-top:28px;">
       <div class="pd-nav-tabs" id="cdNavTabs"></div>
       <div id="cdTabsBody"></div>
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Enrollment Bar -->
+  <div class="cd-sticky-bar" id="cdStickyBar">
+    <div class="cd-sticky-inner">
+      <div class="cd-sticky-info">
+        <span class="cd-sticky-title" id="cdStickyTitle"></span>
+        <span class="cd-sticky-price" id="cdStickyPrice"></span>
+      </div>
+      <button type="button" class="btn btn-primary" id="cdStickyBuyBtn">ثبت‌نام در دوره 🎓</button>
     </div>
   </div>
 </div>
@@ -4858,15 +5256,164 @@
       $('cdTgNote').textContent = c.telegram_note;
     }
 
-    // Cover main view
+    // Video teaser or cover main view
     const coverMain = $('cdCoverMain');
-    if (c.cover_url) {
+    if (c.video_teaser_url && c.video_teaser_url.trim()) {
+      const vUrl = c.video_teaser_url.trim();
+      if (vUrl.includes('<iframe') || vUrl.includes('aparat.com') || vUrl.includes('youtube.com')) {
+        coverMain.innerHTML = `<div class="cd-video-wrap">${vUrl.includes('<iframe') ? vUrl : `<iframe src="${esc(vUrl)}" allowfullscreen></iframe>`}</div>`;
+      } else {
+        coverMain.innerHTML = `
+          <div class="cd-video-wrap">
+            <video controls playsinline preload="metadata" poster="${esc(c.cover_url || '')}">
+              <source src="${esc(vUrl)}" type="video/mp4">
+              مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+            </video>
+          </div>`;
+      }
+    } else if (c.cover_url) {
       coverMain.innerHTML = `<img src="${esc(c.cover_url)}" alt="${esc(c.title)}">`;
     } else if (c.icon_url) {
       coverMain.innerHTML = `<div class="cd-icon-big"><img src="${esc(c.icon_url)}" alt="${esc(c.title)}"></div>`;
     } else {
       coverMain.innerHTML = `<div class="cd-icon-fallback" style="${courseIconStyle(c)}">${esc((c.title || '؟').charAt(0))}</div>`;
     }
+
+    // Outcomes (What You'll Learn)
+    const outcomesBox = $('cdOutcomesBox');
+    const outcomesGrid = $('cdOutcomesGrid');
+    const outcomesList = (c.what_you_will_learn || '').split('\n').map(x => x.trim()).filter(Boolean);
+    if (outcomesList.length) {
+      outcomesGrid.innerHTML = outcomesList.map(item => `
+        <div class="cd-outcome-item">
+          <span class="co-icon">✓</span>
+          <span>${esc(item)}</span>
+        </div>
+      `).join('');
+      outcomesBox.style.display = 'block';
+    } else {
+      outcomesBox.style.display = 'none';
+    }
+
+    // Hardware Requirements
+    const hwBox = $('cdHwBox');
+    const hwGrid = $('cdHwGrid');
+    let hwData = null;
+    try { hwData = JSON.parse(c.hardware_requirements || '{}'); } catch (_) { hwData = null; }
+    if (hwData && (hwData.os || hwData.ram_min || hwData.gpu || hwData.storage)) {
+      hwGrid.innerHTML = `
+        <div class="cd-hw-card">
+          <div class="ch-label">💻 سیستم‌عامل (OS)</div>
+          <div class="ch-val">${esc(hwData.os || 'ویندوز 10 یا 11 (64 بیتی)')}</div>
+        </div>
+        <div class="cd-hw-card">
+          <div class="ch-label">💾 حافظه رم (RAM)</div>
+          <div class="ch-val">${esc(hwData.ram_min ? 'حداقل: ' + hwData.ram_min : '8 گیگابایت')}${hwData.ram_rec ? ` • پیشنهادی: ${esc(hwData.ram_rec)}` : ''}</div>
+        </div>
+        <div class="cd-hw-card">
+          <div class="ch-label">🎮 کارت گرافیک (GPU)</div>
+          <div class="ch-val">${esc(hwData.gpu || 'Nvidia 4GB+ یا اجرای CPU-Only')}</div>
+        </div>
+        <div class="cd-hw-card">
+          <div class="ch-label">💽 فضای ذخیره‌سازی (SSD)</div>
+          <div class="ch-val">${esc(hwData.storage || '20 گیگابایت SSD')}</div>
+        </div>
+      `;
+      hwBox.style.display = 'block';
+    } else {
+      hwBox.style.display = 'none';
+    }
+
+    // Interactive Syllabus
+    const sylBox = $('cdSyllabusBox');
+    const sylList = $('cdSyllabusList');
+    const sylMeta = $('cdSyllabusMeta');
+    let syllabus = [];
+    try { syllabus = JSON.parse(c.syllabus || '[]'); } catch (_) { syllabus = []; }
+    if (Array.isArray(syllabus) && syllabus.length) {
+      let totalLessons = 0;
+      syllabus.forEach(ch => { totalLessons += (ch.lessons || []).length; });
+      sylMeta.textContent = `${syllabus.length} فصل جامع • ${totalLessons} جلسه آموزشی ${c.duration ? `• مجموعاً ${c.duration}` : ''}`;
+
+      sylList.innerHTML = syllabus.map((ch, ci) => `
+        <div class="cd-chapter ${ci === 0 ? 'open' : ''}" data-ch-index="${ci}">
+          <div class="cd-ch-head">
+            <div class="cd-ch-title-wrap">
+              <span style="color:var(--primary);font-size:0.85rem;">${ci + 1}.</span>
+              <span>${esc(ch.title || `فصل ${ci + 1}`)}</span>
+            </div>
+            <div class="cd-ch-badge">
+              <span>${(ch.lessons || []).length} جلسه</span>
+              <svg class="cd-ch-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="cd-ch-body">
+            ${(ch.lessons || []).map((les, li) => `
+              <div class="cd-lesson-row">
+                <div class="cd-lesson-title">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                  <span>${li + 1}. ${esc(les.title || 'جلسه بدون عنوان')}</span>
+                </div>
+                <div class="cd-lesson-meta">
+                  ${les.free ? `<span class="cd-free-badge">دمو رایگان 🔓</span>` : ''}
+                  ${les.duration ? `<span>⏱️ ${esc(les.duration)}</span>` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      sylBox.style.display = 'block';
+    } else {
+      sylBox.style.display = 'none';
+    }
+
+    // Instructor Profile
+    const instBox = $('cdInstructorBox');
+    const instCard = $('cdInstructorCard');
+    if (c.instructor_name && c.instructor_name.trim()) {
+      const avatarHtml = c.instructor_avatar
+        ? `<img src="${esc(c.instructor_avatar)}" alt="${esc(c.instructor_name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+        : `<span>👨‍🏫</span>`;
+      instCard.innerHTML = `
+        <div class="cd-inst-avatar">${avatarHtml}</div>
+        <div style="flex:1;">
+          <h4 class="cd-inst-name">${esc(c.instructor_name)}</h4>
+          <div class="cd-inst-role">${esc(c.instructor_role || 'معمار و متخصص هوش مصنوعی')}</div>
+          <p class="cd-inst-bio">${esc(c.instructor_bio || 'پشتیبانی مستقیم و پاسخ به تمامی ابهامات هنرجویان در کانال تلگرام دوره.')}</p>
+        </div>
+        <a href="https://t.me/otak_dev" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" style="color:#229ED9;border-color:rgba(34,158,217,0.3);flex-shrink:0;">
+          ارتباط تلگرام 💬
+        </a>
+      `;
+      instBox.style.display = 'block';
+    } else {
+      instBox.style.display = 'none';
+    }
+
+    // Course FAQ
+    const faqBox = $('cdFaqBox');
+    const faqList = $('cdFaqList');
+    let faqData = [];
+    try { faqData = JSON.parse(c.course_faq || '[]'); } catch (_) { faqData = []; }
+    if (Array.isArray(faqData) && faqData.length) {
+      faqList.innerHTML = faqData.map((f, fi) => `
+        <div class="cd-faq-item ${fi === 0 ? 'open' : ''}">
+          <div class="cd-faq-q">
+            <span>${esc(f.q || '')}</span>
+            <svg class="cd-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="cd-faq-a">${esc(f.a || '')}</div>
+        </div>
+      `).join('');
+      faqBox.style.display = 'block';
+    } else {
+      faqBox.style.display = 'none';
+    }
+
+    // Sticky Enrollment Bar setup
+    $('cdStickyTitle').textContent = c.title;
+    $('cdStickyPrice').textContent = `${fmt(c.price)} تومان`;
 
     // Features checklist
     const feats = (c.features || '').split('\n').map(x => x.trim()).filter(Boolean);
@@ -4917,6 +5464,55 @@
     showAppPage('courseDetailPage');
   }
 
+  // Accordion clicks for Syllabus
+  $('cdSyllabusList').addEventListener('click', (e) => {
+    const head = e.target.closest('.cd-ch-head');
+    if (!head) return;
+    const chapter = head.closest('.cd-chapter');
+    if (chapter) chapter.classList.toggle('open');
+  });
+
+  // Toggle all syllabus chapters
+  $('cdSyllabusToggleAll').addEventListener('click', () => {
+    const chapters = document.querySelectorAll('#cdSyllabusList .cd-chapter');
+    if (!chapters.length) return;
+    const allOpen = Array.from(chapters).every(c => c.classList.contains('open'));
+    chapters.forEach(c => c.classList.toggle('open', !allOpen));
+    $('cdSyllabusToggleAll').textContent = allOpen ? 'باز کردن همه فصل‌ها' : 'بستن همه فصل‌ها';
+  });
+
+  // Accordion clicks for Course FAQ
+  $('cdFaqList').addEventListener('click', (e) => {
+    const q = e.target.closest('.cd-faq-q');
+    if (!q) return;
+    const item = q.closest('.cd-faq-item');
+    if (item) item.classList.toggle('open');
+  });
+
+  // Sticky Buy Button
+  $('cdStickyBuyBtn').addEventListener('click', () => {
+    if (!currentCourse) return;
+    const key = 'course:' + currentCourse.id;
+    cart[key] = (Number(cart[key]) || 0) + 1;
+    cartSave();
+    updateCartBadge();
+    gToast(`دوره «${currentCourse.title}» به سبد خرید اضافه شد 🛒`, 'success');
+    openCart();
+  });
+
+  // Scroll listener for sticky bar
+  window.addEventListener('scroll', () => {
+    const isCoursePage = $('courseDetailPage').classList.contains('active');
+    const stickyBar = $('cdStickyBar');
+    if (stickyBar) {
+      if (isCoursePage && window.scrollY > 320) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    }
+  }, { passive: true });
+
   // Course tabs switching
   $('cdNavTabs').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-cdtab-idx]');
@@ -4957,11 +5553,54 @@
     if (s) s.scrollIntoView({ behavior: 'smooth' });
   });
 
+  function renderRoadmap() {
+    const track = $('roadmapTrack');
+    if (!track) return;
+
+    const rmCourses = (courses || [])
+      .filter(c => c.roadmap_step)
+      .sort((a, b) => (Number(a.roadmap_step) || 0) - (Number(b.roadmap_step) || 0));
+
+    let html = '';
+    if (rmCourses.length) {
+      html = rmCourses.map(c => `
+        <div class="roadmap-card" data-course="${esc(c.id)}">
+          <div class="rm-step-head">
+            <span class="rm-step-num">گام ${c.roadmap_step}</span>
+            <span class="rm-status-badge active">دوره آماده ثبت‌نام</span>
+          </div>
+          <h4 class="rm-title">${esc(c.roadmap_title || c.title)}</h4>
+          <p class="rm-desc">${esc(c.subtitle || c.description || '')}</p>
+          <button type="button" class="rm-btn" onclick="openCourseDetail('${esc(c.id)}')">
+            <span>مشاهده سرفصل‌ها و ثبت‌نام</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Upcoming future step
+    html += `
+      <div class="roadmap-card" style="opacity:0.85;">
+        <div class="rm-step-head">
+          <span class="rm-step-num" style="background:rgba(245,158,11,0.15);color:#f59e0b;border-color:rgba(245,158,11,0.3);">گام ۳</span>
+          <span class="rm-status-badge upcoming">به زودی</span>
+        </div>
+        <h4 class="rm-title">ایجنت‌های خودکار و اتوماسیون پیشرفته هوش مصنوعی</h4>
+        <p class="rm-desc">ساخت سیستم‌های خودمختار چندعاملی (Multi-Agent)، پایگاه‌های RAG سازمانی و اتوماسیون کامل تسک‌ها.</p>
+        <span style="font-size:0.8rem;color:var(--text-mute);margin-top:auto;">در حال ضبط و آماده‌سازی محتوا… ⏳</span>
+      </div>
+    `;
+
+    track.innerHTML = html;
+  }
+
   async function loadCourses() {
     const { ok, data } = await api('/api/courses', 'GET');
     if (ok && data.ok) {
       courses = data.courses;
       renderCourses();
+      renderRoadmap();
       renderCart();
     } else {
       const grid = $('coursesGrid');

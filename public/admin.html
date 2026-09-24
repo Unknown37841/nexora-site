@@ -440,6 +440,68 @@
     .p-desc { font-size: 0.82rem; color: var(--text-mute); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
     .p-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--surface-border); }
 
+    /* Course Modal Tabs & Builders */
+    .cmodal-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      background: var(--surface-2);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow-x: auto;
+    }
+    .cmt-btn {
+      flex: 1;
+      min-width: 105px;
+      padding: 8px 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-mute);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .cmt-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .cmt-btn.active { color: #fff; background: var(--primary); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+
+    .cmodal-pane { display: none; }
+    .cmodal-pane.active { display: block; animation: slideIn 0.2s ease-out; }
+
+    .syl-chapter-card {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .syl-ch-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .syl-lesson-item {
+      display: grid;
+      grid-template-columns: 1fr 110px auto auto;
+      gap: 8px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-bottom: 6px;
+    }
+    .faq-builder-card {
+      background: var(--surface-2);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+
     /* Toggle switch */
     .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
     .toggle input { opacity: 0; width: 0; height: 0; }
@@ -1119,102 +1181,207 @@
 
   <!-- Course Modal (Add / Edit) -->
   <div class="modal-backdrop" id="courseModal">
-    <div class="modal" style="max-width:640px;">
-      <div class="modal-head">
+    <div class="modal" style="max-width:820px;max-height:92vh;display:flex;flex-direction:column;">
+      <div class="modal-head" style="margin-bottom:12px;">
         <h3 id="courseModalTitle">افزودن دوره جدید</h3>
         <button type="button" class="modal-close" id="closeCourseModalBtn">&times;</button>
       </div>
-      <form id="courseModalForm">
+
+      <!-- Course Sub-Tabs Navigation -->
+      <div class="cmodal-tabs" id="cmTabsNav">
+        <button type="button" class="cmt-btn active" data-cm-pane="cmPaneBasic">📌 اطلاعات اصلی</button>
+        <button type="button" class="cmt-btn" data-cm-pane="cmPaneSyllabus">📚 سرفصل‌ها (Syllabus)</button>
+        <button type="button" class="cmt-btn" data-cm-pane="cmPaneHardware">💻 مشخصات سخت‌افزار</button>
+        <button type="button" class="cmt-btn" data-cm-pane="cmPaneOutcomes">🎯 دستاوردهای دوره</button>
+        <button type="button" class="cmt-btn" data-cm-pane="cmPaneMedia">🎬 تیزر و مدرس و نقشه راه</button>
+        <button type="button" class="cmt-btn" data-cm-pane="cmPaneFaq">❓ سوالات متداول (FAQ)</button>
+      </div>
+
+      <form id="courseModalForm" style="flex:1;overflow-y:auto;padding-left:4px;padding-right:4px;">
         <input type="hidden" id="cmId" value="">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>عنوان دوره *</label>
-            <input type="text" id="cmTitle" class="form-input" required placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>زیرعنوان (توضیح کوتاه کارت)</label>
-            <input type="text" id="cmSubtitle" class="form-input" placeholder="مثلاً: راه‌اندازی کامل ChatGPT و ابزارها بدون محدودیت روی سیستم شخصی">
-          </div>
-          <div class="form-group">
-            <label>قیمت (تومان) *</label>
-            <input type="number" id="cmPrice" class="form-input" required min="0" placeholder="890000">
-          </div>
-          <div class="form-group">
-            <label>قیمت قبل از تخفیف (اختیاری)</label>
-            <input type="number" id="cmOldPrice" class="form-input" min="0" placeholder="1200000">
-          </div>
-          <div class="form-group">
-            <label>سطح دوره</label>
-            <select id="cmLevel" class="form-input">
-              <option value="">— انتخاب کنید —</option>
-              <option value="مقدماتی">مقدماتی</option>
-              <option value="متوسط">متوسط</option>
-              <option value="پیشرفته">پیشرفته</option>
-              <option value="مقدماتی تا پیشرفته">مقدماتی تا پیشرفته</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>مدت دوره</label>
-            <input type="text" id="cmDuration" class="form-input" placeholder="مثلاً: 6 ساعت ویدیو">
-          </div>
-          <div class="form-group">
-            <label>تعداد درس / ویدیو</label>
-            <input type="number" id="cmLessons" class="form-input" min="0" placeholder="32">
-          </div>
-          <div class="form-group">
-            <label>ترتیب نمایش</label>
-            <input type="number" id="cmSort" class="form-input" min="1" value="1">
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>پیش‌نیاز دوره (اختیاری)</label>
-            <input type="text" id="cmPrerequisites" class="form-input" placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>لینک کانال خصوصی تلگرام این دوره *</label>
-            <input type="text" id="cmTelegramLink" class="form-input" dir="ltr" required placeholder="https://t.me/YourPrivateChannel">
-            <div style="font-size:0.72rem;color:var(--text-mute);margin-top:4px;">این لینک پس از تأیید پرداخت، فقط به خریدار همان دوره تحویل داده می‌شود.</div>
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>توضیح نحوه دسترسی (اختیاری)</label>
-            <input type="text" id="cmTelegramNote" class="form-input" placeholder="مثلاً: پس از تأیید پرداخت، روی دکمه عضویت در کانال دوره کلیک کنید.">
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>توضیح کوتاه (نمایش در لیست)</label>
-            <textarea id="cmDesc" class="form-input" rows="2" placeholder="چند خط درباره محتوای دوره…"></textarea>
-          </div>
-          <div class="form-group" style="grid-column:1/-1;">
-            <label>توضیحات کامل دوره (تب «درباره این دوره»)</label>
-            <textarea id="cmLongDesc" class="form-input" rows="4" placeholder="سرفصل‌ها، نکات، مزایا و هر توضیح مفصل…"></textarea>
-          </div>
-          <div class="form-group">
-            <label>ویژگی‌ها (هر خط یک مورد)</label>
-            <textarea id="cmFeatures" class="form-input" rows="3" placeholder="۳۲ درس ویدیویی&#10;پشتیبانی اختصاصی&#10;دسترسی مادام‌العمر"></textarea>
-          </div>
-          <div class="form-group">
-            <label>لوگو / آیکون دوره</label>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <img id="cmIconImg" src="" alt="" style="display:none;width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--surface-2);">
-              <span id="cmIconEmpty" style="width:44px;height:44px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);">🎓</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="cmIconBtn">انتخاب آیکون</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveIcon" style="display:none;color:var(--danger);">حذف</button>
+
+        <!-- Pane 1: Basic Info -->
+        <div class="cmodal-pane active" id="cmPaneBasic">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>عنوان دوره *</label>
+              <input type="text" id="cmTitle" class="form-input" required placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
             </div>
-            <input type="file" id="cmIconFileInput" accept="image/*" style="display:none;">
-          </div>
-          <div class="form-group">
-            <label>کاور دوره (اختیاری)</label>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <img id="cmCoverImg" src="" alt="" style="display:none;width:64px;height:40px;border-radius:8px;object-fit:cover;background:var(--surface-2);">
-              <span id="cmCoverEmpty" style="width:64px;height:40px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);font-size:0.7rem;">۱۶:۱۰</span>
-              <button type="button" class="btn btn-ghost btn-sm" id="cmCoverBtn">انتخاب کاور</button>
-              <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveCover" style="display:none;color:var(--danger);">حذف</button>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>زیرعنوان (توضیح کوتاه کارت)</label>
+              <input type="text" id="cmSubtitle" class="form-input" placeholder="مثلاً: راه‌اندازی کامل ChatGPT و ابزارها بدون محدودیت روی سیستم شخصی">
             </div>
-            <input type="file" id="cmCoverFileInput" accept="image/*" style="display:none;">
+            <div class="form-group">
+              <label>قیمت (تومان) *</label>
+              <input type="number" id="cmPrice" class="form-input" required min="0" placeholder="890000">
+            </div>
+            <div class="form-group">
+              <label>قیمت قبل از تخفیف (اختیاری)</label>
+              <input type="number" id="cmOldPrice" class="form-input" min="0" placeholder="1200000">
+            </div>
+            <div class="form-group">
+              <label>سطح دوره</label>
+              <select id="cmLevel" class="form-input">
+                <option value="">— انتخاب کنید —</option>
+                <option value="مقدماتی">مقدماتی</option>
+                <option value="متوسط">متوسط</option>
+                <option value="پیشرفته">پیشرفته</option>
+                <option value="مقدماتی تا پیشرفته">مقدماتی تا پیشرفته</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>مدت دوره</label>
+              <input type="text" id="cmDuration" class="form-input" placeholder="مثلاً: 6 ساعت ویدیو">
+            </div>
+            <div class="form-group">
+              <label>تعداد درس / ویدیو</label>
+              <input type="number" id="cmLessons" class="form-input" min="0" placeholder="32">
+            </div>
+            <div class="form-group">
+              <label>ترتیب نمایش</label>
+              <input type="number" id="cmSort" class="form-input" min="1" value="1">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>پیش‌نیاز دوره (اختیاری)</label>
+              <input type="text" id="cmPrerequisites" class="form-input" placeholder="مثلاً: آموزش نصب هوش مصنوعی نامحدود در ویندوز">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>لینک کانال خصوصی تلگرام این دوره *</label>
+              <input type="text" id="cmTelegramLink" class="form-input" dir="ltr" required placeholder="https://t.me/YourPrivateChannel">
+              <div style="font-size:0.72rem;color:var(--text-mute);margin-top:4px;">این لینک پس از تأیید پرداخت، فقط به خریدار همان دوره تحویل داده می‌شود.</div>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>توضیح نحوه دسترسی (اختیاری)</label>
+              <input type="text" id="cmTelegramNote" class="form-input" placeholder="مثلاً: پس از تأیید پرداخت، روی دکمه عضویت در کانال دوره کلیک کنید.">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>توضیح کوتاه (نمایش در کارت لیست)</label>
+              <textarea id="cmDesc" class="form-input" rows="2" placeholder="چند خط درباره محتوای دوره…"></textarea>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>توضیحات کامل دوره (تب «درباره این دوره»)</label>
+              <textarea id="cmLongDesc" class="form-input" rows="4" placeholder="سرفصل‌ها، نکات، مزایا و هر توضیح مفصل…"></textarea>
+            </div>
+            <div class="form-group">
+              <label>ویژگی‌ها (هر خط یک مورد)</label>
+              <textarea id="cmFeatures" class="form-input" rows="3" placeholder="۳۲ درس ویدیویی&#10;پشتیبانی اختصاصی&#10;دسترسی مادام‌العمر"></textarea>
+            </div>
+            <div class="form-group">
+              <label>لوگو / آیکون دوره</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <img id="cmIconImg" src="" alt="" style="display:none;width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--surface-2);">
+                <span id="cmIconEmpty" style="width:44px;height:44px;border-radius:10px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);">🎓</span>
+                <button type="button" class="btn btn-ghost btn-sm" id="cmIconBtn">انتخاب آیکون</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveIcon" style="display:none;color:var(--danger);">حذف</button>
+              </div>
+              <input type="file" id="cmIconFileInput" accept="image/*" style="display:none;">
+            </div>
+            <div class="form-group">
+              <label>کاور دوره (اختیاری)</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <img id="cmCoverImg" src="" alt="" style="display:none;width:64px;height:40px;border-radius:8px;object-fit:cover;background:var(--surface-2);">
+                <span id="cmCoverEmpty" style="width:64px;height:40px;border-radius:8px;background:var(--surface-2);display:grid;place-items:center;color:var(--text-mute);font-size:0.7rem;">۱۶:۱۰</span>
+                <button type="button" class="btn btn-ghost btn-sm" id="cmCoverBtn">انتخاب کاور</button>
+                <button type="button" class="btn btn-ghost btn-sm" id="cmRemoveCover" style="display:none;color:var(--danger);">حذف</button>
+              </div>
+              <input type="file" id="cmCoverFileInput" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          <input type="hidden" id="cmIconData" value="">
+          <input type="hidden" id="cmCoverData" value="">
+        </div>
+
+        <!-- Pane 2: Syllabus Builder -->
+        <div class="cmodal-pane" id="cmPaneSyllabus">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <strong style="font-size:0.95rem;">فصل‌ها و سرفصل‌های آموزشی</strong>
+              <div style="font-size:0.75rem;color:var(--text-mute);margin-top:2px;">جلسات دوره را در قالب فصل‌ها سازمان‌دهی کنید.</div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="cmAddChapterBtn" style="border-color:var(--primary);color:var(--primary);">+ افزودن فصل جدید</button>
+          </div>
+          <div id="cmSyllabusContainer" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+
+        <!-- Pane 3: Hardware Requirements -->
+        <div class="cmodal-pane" id="cmPaneHardware">
+          <p style="font-size:0.8rem;color:var(--text-mute);margin-bottom:14px;">مشخصات سخت‌افزاری مورد نیاز برای اجرای مدل‌های هوش مصنوعی این دوره:</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>سیستم عامل (OS)</label>
+              <input type="text" id="cmHwOs" class="form-input" placeholder="ویندوز 10 یا 11 (64 بیتی)">
+            </div>
+            <div class="form-group">
+              <label>کارت گرافیک (GPU)</label>
+              <input type="text" id="cmHwGpu" class="form-input" placeholder="Nvidia 4GB+ یا اجرای CPU-Only">
+            </div>
+            <div class="form-group">
+              <label>حداقل حافظه رم (Min RAM)</label>
+              <input type="text" id="cmHwRamMin" class="form-input" placeholder="8 گیگابایت">
+            </div>
+            <div class="form-group">
+              <label>حافظه رم پیشنهادی (Recommended RAM)</label>
+              <input type="text" id="cmHwRamRec" class="form-input" placeholder="16 گیگابایت به بالا">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>فضای دیسک / حافظه ذخیره‌سازی (SSD)</label>
+              <input type="text" id="cmHwStorage" class="form-input" placeholder="25 گیگابایت حافظه SSD">
+            </div>
           </div>
         </div>
-        <input type="hidden" id="cmIconData" value="">
-        <input type="hidden" id="cmCoverData" value="">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+        <!-- Pane 4: Outcomes (What You'll Learn) -->
+        <div class="cmodal-pane" id="cmPaneOutcomes">
+          <div class="form-group">
+            <label>دستاوردهای دوره (هر سطر یک مورد خروجی‌محور)</label>
+            <div style="font-size:0.75rem;color:var(--text-mute);margin-bottom:6px;">این دستاوردها با تیک‌های درخشان در باکس «آنچه در این دوره یاد می‌گیرید» نمایش داده می‌شوند.</div>
+            <textarea id="cmWhatYouLearn" class="form-input" rows="8" placeholder="اجرای نامحدود DeepSeek R1 بدون اینترنت&#10;ساخت پایگاه داده اسناد شخصی با RAG&#10;جایگزینی ChatGPT Plus با مدل‌های لوکال"></textarea>
+          </div>
+        </div>
+
+        <!-- Pane 5: Video Teaser, Instructor & Roadmap -->
+        <div class="cmodal-pane" id="cmPaneMedia">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>لینک تیزر ویدیویی دوره (MP4 مستقیم یا لینک ویدیو)</label>
+              <input type="text" id="cmVideoTeaser" class="form-input" dir="ltr" placeholder="https://example.com/teaser.mp4">
+            </div>
+            <div class="form-group">
+              <label>نام مدرس</label>
+              <input type="text" id="cmInstructorName" class="form-input" placeholder="محمد اورک">
+            </div>
+            <div class="form-group">
+              <label>سمت و تخصص مدرس</label>
+              <input type="text" id="cmInstructorRole" class="form-input" placeholder="معمار سیستم‌های هوش مصنوعی و بنیان‌گذار نکسورا">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;">
+              <label>بیوگرافی و معرفی مدرس</label>
+              <textarea id="cmInstructorBio" class="form-input" rows="3" placeholder="توضیح کوتاه درباره سوابق، تخصص و همراهی مدرس در دوره…"></textarea>
+            </div>
+            <div class="form-group">
+              <label>شماره گام در نقشه راه (Roadmap Step)</label>
+              <input type="number" id="cmRoadmapStep" class="form-input" min="1" max="10" placeholder="مثلاً: 1 یا 2">
+            </div>
+            <div class="form-group">
+              <label>عنوان در نقشه راه (Roadmap Title)</label>
+              <input type="text" id="cmRoadmapTitle" class="form-input" placeholder="مثلاً: گام ۱: اجرای محلی هوش مصنوعی در ویندوز">
+            </div>
+          </div>
+        </div>
+
+        <!-- Pane 6: Course FAQ -->
+        <div class="cmodal-pane" id="cmPaneFaq">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div>
+              <strong style="font-size:0.95rem;">سوالات متداول دوره (FAQ)</strong>
+              <div style="font-size:0.75rem;color:var(--text-mute);margin-top:2px;">پاسخ به دغدغه‌های خریداران دوره را در قالب پرسش و پاسخ اضافه کنید.</div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="cmAddFaqBtn" style="border-color:var(--primary);color:var(--primary);">+ افزودن سوال جدید</button>
+          </div>
+          <div id="cmFaqContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--surface-border);margin-top:14px;">
           <span style="font-size:0.9rem;font-weight:600;">وضعیت انتشار</span>
           <label class="toggle">
             <input type="checkbox" id="cmActive" checked>
@@ -1564,7 +1731,155 @@
       }
     };
 
+    // Course Modal Sub-tabs navigation
+    const cmTabBtns = document.querySelectorAll('#cmTabsNav .cmt-btn');
+    cmTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        cmTabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetPane = btn.dataset.cmPane;
+        document.querySelectorAll('#courseModalForm .cmodal-pane').forEach(p => p.classList.remove('active'));
+        const pane = $(targetPane);
+        if (pane) pane.classList.add('active');
+      });
+    });
+
+    function resetCourseModalTabs() {
+      cmTabBtns.forEach((b, i) => b.classList.toggle('active', i === 0));
+      document.querySelectorAll('#courseModalForm .cmodal-pane').forEach((p, i) => p.classList.toggle('active', i === 0));
+    }
+
+    // Dynamic Syllabus Builder
+    let currentSyllabus = [];
+    function renderSyllabusBuilder() {
+      const box = $('cmSyllabusContainer');
+      if (!currentSyllabus.length) {
+        box.innerHTML = `<div style="text-align:center;padding:18px;background:var(--surface-2);border-radius:10px;color:var(--text-mute);font-size:0.85rem;">هنوز سرفصلی تعریف نشده است. روی «+ افزودن فصل جدید» کلیک کنید.</div>`;
+        return;
+      }
+      box.innerHTML = currentSyllabus.map((ch, ci) => `
+        <div class="syl-chapter-card" data-ch-idx="${ci}">
+          <div class="syl-ch-header">
+            <span style="font-weight:700;font-size:0.85rem;color:var(--primary);white-space:nowrap;">فصل ${ci + 1}:</span>
+            <input type="text" class="form-input syl-ch-title" style="flex:1;" placeholder="عنوان فصل (مثلاً: راه‌اندازی و پیش‌نیازها)" value="${esc(ch.title || '')}">
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:4px 8px;" onclick="removeSyllabusChapter(${ci})" title="حذف فصل">🗑️</button>
+          </div>
+          <div class="syl-lessons-list" id="sylLessons_${ci}">
+            ${(ch.lessons || []).map((les, li) => `
+              <div class="syl-lesson-item" data-les-idx="${li}">
+                <input type="text" class="form-input syl-les-title" style="padding:6px 8px;font-size:0.82rem;" placeholder="عنوان جلسه / درس" value="${esc(les.title || '')}">
+                <input type="text" class="form-input syl-les-dur" style="padding:6px 8px;font-size:0.82rem;" placeholder="مدت (مثلاً 20 دقیقه)" value="${esc(les.duration || '')}">
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.75rem;cursor:pointer;white-space:nowrap;">
+                  <input type="checkbox" class="syl-les-free" ${les.free ? 'checked' : ''}>
+                  <span>دمو رایگان</span>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:2px 6px;" onclick="removeSyllabusLesson(${ci}, ${li})">×</button>
+              </div>
+            `).join('')}
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" style="margin-top:6px;font-size:0.78rem;" onclick="addSyllabusLesson(${ci})">+ افزودن جلسه به این فصل</button>
+        </div>
+      `).join('');
+    }
+
+    window.addSyllabusChapter = function() {
+      currentSyllabus.push({
+        title: `فصل ${currentSyllabus.length + 1}: `,
+        lessons: [{ title: 'جلسه اول', duration: '20 دقیقه', free: false }]
+      });
+      renderSyllabusBuilder();
+    };
+    $('cmAddChapterBtn').addEventListener('click', window.addSyllabusChapter);
+
+    window.removeSyllabusChapter = function(ci) {
+      currentSyllabus.splice(ci, 1);
+      renderSyllabusBuilder();
+    };
+
+    window.addSyllabusLesson = function(ci) {
+      syncSyllabusFromDom();
+      if (!currentSyllabus[ci]) return;
+      if (!currentSyllabus[ci].lessons) currentSyllabus[ci].lessons = [];
+      currentSyllabus[ci].lessons.push({ title: '', duration: '', free: false });
+      renderSyllabusBuilder();
+    };
+
+    window.removeSyllabusLesson = function(ci, li) {
+      syncSyllabusFromDom();
+      if (currentSyllabus[ci] && currentSyllabus[ci].lessons) {
+        currentSyllabus[ci].lessons.splice(li, 1);
+        renderSyllabusBuilder();
+      }
+    };
+
+    function syncSyllabusFromDom() {
+      const cards = document.querySelectorAll('#cmSyllabusContainer .syl-chapter-card');
+      const res = [];
+      cards.forEach(card => {
+        const titleInput = card.querySelector('.syl-ch-title');
+        const chTitle = titleInput ? titleInput.value.trim() : '';
+        const lessons = [];
+        card.querySelectorAll('.syl-lesson-item').forEach(lItem => {
+          const lTitle = lItem.querySelector('.syl-les-title')?.value.trim() || '';
+          const lDur = lItem.querySelector('.syl-les-dur')?.value.trim() || '';
+          const lFree = !!lItem.querySelector('.syl-les-free')?.checked;
+          if (lTitle) {
+            lessons.push({ title: lTitle, duration: lDur, free: lFree });
+          }
+        });
+        if (chTitle || lessons.length) {
+          res.push({ title: chTitle, lessons });
+        }
+      });
+      currentSyllabus = res;
+    }
+
+    // Dynamic FAQ Builder
+    let currentFaqs = [];
+    function renderFaqBuilder() {
+      const box = $('cmFaqContainer');
+      if (!currentFaqs.length) {
+        box.innerHTML = `<div style="text-align:center;padding:18px;background:var(--surface-2);border-radius:10px;color:var(--text-mute);font-size:0.85rem;">هنوز سوالی ثبت نشده است. روی «+ افزودن سوال جدید» کلیک کنید.</div>`;
+        return;
+      }
+      box.innerHTML = currentFaqs.map((f, fi) => `
+        <div class="faq-builder-card" data-faq-idx="${fi}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:0.85rem;color:var(--primary);">پرسش ${fi + 1}:</span>
+            <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);padding:2px 6px;" onclick="removeFaqItem(${fi})">حذف 🗑️</button>
+          </div>
+          <input type="text" class="form-input faq-q-input" style="margin-bottom:6px;" placeholder="متن پرسش (مثلاً: آیا به کارت گرافیک نیاز است؟)" value="${esc(f.q || '')}">
+          <textarea class="form-input faq-a-input" rows="2" placeholder="پاسخ کوتاه و شفاف…">${esc(f.a || '')}</textarea>
+        </div>
+      `).join('');
+    }
+
+    window.addFaqItem = function() {
+      syncFaqFromDom();
+      currentFaqs.push({ q: '', a: '' });
+      renderFaqBuilder();
+    };
+    $('cmAddFaqBtn').addEventListener('click', window.addFaqItem);
+
+    window.removeFaqItem = function(fi) {
+      syncFaqFromDom();
+      currentFaqs.splice(fi, 1);
+      renderFaqBuilder();
+    };
+
+    function syncFaqFromDom() {
+      const cards = document.querySelectorAll('#cmFaqContainer .faq-builder-card');
+      const res = [];
+      cards.forEach(card => {
+        const q = card.querySelector('.faq-q-input')?.value.trim() || '';
+        const a = card.querySelector('.faq-a-input')?.value.trim() || '';
+        if (q || a) res.push({ q, a });
+      });
+      currentFaqs = res;
+    }
+
     function openCourseModal() {
+      resetCourseModalTabs();
       $('courseModalTitle').textContent = 'افزودن دوره جدید';
       $('courseModalForm').reset();
       $('cmId').value = '';
@@ -1577,6 +1892,25 @@
       $('cmCoverImg').style.display = 'none';
       $('cmCoverEmpty').style.display = 'grid';
       $('cmRemoveCover').style.display = 'none';
+
+      // Reset new phases fields
+      currentSyllabus = [];
+      renderSyllabusBuilder();
+      currentFaqs = [];
+      renderFaqBuilder();
+      $('cmHwOs').value = 'ویندوز 10 یا 11 (64 بیتی)';
+      $('cmHwGpu').value = '';
+      $('cmHwRamMin').value = '8 گیگابایت';
+      $('cmHwRamRec').value = '16 گیگابایت';
+      $('cmHwStorage').value = '20 گیگابایت SSD';
+      $('cmWhatYouLearn').value = '';
+      $('cmVideoTeaser').value = '';
+      $('cmInstructorName').value = 'محمد اورک';
+      $('cmInstructorRole').value = 'معمار سیستم‌های هوش مصنوعی و بنیان‌گذار نکسورا';
+      $('cmInstructorBio').value = '';
+      $('cmRoadmapStep').value = '';
+      $('cmRoadmapTitle').value = '';
+
       $('courseModal').classList.add('active');
     }
     $('openAddCourseBtn').addEventListener('click', openCourseModal);
@@ -1586,6 +1920,7 @@
     $('courseModal').addEventListener('click', e => { if (e.target === $('courseModal')) closeCourseModal(); });
 
     window.editCourse = function(id) {
+      resetCourseModalTabs();
       const c = allCourses.find(x => x.id === id);
       if (!c) return;
       $('courseModalTitle').textContent = 'ویرایش دوره';
@@ -1605,6 +1940,47 @@
       $('cmLongDesc').value = c.long_description || '';
       $('cmFeatures').value = c.features || '';
       $('cmActive').checked = c.active !== 0;
+
+      // Populate Syllabus
+      try {
+        currentSyllabus = JSON.parse(c.syllabus || '[]');
+        if (!Array.isArray(currentSyllabus)) currentSyllabus = [];
+      } catch (_) { currentSyllabus = []; }
+      renderSyllabusBuilder();
+
+      // Populate Hardware Requirements
+      try {
+        const hw = JSON.parse(c.hardware_requirements || '{}');
+        $('cmHwOs').value = hw.os || '';
+        $('cmHwGpu').value = hw.gpu || '';
+        $('cmHwRamMin').value = hw.ram_min || '';
+        $('cmHwRamRec').value = hw.ram_rec || '';
+        $('cmHwStorage').value = hw.storage || '';
+      } catch (_) {
+        $('cmHwOs').value = '';
+        $('cmHwGpu').value = '';
+        $('cmHwRamMin').value = '';
+        $('cmHwRamRec').value = '';
+        $('cmHwStorage').value = '';
+      }
+
+      // Populate Outcomes
+      $('cmWhatYouLearn').value = c.what_you_will_learn || '';
+
+      // Populate Media, Instructor & Roadmap
+      $('cmVideoTeaser').value = c.video_teaser_url || '';
+      $('cmInstructorName').value = c.instructor_name || 'محمد اورک';
+      $('cmInstructorRole').value = c.instructor_role || 'معمار سیستم‌های هوش مصنوعی';
+      $('cmInstructorBio').value = c.instructor_bio || '';
+      $('cmRoadmapStep').value = c.roadmap_step || '';
+      $('cmRoadmapTitle').value = c.roadmap_title || '';
+
+      // Populate FAQ
+      try {
+        currentFaqs = JSON.parse(c.course_faq || '[]');
+        if (!Array.isArray(currentFaqs)) currentFaqs = [];
+      } catch (_) { currentFaqs = []; }
+      renderFaqBuilder();
 
       const icon = c.icon_url || '';
       $('cmIconData').value = icon;
@@ -1667,6 +2043,20 @@
       e.preventDefault();
       const id = $('cmId').value;
       const isEdit = !!id;
+
+      // Sync latest Syllabus and FAQs from DOM
+      syncSyllabusFromDom();
+      syncFaqFromDom();
+
+      // Build hardware JSON
+      const hwObj = {
+        os: $('cmHwOs').value.trim(),
+        gpu: $('cmHwGpu').value.trim(),
+        ram_min: $('cmHwRamMin').value.trim(),
+        ram_rec: $('cmHwRamRec').value.trim(),
+        storage: $('cmHwStorage').value.trim()
+      };
+
       const payload = {
         title: $('cmTitle').value.trim(),
         subtitle: $('cmSubtitle').value.trim(),
@@ -1684,6 +2074,16 @@
         features: $('cmFeatures').value.trim(),
         icon_url: $('cmIconData').value || '',
         cover_url: $('cmCoverData').value || '',
+        syllabus: JSON.stringify(currentSyllabus),
+        hardware_requirements: JSON.stringify(hwObj),
+        what_you_will_learn: $('cmWhatYouLearn').value.trim(),
+        video_teaser_url: $('cmVideoTeaser').value.trim(),
+        instructor_name: $('cmInstructorName').value.trim(),
+        instructor_role: $('cmInstructorRole').value.trim(),
+        instructor_bio: $('cmInstructorBio').value.trim(),
+        course_faq: JSON.stringify(currentFaqs),
+        roadmap_step: parseInt($('cmRoadmapStep').value, 10) || null,
+        roadmap_title: $('cmRoadmapTitle').value.trim(),
         active: $('cmActive').checked
       };
 
