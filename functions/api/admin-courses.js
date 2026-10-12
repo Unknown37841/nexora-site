@@ -78,8 +78,8 @@ export async function onRequestPost(context) {
           syllabus, hardware_requirements, what_you_will_learn, video_teaser_url,
           instructor_name, instructor_role, instructor_bio, instructor_avatar,
           course_faq, roadmap_step, roadmap_title,
-          active, sort_order, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          coming_soon, active, sort_order, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
       .bind(
         id,
@@ -111,6 +111,7 @@ export async function onRequestPost(context) {
         (body.course_faq ?? "").toString().trim().slice(0, 20000),
         parseInt(body.roadmap_step, 10) || null,
         cleanText(body.roadmap_title, 160),
+        body.coming_soon === false || body.coming_soon === 0 ? 0 : 1,
         body.active === false ? 0 : 1,
         parseInt(body.sort_order, 10) || 99,
         now
@@ -175,7 +176,7 @@ export async function onRequestPut(context) {
          syllabus = ?, hardware_requirements = ?, what_you_will_learn = ?, video_teaser_url = ?,
          instructor_name = ?, instructor_role = ?, instructor_bio = ?, instructor_avatar = ?,
          course_faq = ?, roadmap_step = ?, roadmap_title = ?,
-         active = ?, sort_order = ?
+         coming_soon = ?, active = ?, sort_order = ?
        WHERE id = ?`
     )
       .bind(
@@ -207,6 +208,7 @@ export async function onRequestPut(context) {
         (body.course_faq ?? "").toString().trim().slice(0, 20000),
         parseInt(body.roadmap_step, 10) || null,
         cleanText(body.roadmap_title, 160),
+        body.coming_soon === false || body.coming_soon === 0 ? 0 : 1,
         body.active === false ? 0 : 1,
         parseInt(body.sort_order, 10) || 99,
         id

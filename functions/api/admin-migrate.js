@@ -101,6 +101,7 @@ export async function ensureDatabaseSchema(env) {
         telegram_link TEXT,
         telegram_note TEXT,
         custom_tabs TEXT,
+        coming_soon INTEGER NOT NULL DEFAULT 1,
         active INTEGER NOT NULL DEFAULT 1,
         sort_order INTEGER NOT NULL DEFAULT 99,
         created_at INTEGER NOT NULL
@@ -120,11 +121,15 @@ export async function ensureDatabaseSchema(env) {
       "ALTER TABLE courses ADD COLUMN instructor_avatar TEXT",
       "ALTER TABLE courses ADD COLUMN course_faq TEXT",
       "ALTER TABLE courses ADD COLUMN roadmap_step INTEGER",
-      "ALTER TABLE courses ADD COLUMN roadmap_title TEXT"
+      "ALTER TABLE courses ADD COLUMN roadmap_title TEXT",
+      "ALTER TABLE courses ADD COLUMN coming_soon INTEGER DEFAULT 1"
     ];
     for (const sql of courseColumns) {
       try { await env.DB.prepare(sql).run(); } catch (_) {}
     }
+    try {
+      await env.DB.prepare("UPDATE courses SET coming_soon = 1 WHERE coming_soon IS NULL").run();
+    } catch (_) {}
 
     // ارتقای داده‌های دوره‌های پیش‌فرض با سرفصل‌ها، سخت‌افزار، دستاوردها و سوالات متداول در صورت خالی بودن
     try {

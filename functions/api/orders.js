@@ -37,7 +37,7 @@ export async function onRequestPost(context) {
   const priceMap = new Map((priceRows.results || []).map((r) => [r.id, r]));
 
   const courseRows = await env.DB.prepare(
-    `SELECT id, title, price, telegram_link FROM courses WHERE active = 1`
+    `SELECT id, title, price, telegram_link, coming_soon FROM courses WHERE active = 1`
   ).all();
   const courseMap = new Map((courseRows.results || []).map((r) => [r.id, r]));
 
@@ -47,6 +47,7 @@ export async function onRequestPost(context) {
     if (it.kind === "course") {
       const c = courseMap.get(it.id);
       if (!c) return jsonError("یکی از دوره‌های سبد دیگر موجود نیست.", 400);
+      if (c.coming_soon) return jsonError(`دوره «${c.title}» هنوز منتشر نشده و در وضعیت به‌زودی است.`, 400);
       total += c.price * it.qty;
       finalItems.push({
         id: c.id, kind: "course", name: c.title,

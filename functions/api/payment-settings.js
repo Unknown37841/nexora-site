@@ -10,7 +10,7 @@ export async function onRequestGet(context) {
 
   try {
     const { results } = await env.DB.prepare(
-      "SELECT key, value FROM settings WHERE key IN ('card_number', 'card_holder', 'card_bank', 'card_sheba', 'card_help')"
+      "SELECT key, value FROM settings WHERE key IN ('card_number', 'card_holder', 'card_bank', 'card_sheba', 'card_help', 'google_client_id')"
     ).all();
 
     const map = {};
@@ -25,7 +25,8 @@ export async function onRequestGet(context) {
         cardHolder: map.card_holder || "محمد اورک",
         cardBank: map.card_bank || "بانک سامان",
         cardSheba: map.card_sheba || "",
-        cardHelp: map.card_help || "لطفاً مبلغ سفارش را به شماره کارت بالا واریز نمایید و سپس عکس فیش و کد رهگیری را ثبت کنید. پس از تأیید، مشخصات اشتراک در حساب کاربری شما تحویل داده می‌شود."
+        cardHelp: map.card_help || "لطفاً مبلغ سفارش را به شماره کارت بالا واریز نمایید و سپس عکس فیش و کد رهگیری را ثبت کنید. پس از تأیید، مشخصات اشتراک در حساب کاربری شما تحویل داده می‌شود.",
+        googleClientId: map.google_client_id || env.GOOGLE_CLIENT_ID || ""
       }
     });
   } catch (err) {
@@ -54,7 +55,8 @@ export async function onRequestPut(context) {
     cardHolder: 'card_holder',
     cardBank: 'card_bank',
     cardSheba: 'card_sheba',
-    cardHelp: 'card_help'
+    cardHelp: 'card_help',
+    googleClientId: 'google_client_id'
   };
 
   try {

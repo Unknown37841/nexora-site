@@ -885,6 +885,40 @@
               </button>
             </form>
           </div>
+
+          <!-- Card 2: Google Sign-In Settings -->
+          <div class="card" style="max-width:700px;margin:24px auto 0;">
+            <div class="card-head">
+              <div class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+                <span>تنظیمات ورود مستقیم با گوگل (Google Sign-In / Gmail)</span>
+              </div>
+            </div>
+
+            <form id="googleSettingsForm">
+              <div class="form-group">
+                <label>شناسه کلاینت گوگل (Google Client ID)</label>
+                <input type="text" id="setGoogleClientId" class="form-input" placeholder="مثال: 123456789-xxxxxxxx.apps.googleusercontent.com" dir="ltr">
+                <div style="font-size:0.75rem;color:var(--text-mute);margin-top:6px;line-height:1.6;">
+                  با وارد کردن این شناسه، دکمه رسمی «ورود سریع با حساب گوگل» در سایت فعال شده و کاربران می‌توانند با یک کلیک و بدون نیاز به رمز وارد حسابشان شوند.
+                </div>
+              </div>
+
+              <div style="background:var(--surface-2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:0.8rem;line-height:1.7;color:var(--text-soft);border:1px solid var(--surface-border);">
+                <div style="font-weight:700;color:var(--text);margin-bottom:6px;">📌 راهنمای کوتاه دریافت Google Client ID:</div>
+                ۱. وارد کنسول گوگل شوید: <a href="https://console.cloud.google.com" target="_blank" style="color:var(--primary);text-decoration:underline;">console.cloud.google.com</a><br>
+                ۲. یک پروژه بسازید و از منوی <b>APIs &amp; Services → Credentials</b> دکمه <b>Create Credentials → OAuth client ID</b> را بزنید.<br>
+                ۳. نوع را <b>Web application</b> انتخاب کنید و در بخش <b>Authorized JavaScript origins</b> آدرس‌های زیر را اضافه کنید:<br>
+                &nbsp;&nbsp;• <code>https://noor.kdns.fr</code><br>
+                &nbsp;&nbsp;• <code>https://nexora-site-8wi.pages.dev</code><br>
+                ۴. شناسه (Client ID) تولیدشده را کپی کنید، در کادر بالا قرار دهید و دکمه ذخیره را بزنید.
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="saveGoogleSettingsBtn" style="width:100%;padding:12px;">
+                ذخیره شناسه گوگل
+              </button>
+            </form>
+          </div>
         </section>
 
       </div>
@@ -1210,6 +1244,15 @@
             <div class="form-group" style="grid-column:1/-1;">
               <label>زیرعنوان (توضیح کوتاه کارت)</label>
               <input type="text" id="cmSubtitle" class="form-input" placeholder="مثلاً: راه‌اندازی کامل ChatGPT و ابزارها بدون محدودیت روی سیستم شخصی">
+            </div>
+            <div class="form-group" style="grid-column:1/-1;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.3);padding:10px 14px;border-radius:10px;">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0;font-weight:700;color:#f59e0b;">
+                <input type="checkbox" id="cmComingSoon" style="width:18px;height:18px;accent-color:#f59e0b;">
+                <span>⏳ دوره در وضعیت «به زودی» (عدم نمایش قیمت در سایت و غیرفعال‌سازی موقت خرید)</span>
+              </label>
+              <div style="font-size:0.75rem;color:var(--text-mute);margin-top:4px;">
+                با فعال بودن این گزینه، دوره با نشان «به زودی» و بدون قیمت نمایش می‌یابد و کاربران می‌توانند سرفصل‌ها را مشاهده کنند. هر زمان آماده شد، کافیست تیک را بردارید تا دکمه خرید فعال شود.
+              </div>
             </div>
             <div class="form-group">
               <label>قیمت (تومان) *</label>
@@ -1884,6 +1927,7 @@
       $('courseModalForm').reset();
       $('cmId').value = '';
       $('cmActive').checked = true;
+      $('cmComingSoon').checked = true;
       $('cmIconData').value = '';
       $('cmCoverData').value = '';
       $('cmIconImg').style.display = 'none';
@@ -1940,6 +1984,7 @@
       $('cmLongDesc').value = c.long_description || '';
       $('cmFeatures').value = c.features || '';
       $('cmActive').checked = c.active !== 0;
+      $('cmComingSoon').checked = c.coming_soon !== 0;
 
       // Populate Syllabus
       try {
@@ -2084,6 +2129,7 @@
         course_faq: JSON.stringify(currentFaqs),
         roadmap_step: parseInt($('cmRoadmapStep').value, 10) || null,
         roadmap_title: $('cmRoadmapTitle').value.trim(),
+        coming_soon: $('cmComingSoon').checked,
         active: $('cmActive').checked
       };
 
@@ -3025,6 +3071,9 @@
         $('setCardBank').value = bankSettings.cardBank || '';
         $('setCardSheba').value = bankSettings.cardSheba || '';
         $('setCardHelp').value = bankSettings.cardHelp || '';
+        if ($('setGoogleClientId')) {
+          $('setGoogleClientId').value = bankSettings.googleClientId || '';
+        }
 
         updateCardPreview();
       }
@@ -3062,6 +3111,24 @@
         updateCardPreview();
       } else {
         toast(data.error || 'خطا در ذخیره تنظیمات', 'error');
+      }
+    });
+
+    $('googleSettingsForm')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      const googleClientId = $('setGoogleClientId').value.trim();
+      const btn = $('saveGoogleSettingsBtn');
+      btn.disabled = true;
+      btn.textContent = 'در حال ذخیره…';
+
+      const { ok, data } = await api('/api/payment-settings', 'PUT', { googleClientId });
+      btn.disabled = false;
+      btn.textContent = 'ذخیره شناسه گوگل';
+
+      if (ok && data.ok) {
+        toast('شناسه گوگل (Google Client ID) با موفقیت ذخیره شد ✓', 'success');
+      } else {
+        toast(data.error || 'خطا در ذخیره تنظیمات گوگل', 'error');
       }
     });
 

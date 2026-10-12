@@ -12,7 +12,8 @@ export async function onRequestGet(context) {
             level, duration, lessons_count, icon_url, cover_url, gallery_images,
             features, prerequisites, custom_tabs, syllabus, hardware_requirements,
             what_you_will_learn, video_teaser_url, instructor_name, instructor_role,
-            instructor_bio, instructor_avatar, course_faq, roadmap_step, roadmap_title
+            instructor_bio, instructor_avatar, course_faq, roadmap_step, roadmap_title,
+            coming_soon
      FROM courses
      WHERE active = 1
      ORDER BY sort_order ASC, created_at ASC`
@@ -21,6 +22,7 @@ export async function onRequestGet(context) {
   const courses = (results || []).map((c) => ({
     ...c,
     price: Number(c.price),
+    coming_soon: Number(c.coming_soon ?? 1) === 1,
     active: true,
   }));
 
