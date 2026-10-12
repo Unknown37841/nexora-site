@@ -4225,13 +4225,23 @@
   // ---- Logout ----
   $('logoutBtn').addEventListener('click', doLogout);
   $('accAdminBtn').addEventListener('click', () => { closeModal(); openAdmin(); });
+  function closeAdmin() {}
   async function doLogout() {
-    await api('/api/logout', 'POST');
+    try {
+      await api('/api/logout', 'POST');
+    } catch (e) {
+      console.warn('Logout error:', e);
+    }
     currentUser = null;
+    if (typeof userOrders !== 'undefined') userOrders = [];
+    if (window.google && google.accounts && google.accounts.id) {
+      try { google.accounts.id.disableAutoSelect(); } catch (_) {}
+    }
     updateAuthUI();
-    closeAdmin();
     closeModal();
-    gToast('از حساب خارج شدید.', 'info');
+    if (typeof closeAppPages === 'function') closeAppPages();
+    if (typeof closeMobileMenu === 'function') closeMobileMenu();
+    gToast('از حساب کاربری خارج شدید 👋', 'info');
   }
 
   // ================= Google Sign-In =================
