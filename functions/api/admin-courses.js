@@ -13,7 +13,7 @@ function validateImage(v, label) {
   if (s.length > MAX_IMAGE_CHARS) {
     throw new Error(`حجم ${label} زیاد است (حداکثر حدود ۷۰۰ کیلوبایت).`);
   }
-  if (!/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/.test(s)) {
+  if (!/^data:image\/(png|jpe?g|webp|gif|svg\+xml);base64,/i.test(s) && !/^https?:\/\//i.test(s) && !s.startsWith('/')) {
     throw new Error(`فرمت ${label} معتبر نیست.`);
   }
   return s;
@@ -148,6 +148,20 @@ export async function onRequestPut(context) {
     .bind(id)
     .first();
   if (!existing) return jsonError("دوره پیدا نشد.", 404);
+
+  // تغییر سریع وضعیت به‌زودی (خروج از به‌زودی یا بازگشت به آن)
+  if (body.action === "toggle_coming_soon" || ("coming_soon" in body && !body.title)) {
+    const cs = body.coming_soon === false || body.coming_soon === 0 ? 0 : 1;
+    await env.DB.prepare("UPDATE courses SET coming_soon = ? WHERE id = ?").bind(cs, id).run();
+    return jsonResponse({ ok: true, coming_soon: cs });
+  }
+
+  // تغییر سریع فعال / غیرفعال بودن دوره
+  if (body.action === "toggle_active" || ("active" in body && !body.title)) {
+    const act = body.active === false || body.active === 0 ? 0 : 1;
+    await env.DB.prepare("UPDATE courses SET active = ? WHERE id = ?").bind(act, id).run();
+    return jsonResponse({ ok: true, active: act });
+  }
 
   const title = cleanText(body.title, 160);
   if (!title) return jsonError("عنوان دوره الزامی است.", 400);
