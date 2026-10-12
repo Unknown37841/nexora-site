@@ -1848,7 +1848,7 @@
 
   /* Google Auth Button & Divider */
   .auth-divider {
-    display: flex; align-items: center; margin: 16px 0 12px;
+    display: flex; align-items: center; margin: 14px 0 10px;
     color: var(--text-mute); font-size: 0.76rem;
   }
   .auth-divider::before, .auth-divider::after {
@@ -1856,7 +1856,7 @@
   }
   .auth-divider span { padding: 0 10px; }
   .google-auth-box {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     background: rgba(99, 102, 241, 0.05);
     border: 1px solid rgba(99, 102, 241, 0.22);
     border-radius: var(--radius-sm);
@@ -1884,6 +1884,47 @@
   .google-auth-note {
     font-size: 0.74rem; color: var(--text-mute);
     margin-top: 7px; line-height: 1.4;
+  }
+  .auth-alt-details {
+    margin-top: 8px;
+    border: 1px dashed var(--surface-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: rgba(255,255,255,0.015);
+    transition: all 0.25s ease;
+  }
+  .auth-alt-details[open] {
+    border-style: solid;
+    border-color: rgba(99, 102, 241, 0.25);
+    background: var(--surface);
+  }
+  .auth-alt-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-mute);
+    user-select: none;
+    list-style: none;
+    transition: color 0.2s;
+  }
+  .auth-alt-summary::-webkit-details-marker { display: none; }
+  .auth-alt-summary:hover {
+    color: var(--text);
+  }
+  .auth-alt-chevron {
+    font-size: 0.85rem;
+    transition: transform 0.25s ease;
+  }
+  .auth-alt-details[open] .auth-alt-chevron {
+    transform: rotate(180deg);
+  }
+  .auth-alt-body {
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--surface-border);
   }
   .auth-submit-secondary {
     background: var(--surface);
@@ -2564,24 +2605,30 @@
         </div>
       </div>
 
-      <div class="auth-divider"><span>یا ورود با ایمیل و رمز (روش دوم)</span></div>
-
-      <!-- روش دوم: ایمیل و رمز عبور -->
-      <form id="loginForm" novalidate>
-        <div class="form-group">
-          <label for="loginEmail">ایمیل</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
-          <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
+      <!-- روش دوم: بازشونده برای ایمیل و رمز -->
+      <details class="auth-alt-details" id="loginAltDetails">
+        <summary class="auth-alt-summary">
+          <span>یا ورود با ایمیل و رمز عبور (روش دوم)</span>
+          <span class="auth-alt-chevron">▾</span>
+        </summary>
+        <div class="auth-alt-body">
+          <form id="loginForm" novalidate>
+            <div class="form-group">
+              <label for="loginEmail">ایمیل</label>
+              <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
+              <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">رمز عبور</label>
+              <input type="password" id="loginPassword" placeholder="رمز عبور" autocomplete="current-password" dir="ltr">
+              <div class="field-error">لطفاً رمز عبور را وارد کنید.</div>
+            </div>
+            <button type="submit" class="auth-submit auth-submit-secondary" id="loginSubmit">ارسال کد ورود به ایمیل</button>
+            <div style="font-size:0.72rem;color:var(--text-mute);text-align:center;margin-top:5px;">کد ۶ رقمی ورود به ایمیل ارسال می‌شود</div>
+            <div class="auth-toast" id="loginToast"></div>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="loginPassword">رمز عبور</label>
-          <input type="password" id="loginPassword" placeholder="رمز عبور" autocomplete="current-password" dir="ltr">
-          <div class="field-error">لطفاً رمز عبور را وارد کنید.</div>
-        </div>
-        <button type="submit" class="auth-submit auth-submit-secondary" id="loginSubmit">ارسال کد ورود به ایمیل</button>
-        <div style="font-size:0.73rem;color:var(--text-mute);text-align:center;margin-top:6px;">کد ۶ رقمی ورود به ایمیل شما ارسال می‌شود</div>
-        <div class="auth-toast" id="loginToast"></div>
-      </form>
+      </details>
 
       <div class="switch-link">حساب ندارید؟ <a id="gotoRegister">ثبت‌نام کنید</a></div>
     </div>
@@ -2603,34 +2650,40 @@
         </div>
       </div>
 
-      <div class="auth-divider"><span>یا ساخت دستی حساب کاربری (روش دوم)</span></div>
-
-      <!-- روش دوم: ثبت‌نام دستی با فرم -->
-      <form id="registerForm" novalidate>
-        <div class="form-group">
-          <label for="regName">یوزرنیم (نام کاربری)</label>
-          <input type="text" id="regName" placeholder="مثلاً sara_m" autocomplete="username">
-          <div class="field-error">لطفاً یوزرنیم خود را وارد کنید.</div>
+      <!-- روش دوم: بازشونده برای ساخت دستی حساب -->
+      <details class="auth-alt-details" id="regAltDetails">
+        <summary class="auth-alt-summary">
+          <span>یا ساخت دستی حساب کاربری (روش دوم)</span>
+          <span class="auth-alt-chevron">▾</span>
+        </summary>
+        <div class="auth-alt-body">
+          <form id="registerForm" novalidate>
+            <div class="form-group">
+              <label for="regName">یوزرنیم (نام کاربری)</label>
+              <input type="text" id="regName" placeholder="مثلاً sara_m" autocomplete="username">
+              <div class="field-error">لطفاً یوزرنیم خود را وارد کنید.</div>
+            </div>
+            <div class="form-group">
+              <label for="regEmail">ایمیل</label>
+              <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
+              <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
+            </div>
+            <div class="form-group">
+              <label for="regPassword">رمز عبور</label>
+              <input type="password" id="regPassword" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" dir="ltr">
+              <div class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</div>
+            </div>
+            <div class="form-group">
+              <label for="regPassword2">تکرار رمز عبور</label>
+              <input type="password" id="regPassword2" placeholder="تکرار رمز عبور" autocomplete="new-password" dir="ltr">
+              <div class="field-error">رمزهای عبور یکسان نیستند.</div>
+            </div>
+            <button type="submit" class="auth-submit auth-submit-secondary">ارسال کد تأیید و ساخت حساب</button>
+            <div style="font-size:0.72rem;color:var(--text-mute);text-align:center;margin-top:5px;">کد فعال‌سازی به ایمیل ارسال خواهد شد</div>
+            <div class="auth-toast" id="regToast"></div>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="regEmail">ایمیل</label>
-          <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email" dir="ltr">
-          <div class="field-error">لطفاً یک ایمیل معتبر وارد کنید.</div>
-        </div>
-        <div class="form-group">
-          <label for="regPassword">رمز عبور</label>
-          <input type="password" id="regPassword" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password" dir="ltr">
-          <div class="field-error">رمز عبور باید حداقل ۶ کاراکتر باشد.</div>
-        </div>
-        <div class="form-group">
-          <label for="regPassword2">تکرار رمز عبور</label>
-          <input type="password" id="regPassword2" placeholder="تکرار رمز عبور" autocomplete="new-password" dir="ltr">
-          <div class="field-error">رمزهای عبور یکسان نیستند.</div>
-        </div>
-        <button type="submit" class="auth-submit auth-submit-secondary">ارسال کد تأیید و ساخت حساب</button>
-        <div style="font-size:0.73rem;color:var(--text-mute);text-align:center;margin-top:6px;">کد فعال‌سازی به ایمیل ارسال خواهد شد</div>
-        <div class="auth-toast" id="regToast"></div>
-      </form>
+      </details>
 
       <div class="switch-link">قبلاً ثبت‌نام کرده‌اید؟ <a id="gotoLogin">وارد شوید</a></div>
     </div>
